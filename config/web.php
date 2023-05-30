@@ -1,5 +1,7 @@
 <?php
 
+use app\assets\MainAsset;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -11,6 +13,7 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'layout' => 'mainy',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -42,14 +45,23 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
+/*        'assetManager' => [
+            'bundles' => [
+                MainAsset::class => [
+                    'css' => [
+                        'app.min.css',
+                    ],
+                ],
+            ],
+        ],*/
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+
     ],
     'params' => $params,
 ];
