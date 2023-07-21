@@ -2,6 +2,16 @@
 
 namespace app\controllers;
 
+use app\helpers\Utils;
+use app\models\Anagrafica;
+use app\models\Conto;
+use app\models\ContoCessionario;
+use app\models\Distretto;
+use app\models\enums\FileParisi;
+use app\models\Gruppo;
+use app\models\Istanza;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Box\Spout\Reader\XLSX\Sheet;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -116,12 +126,114 @@ class SiteController extends Controller
         ]);
     }
 
+
+    public function actionImport()
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $path = '../import/out3.xlsx';
+        $reader = ReaderEntityFactory::createReaderFromFile($path);
+        $reader->open($path);
+        $header = null;
+        $rowIndex = 0;
+        ContoCessionario::deleteAll();
+        Conto::deleteAll();
+        Istanza::deleteAll();
+        Anagrafica::deleteAll();
+        Gruppo::deleteAll();
+        $errors = [];
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+            /* @var Sheet $sheet */
+            foreach ($sheet->getRowIterator() as $row) {
+                $newRow = [];
+                foreach ($row->getCells() as $idxcel => $cel) {
+                    $newRow[$idxcel] = $cel->getValue();
+                }
+                if ($rowIndex === 0) {
+                    foreach ($newRow as $idx => $cell)
+                        $header[$cell] = $idx;
+                } else if ($newRow[$header[FileParisi::CHIUSO]] !== "") {
+                    $cessionario = null;
+                    $distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
+                    $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
+                    if (!$gruppo) {
+                        $gruppo = new Gruppo();
+                        $gruppo->descrizione_gruppo_old = substr($newRow[$header[FileParisi::GRUPPO]], 0, 1);
+                        $gruppo->descrizione_gruppo = $gruppo->descrizione_gruppo_old;
+                        $gruppo->save();
+                        $errors = array_merge($errors,$gruppo->errors);
+                    }
+                    $disabile = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_DISABILE]]]);
+                    if (!$disabile) {
+                        $disabile = new Anagrafica();
+                        $disabile->codice_fiscale = $newRow[$header[FileParisi::CF_DISABILE]];
+                        $disabile->cognome_nome = $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]];
+                        // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
+                        $disabile->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
+                        $disabile->save();
+                        $errors = array_merge($errors,$disabile->errors);
+                    }
+                    if ($newRow[$header[FileParisi::CF_CESSIONARIO]] !== "") {
+                        $cessionario = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_CESSIONARIO]]]);
+                        if (!$cessionario) {
+                            $cessionario = new Anagrafica();
+                            $cessionario->codice_fiscale = $newRow[$header[FileParisi::CF_CESSIONARIO]];
+                            $cessionario->cognome_nome = $newRow[$header[FileParisi::CESSIONARIO_NOME_COGNOME]];
+                            // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
+                            $cessionario->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
+                            $cessionario->save();
+                            $errors = array_merge($errors,$cessionario->errors);
+                        }
+                    }
+                    if ($disabile && $distretto && $gruppo) {
+                        $istanza = new Istanza();
+                        $istanza->id_distretto = $distretto->id;
+                        $istanza->riconosciuto = 1;
+                        $istanza->id_gruppo = $gruppo->id;
+                        $istanza->id_anagrafica_disabile = $disabile->id;
+                        $istanza->attivo = $newRow[$header[FileParisi::ATTIVO]] === "SI" ? 1 : 0;
+                        $istanza->data_decesso = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::DISABILE_DATA_DECESSO]]);
+                        if ($istanza->data_decesso)
+                            $istanza->attivo = 0;
+                        $istanza->note = $newRow[$header[FileParisi::NOTE]] . "<br />" . $newRow[$header[FileParisi::NOTE_ESCLUSIONE]] . "<br />" . $newRow[$header[FileParisi::NOTA_ALLERT]];
+                        $istanza->nota_chiusura = $newRow[$header[FileParisi::NOTA_CHIUSO]];
+                        $istanza->save();
+                        $errors = array_merge($errors,$istanza->errors);
+                        $conto = new Conto();
+                        $conto->id_istanza = $istanza->id;
+                        if ($cessionario)
+                            $conto->iban = $newRow[$header[FileParisi::IBAN]];
+                        if ($conto->iban !== "" || !$cessionario)
+                            $conto->iban = $newRow[$header[FileParisi::DISABILE_IBAN]];
+                        $conto->save();
+                        $errors = array_merge($errors,$conto->errors);
+                        $contoCessionario = new ContoCessionario();
+                        $contoCessionario->id_conto = $conto->id;
+                        if ($cessionario)
+                            $contoCessionario->id_cessionario = $cessionario->id;
+                        else
+                            $contoCessionario->id_cessionario = $disabile->id;
+                        $contoCessionario->save();
+                        $errors = array_merge($errors,$contoCessionario->errors);
+                    }
+                    if (count($errors) >0)
+                    {
+                       echo ("errore");
+                    }
+                }
+                $rowIndex++;
+            }
+        }
+    }
+
     /**
      * Displays about page.
      *
      * @return string
      */
-    public function actionAbout()
+    public
+    function actionAbout()
     {
         return $this->render('about');
     }
