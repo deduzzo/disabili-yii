@@ -8,8 +8,10 @@ use app\models\Conto;
 use app\models\ContoCessionario;
 use app\models\Distretto;
 use app\models\enums\FileParisi;
+use app\models\enums\PagamentiConElenchi;
 use app\models\Gruppo;
 use app\models\Istanza;
+use app\models\Pagamento;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Yii;
@@ -126,12 +128,47 @@ class SiteController extends Controller
         ]);
     }
 
-
     public function actionImport()
+    {
+        //$parisiOk = $this->importaFileParisi('../import/out3.xlsx');
+        $conElenchi = $this->importaFileConElenchi('../import/pagamenti/con_elenchi/al 30-06-2023_con_elenchi.xlsx');
+    }
+
+    public function importaFileConElenchi($path)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
-        $path = '../import/out3.xlsx';
+        $reader = ReaderEntityFactory::createReaderFromFile($path);
+        $reader->open($path);
+        $header = null;
+        $rowIndex = 0;
+        Pagamento::deleteAll();
+        $errors = [];
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+            /* @var Sheet $sheet */
+            foreach ($sheet->getRowIterator() as $row) {
+                $newRow = [];
+                foreach ($row->getCells() as $idxcel => $cel) {
+                    $newRow[$idxcel] = $cel->getValue();
+                }
+                if ($rowIndex === 0) {
+                    foreach ($newRow as $idx => $cell)
+                        $header[$cell] = $idx;
+                } else if ($newRow[$header[PagamentiConElenchi::IMPORTO]] !== "") {
+
+                }
+                $rowIndex++;
+            }
+        }
+
+    }
+
+
+    public function importaFileParisi($path)
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
         $reader = ReaderEntityFactory::createReaderFromFile($path);
         $reader->open($path);
         $header = null;
@@ -162,7 +199,7 @@ class SiteController extends Controller
                         $gruppo->descrizione_gruppo_old = substr($newRow[$header[FileParisi::GRUPPO]], 0, 1);
                         $gruppo->descrizione_gruppo = $gruppo->descrizione_gruppo_old;
                         $gruppo->save();
-                        $errors = array_merge($errors,$gruppo->errors);
+                        $errors = array_merge($errors, $gruppo->errors);
                     }
                     $disabile = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_DISABILE]]]);
                     if (!$disabile) {
@@ -172,7 +209,7 @@ class SiteController extends Controller
                         // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
                         $disabile->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
                         $disabile->save();
-                        $errors = array_merge($errors,$disabile->errors);
+                        $errors = array_merge($errors, $disabile->errors);
                     }
                     if ($newRow[$header[FileParisi::CF_CESSIONARIO]] !== "") {
                         $cessionario = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_CESSIONARIO]]]);
@@ -183,7 +220,7 @@ class SiteController extends Controller
                             // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
                             $cessionario->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
                             $cessionario->save();
-                            $errors = array_merge($errors,$cessionario->errors);
+                            $errors = array_merge($errors, $cessionario->errors);
                         }
                     }
                     if ($disabile && $distretto && $gruppo) {
@@ -199,7 +236,7 @@ class SiteController extends Controller
                         $istanza->note = $newRow[$header[FileParisi::NOTE]] . "<br />" . $newRow[$header[FileParisi::NOTE_ESCLUSIONE]] . "<br />" . $newRow[$header[FileParisi::NOTA_ALLERT]];
                         $istanza->nota_chiusura = $newRow[$header[FileParisi::NOTA_CHIUSO]];
                         $istanza->save();
-                        $errors = array_merge($errors,$istanza->errors);
+                        $errors = array_merge($errors, $istanza->errors);
                         $conto = new Conto();
                         $conto->id_istanza = $istanza->id;
                         if ($cessionario)
@@ -207,7 +244,7 @@ class SiteController extends Controller
                         if ($conto->iban !== "" || !$cessionario)
                             $conto->iban = $newRow[$header[FileParisi::DISABILE_IBAN]];
                         $conto->save();
-                        $errors = array_merge($errors,$conto->errors);
+                        $errors = array_merge($errors, $conto->errors);
                         $contoCessionario = new ContoCessionario();
                         $contoCessionario->id_conto = $conto->id;
                         if ($cessionario)
@@ -215,16 +252,19 @@ class SiteController extends Controller
                         else
                             $contoCessionario->id_cessionario = $disabile->id;
                         $contoCessionario->save();
-                        $errors = array_merge($errors,$contoCessionario->errors);
+                        $errors = array_merge($errors, $contoCessionario->errors);
                     }
-                    if (count($errors) >0)
-                    {
-                       echo ("errore");
+                    if (count($errors) > 0) {
+                        echo("errore");
                     }
                 }
                 $rowIndex++;
             }
         }
+        if (count($errors) > 0)
+            return false;
+        else
+            return true;
     }
 
     /**

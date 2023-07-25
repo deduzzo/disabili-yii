@@ -30,12 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'cognome',
+            'cognome_nome',
             'nome',
             'codice_fiscale',
             'data_nascita',
             //'comune_nascita',
-            //'attivo',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Anagrafica $model, $key, $index, $column) {

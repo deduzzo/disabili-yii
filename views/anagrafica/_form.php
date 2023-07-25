@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'cognome')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'cognome_nome')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'nome')->textInput(['maxlength' => true]) ?>
 
@@ -22,7 +22,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'comune_nascita')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'attivo')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

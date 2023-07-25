@@ -1,0 +1,1007 @@
+{
+  "ultimiFiles": {
+    "filePathParisi": "parisi/20211217.xlsx",
+    "pathPagamentiConElenchi": "pagamenti/conElenchi/",
+    "pathPagamentiConIban": "pagamenti/conIban/",
+    "pathRicoveri": "ricoveri/",
+    "fileCundari": "altro/anagrafica-cundari.xlsx"
+  },
+  "operazioniLog": [
+    {
+      "descrizioneOperazione": "Login",
+      "tipoOperazione": "sistema"
+    },
+    {
+      "descrizioneOperazione": "Crea Nota",
+      "tipoOperazione": "crea"
+    },
+    {
+      "descrizioneOperazione": "Modifica Nota",
+      "tipoOperazione": "modifica"
+    }
+  ],
+  "gruppi": [
+    {
+      "dataInizioBenefici": "01/03/2017",
+      "descrizioneGruppoOld": "1",
+      "descrizioneGruppo": "2017-1"
+    },
+    {
+      "dataInizioBenefici": "01/10/2017",
+      "descrizioneGruppoOld": "2",
+      "descrizioneGruppo": "2017-2"
+    },
+    {
+      "dataInizioBenefici": "01/04/2019",
+      "descrizioneGruppoOld": "3",
+      "descrizioneGruppo": "2019-1"
+    },
+    {
+      "dataInizioBenefici": "01/04/2020",
+      "descrizioneGruppoOld": "4",
+      "descrizioneGruppo": "2020-1"
+    },
+    {
+      "dataInizioBenefici": "01/04/2021",
+      "descrizioneGruppoOld": "5",
+      "descrizioneGruppo": "2021-1"
+    }
+  ],
+  "distretti": [
+    {
+      "nome": "Barcellona"
+    },
+    {
+      "nome": "Lipari"
+    },
+    {
+      "nome": "Messina"
+    },
+    {
+      "nome": "Milazzo"
+    },
+    {
+      "nome": "Mistretta"
+    },
+    {
+      "nome": "Patti"
+    },
+    {
+      "nome": "S. Agata M."
+    },
+    {
+      "nome": "Taormina"
+    }
+  ],
+  "tipologiaCodiciEsterni": [
+    "conto",
+    "elencoPagamento",
+    "istanza"
+  ],
+  "piattaformeEsterne": [
+    {
+      "_id": 1,
+      "nomePiattaforma": "Dedalus PUA",
+      "proprietario": "Dedalus"
+    },
+    {
+      "_id": 2,
+      "nomePiattaforma": "C4H",
+      "proprietario": "Dedalus"
+    },
+    {
+      "_id": 3,
+      "nomePiattaforma": "Disabili",
+      "proprietario": "Dott. Parisi"
+    }
+  ],
+  "decreti": [
+    {
+      "_id": 1,
+      "atto": "DDG 1340",
+      "del": "25/05/2017",
+      "note": "1° gruppo"
+    },
+    {
+      "_id": 2,
+      "atto": "DDG 412",
+      "del": "09/03/2018",
+      "note": "2° gruppo"
+    },
+    {
+      "_id": 3,
+      "atto": "DDG 1057",
+      "del": "04/06/2018"
+    },
+    {
+      "_id": 4,
+      "atto": "Bonifico 4958",
+      "del": "27/07/2018"
+    },
+    {
+      "_id": 5,
+      "atto": "Bonifico 4959",
+      "del": "27/07/2018"
+    },
+    {
+      "_id": 6,
+      "atto": "Bonifico 4960",
+      "del": "27/07/2018"
+    },
+    {
+      "_id": 7,
+      "atto": "Nota 78492",
+      "del": "23/10/2018"
+    },
+    {
+      "_id": 8,
+      "atto": "DDG 2394",
+      "del": "26/11/2018"
+    },
+    {
+      "_id": 9,
+      "atto": "DDG 420",
+      "del": "28/03/2019"
+    },
+    {
+      "_id": 10,
+      "atto": "DDG 862",
+      "del": "22/05/2019",
+      "note": "1° e 2° gruppo"
+    },
+    {
+      "_id": 11,
+      "atto": "DDS 1331",
+      "del": "25/07/2019",
+      "note": "3° gruppo dal 1/04 al 30/09, 1° e 2° dal 1/07 al 30/09"
+    },
+    {
+      "_id": 12,
+      "atto": "DDS 1639",
+      "del": "30/09/2019"
+    },
+    {
+      "_id": 13,
+      "atto": "DDS 2031",
+      "del": "25/11/2019"
+    },
+    {
+      "_id": 14,
+      "atto": "DDS 66",
+      "del": "05/02/2020"
+    },
+    {
+      "_id": 15,
+      "atto": "DRS 253",
+      "del": "16/03/2020"
+    },
+    {
+      "_id": 16,
+      "atto": "DRS 385",
+      "del": "27/04/2020"
+    },
+    {
+      "_id": 17,
+      "atto": "DRS 502",
+      "del": "22/05/2020"
+    },
+    {
+      "_id": 18,
+      "atto": "DRS 681",
+      "del": "22/06/2020"
+    },
+    {
+      "_id": 19,
+      "atto": "DRS 786",
+      "del": "13/07/2021"
+    },
+    {
+      "_id": 20,
+      "atto": "DRS 1109",
+      "del": "28/09/2020"
+    },
+    {
+      "_id": 21,
+      "atto": "DRS 1289",
+      "del": "27/10/2020"
+    },
+    {
+      "_id": 22,
+      "atto": "DRS 1537",
+      "del": "27/11/2020",
+      "note": "Comprensivo delle somme per i disabili 2020"
+    },
+    {
+      "_id": 23,
+      "atto": "DRS 1621",
+      "del": "09/12/2020",
+      "note": "Minori già riconosciuti (NOV e DIC e minori 2020)"
+    },
+    {
+      "_id": 24,
+      "atto": "DRS 188",
+      "del": "10/02/2021"
+    },
+    {
+      "_id": 25,
+      "atto": "DRS 477",
+      "del": "31/03/2021"
+    },
+    {
+      "_id": 26,
+      "atto": "DRS 612",
+      "del": "14/04/2021"
+    },
+    {
+      "_id": 27,
+      "atto": "DRS 929",
+      "del": "18/05/2021"
+    },
+    {
+      "_id": 28,
+      "atto": "DRS 1249",
+      "del": "28/06/2021"
+    },
+    {
+      "_id": 29,
+      "atto": "DRS 1423",
+      "del": "19/07/2021"
+    },
+    {
+      "_id": 30,
+      "atto": "DRS 1921",
+      "del": "28/09/2021"
+    },
+    {
+      "_id": 31,
+      "atto": "DRS 2120",
+      "del": "19/10/2021"
+    },
+    {
+      "_id": 32,
+      "atto": "DRS 2544",
+      "del": "30/11/2021"
+    }
+  ],
+  "blocchiPagamento": [
+    {
+      "_id": 1,
+      "dal": "01/03/2017",
+      "al": "31/12/2017",
+      "decretoRiferimento": 1
+    },
+    {
+      "_id": 2,
+      "dal": "01/10/2017",
+      "al": "31/12/2017",
+      "decretoRiferimento": 2
+    },
+    {
+      "_id": 3,
+      "dal": "01/01/2018",
+      "al": "30/04/2018",
+      "decretoRiferimento": 3
+    },
+    {
+      "_id": 4,
+      "dal": "01/05/2018",
+      "al": "30/07/2018",
+      "decretoRiferimento": 4
+    },
+    {
+      "_id": 5,
+      "dal": "01/05/2018",
+      "al": "30/07/2018",
+      "decretoRiferimento": 5
+    },
+    {
+      "_id": 6,
+      "dal": "01/05/2018",
+      "al": "30/07/2018",
+      "decretoRiferimento": 6
+    },
+    {
+      "_id": 7,
+      "dal": "01/08/2018",
+      "al": "31/08/2018",
+      "decretoRiferimento": 7
+    },
+    {
+      "_id": 8,
+      "dal": "01/09/2018",
+      "al": "31/12/2018",
+      "decretoRiferimento": 8
+    },
+    {
+      "_id": 9,
+      "dal": "01/01/2019",
+      "al": "31/03/2019",
+      "decretoRiferimento": 9
+    },
+    {
+      "_id": 10,
+      "dal": "01/04/2019",
+      "al": "30/06/2019",
+      "decretoRiferimento": 10
+    },
+    {
+      "_id": 11,
+      "dal": "01/04/2019",
+      "al": "30/09/2019",
+      "decretoRiferimento": 11
+    },
+    {
+      "_id": 12,
+      "dal": "01/07/2019",
+      "al": "30/09/2019",
+      "decretoRiferimento": 11
+    },
+    {
+      "_id": 13,
+      "dal": "01/10/2019",
+      "al": "31/10/2019",
+      "decretoRiferimento": 12
+    },
+    {
+      "_id": 14,
+      "dal": "01/11/2019",
+      "al": "31/12/2019",
+      "decretoRiferimento": 13
+    },
+    {
+      "_id": 15,
+      "dal": "01/01/2020",
+      "al": "29/02/2020",
+      "decretoRiferimento": 14
+    },
+    {
+      "_id": 16,
+      "dal": "01/03/2020",
+      "al": "31/03/2020",
+      "decretoRiferimento": 15
+    },
+    {
+      "_id": 17,
+      "dal": "01/04/2020",
+      "al": "30/04/2020",
+      "decretoRiferimento": 16
+    },
+    {
+      "_id": 18,
+      "dal": "01/05/2020",
+      "al": "31/05/2020",
+      "decretoRiferimento": 17
+    },
+    {
+      "_id": 19,
+      "dal": "01/06/2020",
+      "al": "30/06/2020",
+      "decretoRiferimento": 18
+    },
+    {
+      "_id": 20,
+      "dal": "01/07/2020",
+      "al": "31/08/2020",
+      "decretoRiferimento": 19
+    },
+    {
+      "_id": 21,
+      "dal": "01/09/2020",
+      "al": "30/09/2020",
+      "decretoRiferimento": 20
+    },
+    {
+      "_id": 22,
+      "dal": "01/10/2020",
+      "al": "31/10/2020",
+      "decretoRiferimento": 21
+    },
+    {
+      "_id": 23,
+      "dal": "01/11/2020",
+      "al": "31/12/2020",
+      "decretoRiferimento": 22,
+      "inclusiMinorenni": false
+    },
+    {
+      "_id": 24,
+      "dal": "01/04/2020",
+      "al": "31/12/2020",
+      "decretoRiferimento": 22,
+      "inclusiMinorenni": false
+    },
+    {
+      "_id": 25,
+      "dal": "01/04/2020",
+      "al": "31/12/2020",
+      "decretoRiferimento": 23,
+      "inclusiMaggiorenni": false
+    },
+    {
+      "_id": 26,
+      "dal": "01/11/2020",
+      "al": "31/12/2020",
+      "decretoRiferimento": 23,
+      "inclusiMaggiorenni": false
+    },
+    {
+      "_id": 27,
+      "dal": "01/01/2021",
+      "al": "31/01/2021",
+      "decretoRiferimento": 24
+    },
+    {
+      "_id": 28,
+      "dal": "01/02/2021",
+      "al": "28/02/2021",
+      "decretoRiferimento": 25
+    },
+    {
+      "_id": 29,
+      "dal": "01/03/2021",
+      "al": "31/03/2021",
+      "decretoRiferimento": 26
+    },
+    {
+      "_id": 30,
+      "dal": "01/04/2021",
+      "al": "31/05/2021",
+      "decretoRiferimento": 27
+    },
+    {
+      "_id": 31,
+      "dal": "01/06/2021",
+      "al": "30/06/2021",
+      "decretoRiferimento": 28
+    },
+    {
+      "_id": 32,
+      "dal": "01/07/2021",
+      "al": "31/08/2021",
+      "decretoRiferimento": 29
+    },
+    {
+      "_id": 33,
+      "dal": "01/09/2021",
+      "al": "30/09/2021",
+      "decretoRiferimento": 30
+    },
+    {
+      "_id": 34,
+      "dal": "01/04/2021",
+      "al": "31/10/2021",
+      "decretoRiferimento": 31
+    },
+    {
+      "_id": 35,
+      "dal": "01/10/2021",
+      "al": "31/10/2021",
+      "decretoRiferimento": 31
+    },
+    {
+      "_id": 36,
+      "dal": "01/11/2021",
+      "al": "31/12/2021",
+      "decretoRiferimento": 32
+    }
+  ],
+  "blocchiPagamentoRef": [
+    {
+      "id": 1,
+      "table": "gruppi",
+      "members": [
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "table": "gruppi",
+      "members": [
+        2
+      ]
+    },
+    {
+      "id": 3,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 4,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 5,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 6,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 7,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 8,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 9,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 10,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 11,
+      "table": "gruppi",
+      "members": [
+        3
+      ]
+    },
+    {
+      "id": 12,
+      "table": "gruppi",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 13,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 14,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 15,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 16,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 17,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 18,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 19,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 20,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 21,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 22,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 23,
+      "table": "gruppi",
+      "members": [
+        4
+      ]
+    },
+    {
+      "id": 24,
+      "table": "gruppi",
+      "members": [
+        4
+      ]
+    },
+    {
+      "id": 25,
+      "table": "gruppi",
+      "members": [
+        4
+      ]
+    },
+    {
+      "id": 26,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 27,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 28,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 29,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 30,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 31,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 32,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 33,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 34,
+      "table": "gruppi",
+      "members": [
+        5
+      ]
+    },
+    {
+      "id": 35,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 36,
+      "table": "gruppi",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "pagamentiDedalus": {
+    "GENNAIO": [
+      {
+        "2020": [
+          {
+            "min": 1000003,
+            "max": 1000017
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1002703,
+            "max": 1003701
+          }
+        ]
+      }
+    ],
+    "FEBBRAIO": [
+      {
+        "2020": [
+          {
+            "min": 1000501,
+            "max": 1000515
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1003801,
+            "max": 1004101
+          }
+        ]
+      }
+    ],
+    "MARZO": [
+      {
+        "2020": [
+          {
+            "min": 1000625,
+            "max": 1000713
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1004501,
+            "max": 1005201
+          }
+        ]
+      }
+    ],
+    "APRILE": [
+      {
+        "2020": [
+          {
+            "min": 1000803,
+            "max": 1000817
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1005301,
+            "max": 1006101
+          },
+          {
+            "min": 1008401,
+            "max": 1008401
+          }
+        ]
+      }
+    ],
+    "MAGGIO": [
+      {
+        "2020": [
+          {
+            "min": 1001005,
+            "max": 1001203
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1006701,
+            "max": 1007401
+          }
+        ]
+      }
+    ],
+    "GIUGNO": [
+      {
+        "2020": [
+          {
+            "min": 1001501,
+            "max": 1001515
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1007501,
+            "max": 1008201
+          }
+        ]
+      }
+    ],
+    "LUGLIO": [
+      {
+        "2020": [
+          {
+            "min": 1001801,
+            "max": 1001815
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1008501,
+            "max": 1009003
+          }
+        ]
+      }
+    ],
+    "AGOSTO": [
+      {
+        "2020": [
+          {
+            "min": 1001935,
+            "max": 1002015
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1009203,
+            "max": 1009501
+          }
+        ]
+      }
+    ],
+    "SETTEMBRE": [
+      {
+        "2020": [
+          {
+            "min": 1002103,
+            "max": 1002119
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1009603,
+            "max": 1010303
+          }
+        ]
+      }
+    ],
+    "OTTOBRE": [
+      {
+        "2020": [
+          {
+            "min": 1002201,
+            "max": 1002225
+          }
+        ]
+      },
+      {
+        "2021": [
+          {
+            "min": 1010403,
+            "max": 1011201
+          }
+        ]
+      }
+    ],
+    "NOVEMBRE": [
+      {
+        "2020": [
+          {
+            "min": 1002401,
+            "max": 1002415
+          }
+        ]
+      }
+    ],
+    "DICEMBRE": [
+      {
+        "2020": [
+          {
+            "min": 1002503,
+            "max": 1002517
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -17,8 +17,8 @@ class AnagraficaSearch extends Anagrafica
     public function rules()
     {
         return [
-            [['id', 'data_nascita', 'attivo'], 'integer'],
-            [['cognome', 'nome', 'codice_fiscale', 'comune_nascita'], 'safe'],
+            [['id', 'data_nascita'], 'integer'],
+            [['cognome_nome', 'nome', 'codice_fiscale', 'comune_nascita'], 'safe'],
         ];
     }
 
@@ -60,10 +60,9 @@ class AnagraficaSearch extends Anagrafica
         $query->andFilterWhere([
             'id' => $this->id,
             'data_nascita' => $this->data_nascita,
-            'attivo' => $this->attivo,
         ]);
 
-        $query->andFilterWhere(['like', 'cognome', $this->cognome])
+        $query->andFilterWhere(['like', 'cognome_nome', $this->cognome_nome])
             ->andFilterWhere(['like', 'nome', $this->nome])
             ->andFilterWhere(['like', 'codice_fiscale', $this->codice_fiscale])
             ->andFilterWhere(['like', 'comune_nascita', $this->comune_nascita]);

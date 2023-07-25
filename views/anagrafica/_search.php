@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'cognome') ?>
+    <?= $form->field($model, 'cognome_nome') ?>
 
     <?= $form->field($model, 'nome') ?>
 
@@ -27,7 +27,6 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'comune_nascita') ?>
 
-    <?php // echo $form->field($model, 'attivo') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

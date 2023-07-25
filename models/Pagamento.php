@@ -11,6 +11,8 @@ use Yii;
  * @property float $importo
  * @property int|null $data
  * @property int|null $is_recupero
+ * @property int|null $periodo_da
+ * @property int|null $periodo_a
  * @property string|null $note
  * @property int $tornato_indietro
  * @property int|null $data_invio_notifica
@@ -38,7 +40,7 @@ class Pagamento extends \yii\db\ActiveRecord
         return [
             [['importo'], 'required'],
             [['importo'], 'number'],
-            [['data', 'is_recupero', 'tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_determina', 'id_conto'], 'integer'],
+            [['data', 'is_recupero', 'periodo_da', 'periodo_a', 'tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_determina', 'id_conto'], 'integer'],
             [['note'], 'string'],
             [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
         ];
@@ -54,6 +56,8 @@ class Pagamento extends \yii\db\ActiveRecord
             'importo' => 'Importo',
             'data' => 'Data',
             'is_recupero' => 'Is Recupero',
+            'periodo_da' => 'Periodo Da',
+            'periodo_a' => 'Periodo A',
             'note' => 'Note',
             'tornato_indietro' => 'Tornato Indietro',
             'data_invio_notifica' => 'Data Invio Notifica',
@@ -66,19 +70,10 @@ class Pagamento extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Determina]].
      *
-     * @return \yii\db\ActiveQuery|DeterminaQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getDetermina()
     {
         return $this->hasOne(Determina::class, ['id' => 'id_determina']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return PagamentoQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new PagamentoQuery(get_called_class());
     }
 }
