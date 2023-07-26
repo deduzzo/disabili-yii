@@ -18,6 +18,7 @@ use Yii;
  *
  * @property ContoCessionario[] $contoCessionarios
  * @property Istanza $istanza
+ * @property Movimento[] $movimentos
  */
 class Conto extends \yii\db\ActiveRecord
 {
@@ -62,7 +63,7 @@ class Conto extends \yii\db\ActiveRecord
     /**
      * Gets query for [[ContoCessionarios]].
      *
-     * @return \yii\db\ActiveQuery|ContoCessionarioQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getContoCessionarios()
     {
@@ -72,7 +73,7 @@ class Conto extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Istanza]].
      *
-     * @return \yii\db\ActiveQuery|IstanzaQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getIstanza()
     {
@@ -80,11 +81,12 @@ class Conto extends \yii\db\ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
-     * @return ContoQuery the active query used by this AR class.
+     * Gets query for [[Movimentos]].
+     *
+     * @return \yii\db\ActiveQuery
      */
-    public static function find()
+    public function getMovimentos()
     {
-        return new ContoQuery(get_called_class());
+        return $this->hasMany(Movimento::class, ['id_conto' => 'id']);
     }
 }
