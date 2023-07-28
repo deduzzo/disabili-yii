@@ -56,19 +56,10 @@ class Isee extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Istanza]].
      *
-     * @return \yii\db\ActiveQuery|IstanzaQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getIstanza()
     {
         return $this->hasOne(Istanza::class, ['id' => 'id_istanza']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return IseeQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new IseeQuery(get_called_class());
     }
 }

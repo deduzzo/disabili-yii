@@ -47,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id_anagrafica_disabile',
             'id_distretto',
             'id_gruppo',
+            'id_caregiver',
         ],
     ]) ?>
 

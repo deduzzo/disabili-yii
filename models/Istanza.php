@@ -8,30 +8,34 @@ use Yii;
  * This is the model class for table "istanza".
  *
  * @property int $id
- * @property int|null $data_inserimento
+ * @property string|null $data_inserimento
  * @property int $riconosciuto
  * @property string|null $classe_disabilita
- * @property int|null $data_riconoscimento
+ * @property string|null $data_riconoscimento
  * @property int|null $patto_di_cura
- * @property int|null $data_firma_patto
+ * @property string|null $data_firma_patto
  * @property int $attivo
- * @property int|null $data_decesso
+ * @property string|null $data_decesso
  * @property int|null $liquidazione_decesso_completata
- * @property int|null $data_liquidazione_decesso
+ * @property string|null $data_liquidazione_decesso
  * @property int|null $chiuso
- * @property int|null $data_chiusura
+ * @property string|null $data_chiusura
  * @property string|null $nota_chiusura
  * @property string|null $note
  * @property int $id_anagrafica_disabile
  * @property int $id_distretto
  * @property int $id_gruppo
+ * @property int|null $id_caregiver
  *
  * @property Anagrafica $anagraficaDisabile
+ * @property Anagrafica $caregiver
  * @property Conto[] $contos
  * @property Distretto $distretto
  * @property Documento[] $documentos
  * @property Gruppo $gruppo
  * @property Isee[] $isees
+ * @property IstanzaLog[] $istanzaLogs
+ * @property Recupero[] $recuperos
  * @property Ricovero[] $ricoveros
  */
 class Istanza extends \yii\db\ActiveRecord
@@ -50,11 +54,13 @@ class Istanza extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['data_inserimento', 'riconosciuto', 'data_riconoscimento', 'patto_di_cura', 'data_firma_patto', 'attivo', 'data_decesso', 'liquidazione_decesso_completata', 'data_liquidazione_decesso', 'chiuso', 'data_chiusura', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'integer'],
+            [['data_inserimento', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura'], 'safe'],
+            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
             [['attivo', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
             [['nota_chiusura', 'note'], 'string'],
             [['classe_disabilita'], 'string', 'max' => 10],
             [['id_anagrafica_disabile'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_anagrafica_disabile' => 'id']],
+            [['id_caregiver'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_caregiver' => 'id']],
             [['id_distretto'], 'exist', 'skipOnError' => true, 'targetClass' => Distretto::class, 'targetAttribute' => ['id_distretto' => 'id']],
             [['id_gruppo'], 'exist', 'skipOnError' => true, 'targetClass' => Gruppo::class, 'targetAttribute' => ['id_gruppo' => 'id']],
         ];
@@ -84,6 +90,7 @@ class Istanza extends \yii\db\ActiveRecord
             'id_anagrafica_disabile' => 'Id Anagrafica Disabile',
             'id_distretto' => 'Id Distretto',
             'id_gruppo' => 'Id Gruppo',
+            'id_caregiver' => 'Id Caregiver',
         ];
     }
 
@@ -95,6 +102,16 @@ class Istanza extends \yii\db\ActiveRecord
     public function getAnagraficaDisabile()
     {
         return $this->hasOne(Anagrafica::class, ['id' => 'id_anagrafica_disabile']);
+    }
+
+    /**
+     * Gets query for [[Caregiver]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCaregiver()
+    {
+        return $this->hasOne(Anagrafica::class, ['id' => 'id_caregiver']);
     }
 
     /**
@@ -145,6 +162,26 @@ class Istanza extends \yii\db\ActiveRecord
     public function getIsees()
     {
         return $this->hasMany(Isee::class, ['id_istanza' => 'id']);
+    }
+
+    /**
+     * Gets query for [[IstanzaLogs]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIstanzaLogs()
+    {
+        return $this->hasMany(IstanzaLog::class, ['id_istanza' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Recuperos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRecuperos()
+    {
+        return $this->hasMany(Recupero::class, ['id_istanza' => 'id']);
     }
 
     /**

@@ -13,6 +13,9 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
+        'options' => [
+            'data-pjax' => 1
+        ],
     ]); ?>
 
     <?= $form->field($model, 'id') ?>
@@ -50,6 +53,8 @@ use yii\widgets\ActiveForm;
     <?php // echo $form->field($model, 'id_distretto') ?>
 
     <?php // echo $form->field($model, 'id_gruppo') ?>
+
+    <?php // echo $form->field($model, 'id_caregiver') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

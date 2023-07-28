@@ -30,11 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
             'descrizione_atto',
             'data',
             'dal',
             'al',
+            'note',
             //'inclusi_minorenni',
             //'inclusi_maggiorenni',
             //'note:ntext',

@@ -11,11 +11,15 @@ use Yii;
  * @property string $cognome_nome
  * @property string|null $nome
  * @property string|null $codice_fiscale
- * @property int|null $data_nascita
+ * @property string|null $data_nascita
  * @property string|null $comune_nascita
+ * @property string|null $indirizzo_residenza
+ * @property string|null $comune_residenza
  *
+ * @property AnagraficaAltricampi[] $anagraficaAltricampis
  * @property ContoCessionario[] $contoCessionarios
  * @property Istanza[] $istanzas
+ * @property Istanza[] $istanzas0
  * @property Residenza[] $residenzas
  */
 class Anagrafica extends \yii\db\ActiveRecord
@@ -35,9 +39,10 @@ class Anagrafica extends \yii\db\ActiveRecord
     {
         return [
             [['cognome_nome'], 'required'],
-            [['data_nascita'], 'integer'],
-            [['cognome_nome', 'nome', 'comune_nascita'], 'string', 'max' => 100],
+            [['data_nascita'], 'safe'],
+            [['cognome_nome', 'nome', 'comune_nascita', 'comune_residenza'], 'string', 'max' => 100],
             [['codice_fiscale'], 'string', 'max' => 20],
+            [['indirizzo_residenza'], 'string', 'max' => 200],
             [['codice_fiscale'], 'unique'],
         ];
     }
@@ -54,7 +59,19 @@ class Anagrafica extends \yii\db\ActiveRecord
             'codice_fiscale' => 'Codice Fiscale',
             'data_nascita' => 'Data Nascita',
             'comune_nascita' => 'Comune Nascita',
+            'indirizzo_residenza' => 'Indirizzo Residenza',
+            'comune_residenza' => 'Comune Residenza',
         ];
+    }
+
+    /**
+     * Gets query for [[AnagraficaAltricampis]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAnagraficaAltricampis()
+    {
+        return $this->hasMany(AnagraficaAltricampi::class, ['id_anagrafica' => 'id']);
     }
 
     /**
@@ -75,6 +92,16 @@ class Anagrafica extends \yii\db\ActiveRecord
     public function getIstanzas()
     {
         return $this->hasMany(Istanza::class, ['id_anagrafica_disabile' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Istanzas0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIstanzas0()
+    {
+        return $this->hasMany(Istanza::class, ['id_caregiver' => 'id']);
     }
 
     /**

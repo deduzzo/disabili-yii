@@ -60,11 +60,11 @@ class Decreto extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'descrizione_atto' => 'Descrizione Atto',
-            'data' => 'Data',
-            'dal' => 'Dal',
-            'al' => 'Al',
-            'inclusi_minorenni' => 'Inclusi Minorenni',
-            'inclusi_maggiorenni' => 'Inclusi Maggiorenni',
+            'data' => 'Data decreto',
+            'dal' => 'Pagamenti dal',
+            'al' => 'Pagamenti al',
+            'inclusi_minorenni' => 'Minorenni inclusi',
+            'inclusi_maggiorenni' => 'Maggiorenni inclusi',
             'note' => 'Note',
         ];
     }

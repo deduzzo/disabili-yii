@@ -11,14 +11,16 @@ use app\models\Istanza;
  */
 class IstanzaSearch extends Istanza
 {
+    public $descrizione_gruppo;
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'data_inserimento', 'riconosciuto', 'data_riconoscimento', 'patto_di_cura', 'data_firma_patto', 'attivo', 'data_decesso', 'liquidazione_decesso_completata', 'data_liquidazione_decesso', 'chiuso', 'data_chiusura', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'integer'],
-            [['classe_disabilita', 'nota_chiusura', 'note'], 'safe'],
+            [['id', 'riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
+            [['data_inserimento', 'classe_disabilita', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura', 'nota_chiusura', 'note'], 'safe'],
+            [['descrizione_gruppo'], 'safe'],
         ];
     }
 
@@ -40,13 +42,25 @@ class IstanzaSearch extends Istanza
      */
     public function search($params)
     {
-        $query = Istanza::find();
+        $query = Istanza::find()->innerJoin('gruppo', 'gruppo.id = istanza.id_gruppo')
+            ->innerJoin('distretto', 'distretto.id = istanza.id_distretto')
+            ->innerJoin('anagrafica anagraficaDisabile', 'anagraficaDisabile.id = istanza.id_anagrafica_disabile');
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $dataProvider->sort->attributes['gruppo.descrizione_gruppo'] = [
+            'asc' => ['gruppo.descrizione_gruppo' => SORT_ASC],
+            'desc' => ['gruppo.descrizione_gruppo' => SORT_DESC],
+        ];
+        $dataProvider->sort->attributes['anagraficaDisabile.cognome_nome'] =
+        [
+            'asc' => ['anagraficaDisabile.cognome_nome' => SORT_ASC],
+            'desc' => ['anagraficaDisabile.cognome_nome' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -73,11 +87,14 @@ class IstanzaSearch extends Istanza
             'id_anagrafica_disabile' => $this->id_anagrafica_disabile,
             'id_distretto' => $this->id_distretto,
             'id_gruppo' => $this->id_gruppo,
+            'id_caregiver' => $this->id_caregiver,
         ]);
 
         $query->andFilterWhere(['like', 'classe_disabilita', $this->classe_disabilita])
             ->andFilterWhere(['like', 'nota_chiusura', $this->nota_chiusura])
-            ->andFilterWhere(['like', 'note', $this->note]);
+            ->andFilterWhere(['like', 'note', $this->note])
+            ->andFilterWhere(['like', 'gruppo.descrizione_gruppo', $this->descrizione_gruppo])
+            ->andFilterWhere(['like', 'anagraficaDisabile.cognome_nome', $this->getAttribute('anagraficaDisabile.cognome_nome')]);
 
         return $dataProvider;
     }

@@ -10,6 +10,7 @@ use app\models\Distretto;
 use app\models\enums\FileParisi;
 use app\models\enums\PagamentiConElenchi;
 use app\models\Gruppo;
+use app\models\Isee;
 use app\models\Istanza;
 use app\models\Pagamento;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
@@ -130,8 +131,9 @@ class SiteController extends Controller
 
     public function actionImport()
     {
-        //$parisiOk = $this->importaFileParisi('../import/out3.xlsx');
-        $conElenchi = $this->importaFileConElenchi('../import/pagamenti/con_elenchi/al 30-06-2023_con_elenchi.xlsx');
+        $parisiOk = $this->importaFileParisi('../import/parisi/out4.xlsx');
+        //$conElenchi = $this->importaFileConElenchi('../import/pagamenti/con_elenchi/al 30-06-2023_con_elenchi.xlsx');
+        echo ($parisiOk);
     }
 
     public function importaFileConElenchi($path)
@@ -173,6 +175,7 @@ class SiteController extends Controller
         $reader->open($path);
         $header = null;
         $rowIndex = 0;
+        Isee::deleteAll();
         ContoCessionario::deleteAll();
         Conto::deleteAll();
         Istanza::deleteAll();
@@ -192,7 +195,9 @@ class SiteController extends Controller
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[FileParisi::CHIUSO]] !== "") {
                     $cessionario = null;
-                    $distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
+                    // find distretto where "nome" Like the first 2 character of $newRow[$header[FileParisi::DISTRETTO]]
+                    $distretto = Distretto::find()->where(['like', 'nome', strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 0, 2)). '%', false])->one();
+                    //$distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
                     $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
                     if (!$gruppo) {
                         $gruppo = new Gruppo();
@@ -207,7 +212,7 @@ class SiteController extends Controller
                         $disabile->codice_fiscale = $newRow[$header[FileParisi::CF_DISABILE]];
                         $disabile->cognome_nome = $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]];
                         // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
-                        $disabile->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
+                        $disabile->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
                         $disabile->save();
                         $errors = array_merge($errors, $disabile->errors);
                     }
@@ -218,7 +223,7 @@ class SiteController extends Controller
                             $cessionario->codice_fiscale = $newRow[$header[FileParisi::CF_CESSIONARIO]];
                             $cessionario->cognome_nome = $newRow[$header[FileParisi::CESSIONARIO_NOME_COGNOME]];
                             // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
-                            $cessionario->data_nascita = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
+                            $cessionario->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
                             $cessionario->save();
                             $errors = array_merge($errors, $cessionario->errors);
                         }
@@ -230,7 +235,7 @@ class SiteController extends Controller
                         $istanza->id_gruppo = $gruppo->id;
                         $istanza->id_anagrafica_disabile = $disabile->id;
                         $istanza->attivo = $newRow[$header[FileParisi::ATTIVO]] === "SI" ? 1 : 0;
-                        $istanza->data_decesso = Utils::convertiDataInTimestamp($newRow[$header[FileParisi::DISABILE_DATA_DECESSO]]);
+                        $istanza->data_decesso = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_DECESSO]]);
                         if ($istanza->data_decesso)
                             $istanza->attivo = 0;
                         $istanza->note = $newRow[$header[FileParisi::NOTE]] . "<br />" . $newRow[$header[FileParisi::NOTE_ESCLUSIONE]] . "<br />" . $newRow[$header[FileParisi::NOTA_ALLERT]];
@@ -253,7 +258,17 @@ class SiteController extends Controller
                             $contoCessionario->id_cessionario = $disabile->id;
                         $contoCessionario->save();
                         $errors = array_merge($errors, $contoCessionario->errors);
+                        if (count($newRow) > $header[FileParisi::ISEE_INF] && $newRow[$header[FileParisi::ISEE_INF]] !== "") {
+                            $isee = new Isee();
+                            $isee->id_istanza = $istanza->id;
+                            $isee->maggiore_25mila = $newRow[$header[FileParisi::ISEE_INF]] === 1 ? 0 : 1;
+                            $isee->valido = 1;
+                            $isee->save();
+                            $errors = array_merge($errors, $isee->errors);
+                        }
                     }
+                    else
+                        $errors[] = "Errore riga " . $rowIndex . ": " . $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]] . " " . $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]];
                     if (count($errors) > 0) {
                         echo("errore");
                     }

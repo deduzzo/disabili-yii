@@ -19,4 +19,14 @@ class Utils
             return null;
         }
     }
+
+    static function convertDateFromFormat($date, $originalFormat = "d/m/Y", $destFormat = "Y-m-d")
+    {
+        if (is_string($date)) {
+            $date = DateTime::createFromFormat($originalFormat, $date);
+        }
+        if ($date === false || get_class($date) != "DateTime") {
+            return null;
+        } else return $date->format($destFormat);
+    }
 }

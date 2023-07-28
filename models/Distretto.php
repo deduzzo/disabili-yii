@@ -39,7 +39,7 @@ class Distretto extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'nome' => 'Nome',
+            'nome' => 'Distretto',
         ];
     }
 

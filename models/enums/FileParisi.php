@@ -35,6 +35,9 @@ class FileParisi extends BaseEnum
     const NOTA_ALLERT = "Nota Allert";
     const NOTA_CHIUSO = "NOTA CHIUSO";
 
+    const ISEE_INF = "isee inf";
+    const ISEE_SUP = "isee sup";
+
 
     /**
      * @var string message category
@@ -75,5 +78,7 @@ class FileParisi extends BaseEnum
         self::NOTE_ESCLUSIONE => 'Note Esclusione',
         self::NOTA_ALLERT => 'Nota Allert',
         self::NOTA_CHIUSO => 'NOTA CHIUSO',
+        self::ISEE_INF => 'isee inf',
+        self::ISEE_SUP => 'isee sup',
     ];
 }
