@@ -12,6 +12,9 @@ use app\models\Istanza;
 class IstanzaSearch extends Istanza
 {
     public $descrizione_gruppo;
+    public $cognomeNome;
+    public $cf;
+
     /**
      * {@inheritdoc}
      */
@@ -42,14 +45,21 @@ class IstanzaSearch extends Istanza
      */
     public function search($params)
     {
+        $this->descrizione_gruppo = $params['IstanzaSearch']['descrizione_gruppo'] ?? null;
+        $this->cognomeNome = $params['IstanzaSearch']['cognomeNome'] ?? null;
+        $this->cf = $params['IstanzaSearch']['cf'] ?? null;
         $query = Istanza::find()->innerJoin('gruppo', 'gruppo.id = istanza.id_gruppo')
             ->innerJoin('distretto', 'distretto.id = istanza.id_distretto')
-            ->innerJoin('anagrafica anagraficaDisabile', 'anagraficaDisabile.id = istanza.id_anagrafica_disabile');
+            ->innerJoin('anagrafica anagraficaDisabile', 'anagraficaDisabile.id = istanza.id_anagrafica_disabile')
+            ->innerJoin('gruppo g', 'g.id = istanza.id_gruppo');
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => isset($params['pageSize']) ? $params['pageSize'] : 100, // Default to 10 if not set
+            ],
         ]);
 
         $dataProvider->sort->attributes['gruppo.descrizione_gruppo'] = [
@@ -57,10 +67,10 @@ class IstanzaSearch extends Istanza
             'desc' => ['gruppo.descrizione_gruppo' => SORT_DESC],
         ];
         $dataProvider->sort->attributes['anagraficaDisabile.cognome_nome'] =
-        [
-            'asc' => ['anagraficaDisabile.cognome_nome' => SORT_ASC],
-            'desc' => ['anagraficaDisabile.cognome_nome' => SORT_DESC],
-        ];
+            [
+                'asc' => ['anagraficaDisabile.cognome_nome' => SORT_ASC],
+                'desc' => ['anagraficaDisabile.cognome_nome' => SORT_DESC],
+            ];
 
         $this->load($params);
 
@@ -68,6 +78,10 @@ class IstanzaSearch extends Istanza
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!isset($this->attivo)) {
+            $this->attivo = 1;
         }
 
         // grid filtering conditions
@@ -93,8 +107,9 @@ class IstanzaSearch extends Istanza
         $query->andFilterWhere(['like', 'classe_disabilita', $this->classe_disabilita])
             ->andFilterWhere(['like', 'nota_chiusura', $this->nota_chiusura])
             ->andFilterWhere(['like', 'note', $this->note])
-            ->andFilterWhere(['like', 'gruppo.descrizione_gruppo', $this->descrizione_gruppo])
-            ->andFilterWhere(['like', 'anagraficaDisabile.cognome_nome', $this->getAttribute('anagraficaDisabile.cognome_nome')]);
+            ->andFilterWhere(['like', 'g.descrizione_gruppo', $this->descrizione_gruppo])
+            ->andFilterWhere(['like', 'anagraficaDisabile.cognome_nome', $this->cognomeNome])
+            ->andFilterWhere(['like', 'anagraficaDisabile.codice_ficale', $this->cf]);
 
         return $dataProvider;
     }

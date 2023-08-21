@@ -36,7 +36,7 @@ CSS) ?>
 		<ul>
 			<li class="menu-item">
 				<a href="<?= Url::base() ?>" class="menu-link">
-					<span><i class="bi bi-grid-fill"></i> Dashboard</span>
+					<span><i class="bi bi-grid-fill"></i> Home</span>
 				</a>
 			</li>
 

@@ -193,4 +193,9 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Ricovero::class, ['id_istanza' => 'id']);
     }
+
+    public function getIsee()
+    {
+
+    }
 }

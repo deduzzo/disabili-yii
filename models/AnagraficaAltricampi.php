@@ -9,12 +9,13 @@ use Yii;
  *
  * @property int $id
  * @property int|null $id_anagrafica
- * @property string|null $tipologia
+ * @property int|null $id_tipologia
  * @property string|null $valore
  * @property string|null $data_inserimento
  * @property int|null $valido
  *
  * @property Anagrafica $anagrafica
+ * @property TipologiaDati $tipologia
  */
 class AnagraficaAltricampi extends \yii\db\ActiveRecord
 {
@@ -32,11 +33,11 @@ class AnagraficaAltricampi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_anagrafica', 'valido'], 'integer'],
+            [['id_anagrafica', 'id_tipologia', 'valido'], 'integer'],
             [['valore'], 'string'],
             [['data_inserimento'], 'safe'],
-            [['tipologia'], 'string', 'max' => 100],
             [['id_anagrafica'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_anagrafica' => 'id']],
+            [['id_tipologia'], 'exist', 'skipOnError' => true, 'targetClass' => TipologiaDati::class, 'targetAttribute' => ['id_tipologia' => 'id']],
         ];
     }
 
@@ -48,7 +49,7 @@ class AnagraficaAltricampi extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'id_anagrafica' => 'Id Anagrafica',
-            'tipologia' => 'Tipologia',
+            'id_tipologia' => 'Id Tipologia',
             'valore' => 'Valore',
             'data_inserimento' => 'Data Inserimento',
             'valido' => 'Valido',
@@ -63,5 +64,15 @@ class AnagraficaAltricampi extends \yii\db\ActiveRecord
     public function getAnagrafica()
     {
         return $this->hasOne(Anagrafica::class, ['id' => 'id_anagrafica']);
+    }
+
+    /**
+     * Gets query for [[Tipologia]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTipologia()
+    {
+        return $this->hasOne(TipologiaDati::class, ['id' => 'id_tipologia']);
     }
 }

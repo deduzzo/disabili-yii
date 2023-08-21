@@ -180,7 +180,7 @@ class SiteController extends Controller
         Conto::deleteAll();
         Istanza::deleteAll();
         Anagrafica::deleteAll();
-        Gruppo::deleteAll();
+        //Gruppo::deleteAll();
         $errors = [];
 
         foreach ($reader->getSheetIterator() as $sheet) {

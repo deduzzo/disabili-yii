@@ -1,0 +1,25 @@
+div .gruppo-1 {
+    color: #f3d91a;
+}
+
+div .gruppo-2 {
+    color: #FF0000;
+}
+
+div .gruppo-3 {
+    color: #d2d2d2;
+}
+
+div .gruppo-4 {
+    color: #1d9d6e;
+}
+
+div .gruppo-5 {
+    color: #b911f3;
+}
+
+@media (max-width: 1000px) {
+    .custom-card-cols {
+        column-count: 1 !important;
+    }
+}

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Istanza;
 use app\models\IstanzaSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -131,4 +132,13 @@ class IstanzaController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    public function actionScheda($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('scheda', [
+            'istanza' => $model,
+        ]);
+    }
+
 }

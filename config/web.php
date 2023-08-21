@@ -62,7 +62,8 @@ $config = [
             ],
         ],
         'formatter' => [
-            'dateFormat' => 'dd/mm/yyyy',
+            'class' => 'yii\i18n\Formatter',
+            'dateFormat' => 'dd/MM/yyyy',
             'decimalSeparator' => ',',
             'thousandSeparator' => ' ',
             'currencyCode' => 'EUR'

@@ -29,7 +29,7 @@ JS) ?>
 			<div class="d-flex justify-content-between align-items-center">
 				<div class="logo">
 					<a href="<?= Url::base() ?>">
-						<img src="<?= "{$themeMazer->baseUrl}/images/logo/logo.svg" ?>" alt="Logo" />
+						<img src="<?= "{$themeMazer->baseUrl}/images/logo/logo.png" ?>" alt="Logo" />
 					</a>
 				</div>
 
@@ -64,44 +64,55 @@ JS) ?>
 				<li class="sidebar-item">
 					<a href="<?= Url::toRoute(['/site/index']) ?>" class="sidebar-link">
 						<i class="bi bi-grid-fill"></i>
-						<span>Dashboard</span>
+						<span>Home</span>
 					</a>
 				</li>
 
 				<li class="sidebar-item has-sub">
 					<a href="#" class="sidebar-link">
-						<i class="bi bi-grid-1x2-fill"></i>
-						<span>Layouts</span>
+						<i class="bi bi-people-fill"></i>
+						<span>Disabili</span>
 					</a>
 					<ul class="submenu">
 						<li class="submenu-item">
-							<a href="?layout=mainy">Vertical Navbar</a>
+							<a href="/istanza">Istanze</a>
 						</li>
-						<li class="submenu-item">
+<!--						<li class="submenu-item">
 							<a href="?layout=mainx">Horizontal Menu</a>
 						</li>
 
 						<li class="submenu-item">
-							<a href="<?= Url::current(['layout' => 'auth', 'render' => '/auth/login']) ?>">LogIn</a>
+							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/login']) */?>">LogIn</a>
 						</li>
 						<li class="submenu-item">
-							<a href="<?= Url::current(['layout' => 'auth', 'render' => '/auth/signup']) ?>">SignUp</a>
+							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/signup']) */?>">SignUp</a>
 						</li>
 						<li class="submenu-item">
-							<a href="<?= Url::current(['layout' => 'auth', 'render' => '/auth/forgot_password']) ?>">Forgot Password</a>
+							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/forgot_password']) */?>">Forgot Password</a>
 						</li>
 						<li class="submenu-item">
-							<a href="<?= Url::current(['layout' => 'auth', 'render' => '/auth/reset_password']) ?>">Reset Password</a>
-						</li>
+							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/reset_password']) */?>">Reset Password</a>
+						</li>-->
 					</ul>
 				</li>
+                <li class="sidebar-item has-sub">
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-gear"></i>
+                        <span>Impostazioni</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a href="/tipologia-dati">Tipologie Dati</a>
+                        </li>
+                    </ul>
+                </li>
 
-				<li class="sidebar-title">Raise Support</li>
+				<!--<li class="sidebar-title">Raise Support</li>-->
 
-				<li class="sidebar-item">
+<!--				<li class="sidebar-item">
 					<a href="https://zuramai.github.io/mazer/docs" class="sidebar-link" target="_blank">
-						<i class="bi bi-life-preserver"></i>
-						<span>Documentation</span>
+						<i class="bi bi-people-fill"></i>
+						<span>Istanze</span>
 					</a>
 				</li>
 
@@ -117,7 +128,7 @@ JS) ?>
 						<i class="bi bi-cash"></i>
 						<span>Donate</span>
 					</a>
-				</li>
+				</li>-->
 			</ul>
 		</div>
 	</div>

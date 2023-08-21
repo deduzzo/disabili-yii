@@ -54,7 +54,7 @@ class Anagrafica extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cognome_nome' => 'Cognome Nome',
+            'cognome_nome' => 'Nominativo',
             'nome' => 'Nome',
             'codice_fiscale' => 'Codice Fiscale',
             'data_nascita' => 'Data Nascita',

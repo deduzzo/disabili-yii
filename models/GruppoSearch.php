@@ -61,10 +61,14 @@ class GruppoSearch extends Gruppo
             'id' => $this->id,
             'data_termine_istanze' => $this->data_termine_istanze,
             'data_inizio_beneficio' => $this->data_inizio_beneficio,
+            'descrizione_gruppo' => $this->descrizione_gruppo,
+            'descrizione_gruppo_old' => $this->descrizione_gruppo_old,
         ]);
 
         $query->andFilterWhere(['like', 'descrizione_gruppo', $this->descrizione_gruppo])
-            ->andFilterWhere(['like', 'descrizione_gruppo_old', $this->descrizione_gruppo_old]);
+            ->andFilterWhere(['like', 'descrizione_gruppo_old', $this->descrizione_gruppo_old])->
+                andFilterWhere(['like', 'data_termine_istanze', $this->data_termine_istanze])->
+                andFilterWhere(['like', 'data_inizio_beneficio', $this->data_inizio_beneficio]);
 
         return $dataProvider;
     }

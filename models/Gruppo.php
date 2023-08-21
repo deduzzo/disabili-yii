@@ -8,11 +8,13 @@ use Yii;
  * This is the model class for table "gruppo".
  *
  * @property int $id
- * @property int|null $data_termine_istanze
- * @property int|null $data_inizio_beneficio
+ * @property string|null $data_termine_istanze
+ * @property string|null $data_inizio_beneficio
  * @property string|null $descrizione_gruppo
  * @property string|null $descrizione_gruppo_old
  *
+ * @property DecretoGruppi[] $decretoGruppis
+ * @property Decreto[] $decretos
  * @property Istanza[] $istanzas
  */
 class Gruppo extends \yii\db\ActiveRecord
@@ -31,7 +33,7 @@ class Gruppo extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['data_termine_istanze', 'data_inizio_beneficio'], 'integer'],
+            [['data_termine_istanze', 'data_inizio_beneficio'], 'safe'],
             [['descrizione_gruppo', 'descrizione_gruppo_old'], 'string', 'max' => 10],
         ];
     }
@@ -51,21 +53,37 @@ class Gruppo extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[DecretoGruppis]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDecretoGruppis()
+    {
+        return $this->hasMany(DecretoGruppi::class, ['id_gruppo' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Decretos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDecretos()
+    {
+        return $this->hasMany(Decreto::class, ['id' => 'id_decreto'])->viaTable('decreto_gruppi', ['id_gruppo' => 'id']);
+    }
+
+    /**
      * Gets query for [[Istanzas]].
      *
-     * @return \yii\db\ActiveQuery|IstanzaQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getIstanzas()
     {
         return $this->hasMany(Istanza::class, ['id_gruppo' => 'id']);
     }
 
-    /**
-     * {@inheritdoc}
-     * @return GruppoQuery the active query used by this AR class.
-     */
-    public static function find()
+    public function getDescrizioneCompleta()
     {
-        return new GruppoQuery(get_called_class());
+        return $this->descrizione_gruppo_old . ' [' . $this->descrizione_gruppo . ']';
     }
 }
