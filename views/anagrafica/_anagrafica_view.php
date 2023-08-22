@@ -7,6 +7,7 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Anagrafica $model */
 
+if ($model)
 echo DetailView::widget([
     'model' => $model,
     'attributes' => [
@@ -15,3 +16,5 @@ echo DetailView::widget([
         'data_nascita:date',
     ],
 ]);
+else
+    echo '<p>Non è stata trovata nessuna anagrafica</p>';

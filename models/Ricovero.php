@@ -2,24 +2,27 @@
 
 namespace app\models;
 
+use app\models\enums\ImportoBase;
+use app\models\enums\IseeType;
+use DateTime;
 use Yii;
 
 /**
  * This is the model class for table "ricovero".
  *
  * @property int $id
- * @property int|null $da
- * @property int|null $a
+ * @property string|null $da
+ * @property string|null $a
  * @property string|null $cod_struttura
  * @property string|null $descr_struttura
  * @property string|null $note
  * @property int|null $id_istanza
  * @property int|null $id_determina
- * @property int|null $id_movimento_recupero
+ * @property int|null $id_recupero
  *
  * @property Determina $determina
  * @property Istanza $istanza
- * @property Movimento $movimentoRecupero
+ * @property Recupero $recupero
  */
 class Ricovero extends \yii\db\ActiveRecord
 {
@@ -37,12 +40,13 @@ class Ricovero extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['da', 'a', 'id_istanza', 'id_determina', 'id_movimento_recupero'], 'integer'],
+            [['da', 'a'], 'safe'],
             [['note'], 'string'],
+            [['id_istanza', 'id_determina', 'id_recupero'], 'integer'],
             [['cod_struttura', 'descr_struttura'], 'string', 'max' => 100],
             [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
-            [['id_movimento_recupero'], 'exist', 'skipOnError' => true, 'targetClass' => Movimento::class, 'targetAttribute' => ['id_movimento_recupero' => 'id']],
+            [['id_recupero'], 'exist', 'skipOnError' => true, 'targetClass' => Recupero::class, 'targetAttribute' => ['id_recupero' => 'id']],
         ];
     }
 
@@ -60,7 +64,7 @@ class Ricovero extends \yii\db\ActiveRecord
             'note' => 'Note',
             'id_istanza' => 'Id Istanza',
             'id_determina' => 'Id Determina',
-            'id_movimento_recupero' => 'Id Movimento Recupero',
+            'id_recupero' => 'Id Recupero',
         ];
     }
 
@@ -85,12 +89,24 @@ class Ricovero extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[MovimentoRecupero]].
+     * Gets query for [[Recupero]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getMovimentoRecupero()
+    public function getRecupero()
     {
-        return $this->hasOne(Movimento::class, ['id' => 'id_movimento_recupero']);
+        return $this->hasOne(Recupero::class, ['id' => 'id_recupero']);
+    }
+
+    public function getNumGiorni() {
+        if (!$this->da || !$this->a) return null;
+        $da = new DateTime($this->da);
+        $a = new DateTime($this->a);
+        return $a->diff($da)->days;
+    }
+
+    public function getImportoRicovero()
+    {
+        return $this->getNumGiorni() * (($this->istanza->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
     }
 }

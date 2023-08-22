@@ -35,6 +35,7 @@ class TipologiaDati extends \yii\db\ActiveRecord
             [['descrizione'], 'string'],
             [['tipo'], 'string', 'max' => 50],
             [['categoria'], 'string', 'max' => 20],
+            [['tipo'], 'unique'],
         ];
     }
 

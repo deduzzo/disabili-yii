@@ -17,9 +17,3 @@ div .gruppo-4 {
 div .gruppo-5 {
     color: #b911f3;
 }
-
-@media (max-width: 1000px) {
-    .custom-card-cols {
-        column-count: 1 !important;
-    }
-}

@@ -12,10 +12,13 @@ use Yii;
  * @property int $recuperato
  * @property int $rateizzato
  * @property int|null $num_rate
+ * @property float|null $importo_rata
+ * @property string|null $note
  * @property int|null $id_istanza
  *
  * @property Istanza $istanza
  * @property Movimento[] $movimentos
+ * @property Ricovero[] $ricoveros
  */
 class Recupero extends \yii\db\ActiveRecord
 {
@@ -33,8 +36,9 @@ class Recupero extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['importo'], 'number'],
+            [['importo', 'importo_rata'], 'number'],
             [['recuperato', 'rateizzato', 'num_rate', 'id_istanza'], 'integer'],
+            [['note'], 'string'],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
         ];
     }
@@ -50,6 +54,8 @@ class Recupero extends \yii\db\ActiveRecord
             'recuperato' => 'Recuperato',
             'rateizzato' => 'Rateizzato',
             'num_rate' => 'Num Rate',
+            'importo_rata' => 'Importo Rata',
+            'note' => 'Note',
             'id_istanza' => 'Id Istanza',
         ];
     }
@@ -72,5 +78,15 @@ class Recupero extends \yii\db\ActiveRecord
     public function getMovimentos()
     {
         return $this->hasMany(Movimento::class, ['id_recupero' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Ricoveros]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRicoveros()
+    {
+        return $this->hasMany(Ricovero::class, ['id_recupero' => 'id']);
     }
 }
