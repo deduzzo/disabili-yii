@@ -1,7 +1,6 @@
 <?php
 
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
@@ -10,6 +9,7 @@ use yii\widgets\DetailView;
 if ($model)
 echo DetailView::widget([
     'model' => $model,
+    'options' => ['class' => 'table table-striped table-bordered detail-view small'],
     'attributes' => [
         'cognome_nome',
         'codice_fiscale',
@@ -17,4 +17,4 @@ echo DetailView::widget([
     ],
 ]);
 else
-    echo '<p>Non è stata trovata nessuna anagrafica</p>';
+    echo '<p class="small">Non è stata trovata nessuna anagrafica</p>';

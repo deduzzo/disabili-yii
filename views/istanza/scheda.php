@@ -38,19 +38,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="card-body" id="card-content">
         <div class="row p-1">
             <?php if ($istanza->data_decesso === null): ?>
-                <div class="col-md-1 h3">
+                <div class="col-md-2 h4 d-flex flex-column align-items-center justify-content-center">
                     <span class="badge rounded-pill bg-success">In vita</span>
                 </div>
             <?php else: ?>
-                <div class="col-md-1 d-flex flex-column align-items-center justify-content-center">
+                <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
                     <span class="badge rounded-pill bg-danger text-xl">Deceduto</span>
                         <span class="badge rounded-pill bg-danger small">il <?= $formatter->asDate($istanza->data_decesso) ?></span>
                 </div>
             <?php endif; ?>
-            <div class="col-md-2 h5 d-flex align-items-center ">Distretto:&nbsp;
+            <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
+                <div class="text-sm">Distretto</div>
                 <div class="text-success"><?= $istanza->distretto->nome ?></div>
             </div>
-            <div class="col-md-2 h5 d-flex flex-column align-items-center justify-content-center">
+            <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?php $ultimo = $istanza->getLastIseeType(); ?>
                 <div class="text-sm">Ultimo ISEE</div>
                 <span class='badge <?= (!$ultimo || $ultimo === IseeType::MAGGIORE_25K) ? 'bg-secondary' : 'bg-primary' ?>'><?= ($ultimo !== null) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
@@ -122,13 +123,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-12">
                         <div class="card bg-body p-10">
                             <div class="card-body">
-                                <h5 class="card-title">Recuperi</h5>
+                                <div class="col-md-2 h5 d-flex align-items-center ">
+                                    <div class="h5 card-title">Recuperi</div>&nbsp;
+                                    <?= $istanza->haRecuperiInCorso() ? "<span class='badge bg-warning text-dark h6'>Da recuperare</span>" : "" ?>
+                                </div>
                                 <?=
                                 $this->render('_recuperi_view', [
                                     'model' => $istanza,
                                 ]) ?>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card bg-body p-10">
+                    <div class="card-body">
+                        <h5 class="card-title">Movimenti</h5>
+                        <?=
+                        $this->render('../movimento/_movimenti_view', [
+                            'istanza' => $istanza,
+                        ]) ?>
                     </div>
                 </div>
             </div>

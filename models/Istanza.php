@@ -199,9 +199,10 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
     }
+
     public function getLastIseeType()
     {
-        $last= Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
+        $last = Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
         if ($last)
             return ($last->maggiore_25mila === 0) ? IseeType::MINORE_25K : IseeType::MAGGIORE_25K;
         else
@@ -211,23 +212,34 @@ class Istanza extends \yii\db\ActiveRecord
     public function getStatoRecupero()
     {
         $importoRecuperi = 0;
-        $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id,'recuperato' => 0])->all();
-        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id,'id_recupero' => null])->all();
+        $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'recuperato' => 0])->all();
+        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null])->all();
         foreach ($recuperiInCorso as $recupero) {
-            $importoRecuperi+= $recupero->importo;
-            $recuperato = Movimento::find()->where(['id_recupero' => $recupero->id,'tornato_indietro' => 0])->all();
+            $importoRecuperi += $recupero->importo;
+            $recuperato = Movimento::find()->where(['id_recupero' => $recupero->id, 'tornato_indietro' => 0])->all();
             foreach ($recuperato as $importo) {
-                $importoRecuperi-= $importo->importo;
+                $importoRecuperi -= $importo->importo;
             }
         }
         foreach ($ricoveriDaRecuperare as $ricovero) {
-            $importoRecuperi+= $ricovero->getImportoRicovero();
+            $importoRecuperi += $ricovero->getImportoRicovero();
         }
-        return ($importoRecuperi > 0) ? ("<div>Ancora da recuperare:</div><span class='badge bg-warning text-dark h6'>".Yii::$app->formatter->asCurrency($importoRecuperi)."</span>") :
-            "<span class='badge bg-success'>Nessun recupero pendente</span>";
+        return ($importoRecuperi > 0) ? ("<div>Da recuperare:</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
+            "<span class='badge bg-success'>In regola</span>";
     }
 
-    public function haRicoveriDaRecuperare() {
-        return Ricovero::find()->where(['id_istanza' => $this->id,'id_recupero' => null])->count() > 0;
+    public function haRicoveriDaRecuperare()
+    {
+        return Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null])->count() > 0;
+    }
+
+    public function haRecuperiInCorso()
+    {
+        return Recupero::find()->where(['id_istanza' => $this->id, 'recuperato' => 0])->count() > 0;
+    }
+
+    public function getContoValido()
+    {
+        return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => 1])->one();
     }
 }

@@ -15,6 +15,7 @@ echo GridView::widget([
         'allModels' => $model->recuperos,
         'pagination' => false,
     ]),
+    'options' => ['class' => 'grid-view small'],
     'columns' => [
         'importo:currency',
         [
@@ -28,7 +29,7 @@ echo GridView::widget([
             'attribute' => 'rateizzato',
             'label' => 'Rateizzato?',
             'value' => function ($model) {
-                return $model->rateizzato ? ('Si, in '.$model->num_rate.' rate da '.Yii::$app->formatter->asCurrency($model->importo_rata)) : 'No';
+                return $model->rateizzato ? ('Si, in '.$model->num_rate.' rate '.($model->importo_rata ? ' da '.Yii::$app->formatter->asCurrency($model->importo_rata) : ' variabili')) : 'No';
             }
         ],
         'note:ntext',

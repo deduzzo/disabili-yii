@@ -15,6 +15,7 @@ echo GridView::widget([
         'allModels' => $model->ricoveros,
         'pagination' => false,
     ]),
+    'options' => ['class' => 'grid-view small'],
     'columns' => [
         [
             'format' => 'raw',

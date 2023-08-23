@@ -10,6 +10,7 @@ use yii\widgets\DetailView;
 
     <?= DetailView::widget([
         'model' => $model,
+    'options' => ['class' => 'table table-striped table-bordered detail-view small'],
         'attributes' => [
             'data_inserimento',
             'riconosciuto:boolean',
