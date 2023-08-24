@@ -7,11 +7,14 @@ use app\models\Anagrafica;
 use app\models\AnagraficaAltricampi;
 use app\models\Conto;
 use app\models\ContoCessionario;
+use app\models\Determina;
+use app\models\DeterminaGruppoPagamento;
 use app\models\Distretto;
 use app\models\enums\FileParisi;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
 use app\models\Gruppo;
+use app\models\GruppoPagamento;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
@@ -138,14 +141,19 @@ class SiteController extends Controller
     {
 
         //$parisiOk = $this->importaFileParisi('../import/parisi/out4.xlsx');
-        $this->importaPagamenti();
+        print_r($this->importaPagamenti());
     }
 
     private function importaPagamenti()
     {
+        //DeterminaGruppoPagamento::deleteAll();
+        //GruppoPagamento::deleteAll();
         Movimento::deleteAll();
-        $elenchiPagamenti = $this->importaFilePagamenti('../import/pagamenti/con_elenchi/al 30-06-2023_con_elenchi_small.xlsx');
-        $conElenchi = $this->importaFileConElenchi('../import/pagamenti/con_iban/al 30-06-2023_con_iban.xlsx',$elenchiPagamenti);
+        ContoCessionario::deleteAll();
+        Conto::deleteAll();
+        //$elenchiPagamenti = $this->importaFilePagamenti('../import/pagamenti/con_elenchi/al 30-06-2023_con_elenchi.xlsx');
+        $nonTrovati = $this->importaFileConElenchi('../import/pagamenti/con_iban/al 30-06-2023_con_iban.xlsx');
+        return $nonTrovati;
     }
 
     public function importaFilePagamenti($path)
@@ -157,7 +165,6 @@ class SiteController extends Controller
         $header = null;
         $rowIndex = 0;
         $out = [];
-
         foreach ($reader->getSheetIterator() as $sheet) {
             /* @var Sheet $sheet */
             foreach ($sheet->getRowIterator() as $row) {
@@ -169,8 +176,13 @@ class SiteController extends Controller
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[PagamentiConElenchi::IMPORTO]] !== "") {
-                    if (!array_key_exists($newRow[$header[PagamentiConElenchi::PROGRESSIVO]], $out))
-                        $out[$newRow[$header[PagamentiConElenchi::PROGRESSIVO]]] = $newRow[$header[PagamentiConElenchi::DESCRIZIONE]];
+                    if (!array_key_exists($newRow[$header[PagamentiConElenchi::PROGRESSIVO]], $out)) {
+                        $gruppoPagamento = new GruppoPagamento();
+                        $gruppoPagamento->descrizione = $newRow[$header[PagamentiConElenchi::DESCRIZIONE]];
+                        $gruppoPagamento->progressivo = $newRow[$header[PagamentiConElenchi::PROGRESSIVO]];
+                        $gruppoPagamento->save();
+                        $out[$newRow[$header[PagamentiConElenchi::PROGRESSIVO]]] = $gruppoPagamento;
+                    }
                 }
                 $rowIndex++;
             }
@@ -178,7 +190,7 @@ class SiteController extends Controller
         return $out;
     }
 
-    private function importaFileConElenchi($path, $elenchi)
+    private function importaFileConElenchi($path)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -188,6 +200,11 @@ class SiteController extends Controller
         $rowIndex = 0;
         $nonTrovati = [];
         $errors = [];
+        $gruppiPagamento = GruppoPagamento::find([])->all();
+        $gruppiPagamentoMap = [];
+        foreach ($gruppiPagamento as $gruppo) {
+            $gruppiPagamentoMap[$gruppo->progressivo] = $gruppo;
+        }
         foreach ($reader->getSheetIterator() as $sheet) {
             /* @var Sheet $sheet */
             foreach ($sheet->getRowIterator() as $row) {
@@ -224,19 +241,28 @@ class SiteController extends Controller
                         $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
                         $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
                         $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
-                        $movimento->note = $elenchi[$newRow[$header[PagamentiConIban::ID_ELENCO]]] ?? null;
+                        $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
+                        if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
+                            $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                            $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->save();
+                        }
                         $movimento->contabilizzare = 0;
                         $movimento->save();
                         if ($movimento->errors)
                             $errors = array_merge($errors, ['movimento' => $movimento->errors]);
                     } else {
-                        if (array_key_exists($newRow[$header[PagamentiConIban::CODICE_FISCALE]], $nonTrovati))
+                        if (!array_key_exists($newRow[$header[PagamentiConIban::CODICE_FISCALE]], $nonTrovati))
                             $nonTrovati[$newRow[$header[PagamentiConIban::CODICE_FISCALE]]] = $newRow;
                     }
                 }
                 $rowIndex++;
             }
         }
+        // save $nonTrovati as Json File
+        $fp = fopen('../import/pagamenti/con_iban/non_trovati.json', 'w');
+        fwrite($fp, json_encode($nonTrovati));
+        fclose($fp);
+        return $nonTrovati;
     }
 
 

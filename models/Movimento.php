@@ -18,12 +18,12 @@ use Yii;
  * @property int|null $id_recupero
  * @property int|null $num_rata
  * @property int|null $contabilizzare
- * @property int|null $id_determina
+ * @property int|null $id_gruppo_pagamento
  * @property int|null $id_conto
  * @property string|null $note
  *
  * @property Conto $conto
- * @property Determina $determina
+ * @property GruppoPagamento $gruppoPagamento
  * @property Recupero $recupero
  */
 class Movimento extends \yii\db\ActiveRecord
@@ -45,10 +45,10 @@ class Movimento extends \yii\db\ActiveRecord
             [['importo'], 'required'],
             [['importo'], 'number'],
             [['data', 'periodo_da', 'periodo_a'], 'safe'],
-            [['tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'contabilizzare', 'id_determina', 'id_conto'], 'integer'],
+            [['tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'contabilizzare', 'id_gruppo_pagamento', 'id_conto'], 'integer'],
             [['note'], 'string'],
             [['id_conto'], 'exist', 'skipOnError' => true, 'targetClass' => Conto::class, 'targetAttribute' => ['id_conto' => 'id']],
-            [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
+            [['id_gruppo_pagamento'], 'exist', 'skipOnError' => true, 'targetClass' => GruppoPagamento::class, 'targetAttribute' => ['id_gruppo_pagamento' => 'id']],
             [['id_recupero'], 'exist', 'skipOnError' => true, 'targetClass' => Recupero::class, 'targetAttribute' => ['id_recupero' => 'id']],
         ];
     }
@@ -70,7 +70,7 @@ class Movimento extends \yii\db\ActiveRecord
             'id_recupero' => 'Id Recupero',
             'num_rata' => 'Num Rata',
             'contabilizzare' => 'Contabilizzare',
-            'id_determina' => 'Id Determina',
+            'id_gruppo_pagamento' => 'Id Gruppo Pagamento',
             'id_conto' => 'Id Conto',
             'note' => 'Note',
         ];
@@ -87,13 +87,13 @@ class Movimento extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Determina]].
+     * Gets query for [[GruppoPagamento]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getDetermina()
+    public function getGruppoPagamento()
     {
-        return $this->hasOne(Determina::class, ['id' => 'id_determina']);
+        return $this->hasOne(GruppoPagamento::class, ['id' => 'id_gruppo_pagamento']);
     }
 
     /**

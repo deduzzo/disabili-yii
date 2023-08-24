@@ -39,6 +39,7 @@ class Conto extends \yii\db\ActiveRecord
             [['note'], 'string'],
             [['attivo', 'id_istanza', 'data_disattivazione', 'data_creazione', 'data_modifica'], 'integer'],
             [['iban'], 'string', 'max' => 40],
+            [['iban'], 'unique'],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
         ];
     }
