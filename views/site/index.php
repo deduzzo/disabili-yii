@@ -9,5 +9,5 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div style="height: 51vh;">
-    Home2
+    Home2 23333
 </div>
