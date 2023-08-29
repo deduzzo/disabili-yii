@@ -22,7 +22,7 @@ echo GridView::widget([
             'attribute' => 'da',
             'label' => 'Da - A',
             'value' => function ($model) {
-                return Yii::$app->formatter->asDate($model->da) . '<br />' . Yii::$app->formatter->asDate($model->a);
+                return Yii::$app->formatter->asDate($model->da) . '<br />' . ($model->a ? Yii::$app->formatter->asDate($model->a) : " in corso");
             }
         ],
         [
@@ -37,12 +37,12 @@ echo GridView::widget([
                 return Yii::$app->formatter->asCurrency($model->getImportoRicovero());
             }
         ],
-        'descr_struttura',
+        'cod_struttura',
         [
             'attribute' => 'recupero',
             'label' => 'Recuperato?',
             'value' => function ($model) {
-                return $model->recupero ? ('Si, det. '.$model->determina->numero) : 'No';
+                return $model->contabilizzare ? ($model->recupero ? ('Si, det. '.$model->determina->numero) : 'No') : "Importazione";
             }
         ],
     ],

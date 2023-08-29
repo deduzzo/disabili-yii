@@ -213,7 +213,7 @@ class Istanza extends \yii\db\ActiveRecord
     {
         $importoRecuperi = 0;
         $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'recuperato' => 0])->all();
-        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null])->all();
+        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null,'contabilizzare' => 1])->all();
         foreach ($recuperiInCorso as $recupero) {
             $importoRecuperi += $recupero->importo;
             $recuperato = Movimento::find()->where(['id_recupero' => $recupero->id, 'tornato_indietro' => 0])->all();
@@ -230,7 +230,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function haRicoveriDaRecuperare()
     {
-        return Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null])->count() > 0;
+        return Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null,'contabilizzare' => 1])->count() > 0;
     }
 
     public function haRecuperiInCorso()

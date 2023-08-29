@@ -136,6 +136,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card bg-body p-10">
+                    <div class="card-body">
+                        <h5 class="card-title">Conti</h5>
+                        <?=
+                        $this->render('../conto/_conti_view', [
+                            'istanza' => $istanza,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-12">
                 <div class="card bg-body p-10">
                     <div class="card-body">

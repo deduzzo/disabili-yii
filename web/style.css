@@ -17,3 +17,8 @@ div .gruppo-4 {
 div .gruppo-5 {
     color: #b911f3;
 }
+
+.tooltip.show .tooltip-inner {
+    max-width: 500px !important; /* Imposta la larghezza massima a 500px */
+    width: auto !important; /* Questo assicura che il tooltip non diventi troppo piccolo se il contenuto è breve */
+}

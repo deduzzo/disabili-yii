@@ -15,6 +15,7 @@ use Yii;
  * @property string|null $a
  * @property string|null $cod_struttura
  * @property string|null $descr_struttura
+ * @property int|null $contabilizzare
  * @property string|null $note
  * @property int|null $id_istanza
  * @property int|null $id_determina
@@ -41,8 +42,8 @@ class Ricovero extends \yii\db\ActiveRecord
     {
         return [
             [['da', 'a'], 'safe'],
+            [['contabilizzare', 'id_istanza', 'id_determina', 'id_recupero'], 'integer'],
             [['note'], 'string'],
-            [['id_istanza', 'id_determina', 'id_recupero'], 'integer'],
             [['cod_struttura', 'descr_struttura'], 'string', 'max' => 100],
             [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
@@ -61,6 +62,7 @@ class Ricovero extends \yii\db\ActiveRecord
             'a' => 'A',
             'cod_struttura' => 'Cod Struttura',
             'descr_struttura' => 'Descr Struttura',
+            'contabilizzare' => 'Contabilizzare',
             'note' => 'Note',
             'id_istanza' => 'Id Istanza',
             'id_determina' => 'Id Determina',

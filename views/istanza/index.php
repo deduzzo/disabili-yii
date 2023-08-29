@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="card-body" id="card-content">
         <?php
         $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 100;  // Assumo 100 come default
-         ?>
+        ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
@@ -47,11 +47,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 "<div class='dataTable-top'>
                                 <div class='dataTable-dropdown'>
                                         <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
-                                                <option value='50' ". ($selectedPageSize == 50 ? 'selected' : '').">50</option>
-                                                <option value='100' ".($selectedPageSize == 100 ? 'selected' : '').">100</option>
-                                                <option value='150' ". ($selectedPageSize == 150 ? 'selected' : '').">150</option>
-                                                <option value='200' ". ($selectedPageSize == 200 ? 'selected' : '').">200</option>
-                                                <option value='250' ". ($selectedPageSize == 250 ? 'selected' : '').">250</option>
+                                                <option value='50' " . ($selectedPageSize == 50 ? 'selected' : '') . ">50</option>
+                                                <option value='100' " . ($selectedPageSize == 100 ? 'selected' : '') . ">100</option>
+                                                <option value='150' " . ($selectedPageSize == 150 ? 'selected' : '') . ">150</option>
+                                                <option value='200' " . ($selectedPageSize == 200 ? 'selected' : '') . ">200</option>
+                                                <option value='250' " . ($selectedPageSize == 250 ? 'selected' : '') . ">250</option>
                                         </select>
                                         <label> per pagina</label>
                                  </div>
@@ -110,7 +110,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'attribute' => 'distretto.nome',
+                    'value' => 'distretto.nome',
+                    'attribute' => 'distretto',
                     'filter' => Html::activeDropDownList($searchModel, 'id_distretto', ArrayHelper::map(Distretto::find()->orderBy('nome')->all(), 'id', "nome"), ['class' => 'form-control', 'prompt' => 'Tutti']),
                     'label' => "Distretto",
                     'format' => 'raw',
@@ -120,7 +121,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'attribute' => 'anagraficaDisabile.codice_fiscale',
+                    'attribute' => 'cf',
+                    'value' => 'anagraficaDisabile.codice_fiscale',
                     'label' => "CF",
                     'filter' => Html::activeTextInput($searchModel, 'cf', ['class' => 'form-control', 'value' => $searchModel['cf']]),
                     'contentOptions' => function ($model) {
@@ -128,12 +130,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'attribute' => 'anagraficaDisabile.cognome_nome',
+                    'value' => 'anagraficaDisabile.cognome_nome',
+                    'attribute' => 'cognomeNome',
                     'label' => "Nominativo",
                     'filter' => Html::activeTextInput($searchModel, 'cognomeNome', ['class' => 'form-control']),
                     // set column size max 100px and text center
                     'contentOptions' => function ($model) {
                         return ['style' => 'width:400px; text-align:center;'];
+                    },
+                ],
+                [
+                    'label' => "n°Ricoveri",
+                    'value' => function ($model) {
+                        return count($model->ricoveros);
                     },
                 ],
                 [
@@ -160,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]); ?>
 
-<!--        --><?php /*Pjax::end();
+        <!--        --><?php /*Pjax::end();
         $this->registerJs("
     $(document).on('change', '#pagesize', function() {
     console.log('ciao');
@@ -171,7 +180,7 @@ $this->params['breadcrumbs'][] = $this->title;
             replace: false
         });
     });
-", \yii\web\View::POS_READY); */?>
+", \yii\web\View::POS_READY); */ ?>
     </div>
 </div>
 

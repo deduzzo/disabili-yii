@@ -14,6 +14,7 @@ class IstanzaSearch extends Istanza
     public $descrizione_gruppo;
     public $cognomeNome;
     public $cf;
+    public $distretto;
 
     /**
      * {@inheritdoc}
@@ -23,7 +24,7 @@ class IstanzaSearch extends Istanza
         return [
             [['id', 'riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
             [['data_inserimento', 'classe_disabilita', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura', 'nota_chiusura', 'note'], 'safe'],
-            [['descrizione_gruppo'], 'safe'],
+            [['descrizione_gruppo','cognomeNome','cf','distretto'], 'safe'],
         ];
     }
 
@@ -50,7 +51,7 @@ class IstanzaSearch extends Istanza
         $this->cf = $params['IstanzaSearch']['cf'] ?? null;
         $query = Istanza::find()->innerJoin('gruppo', 'gruppo.id = istanza.id_gruppo')
             ->innerJoin('distretto', 'distretto.id = istanza.id_distretto')
-            ->innerJoin('anagrafica anagraficaDisabile', 'anagraficaDisabile.id = istanza.id_anagrafica_disabile')
+            ->innerJoin('anagrafica', 'anagrafica.id = istanza.id_anagrafica_disabile')
             ->innerJoin('gruppo g', 'g.id = istanza.id_gruppo');
 
         // add conditions that should always apply here
@@ -60,16 +61,31 @@ class IstanzaSearch extends Istanza
             'pagination' => [
                 'pageSize' => isset($params['pageSize']) ? $params['pageSize'] : 100, // Default to 10 if not set
             ],
+            'sort' => [
+                'defaultOrder' => [
+                    'data_inserimento' => SORT_DESC,
+                ],
+            ],
         ]);
 
-        $dataProvider->sort->attributes['gruppo.descrizione_gruppo'] = [
+        $dataProvider->sort->attributes['descrizione_gruppo'] = [
             'asc' => ['gruppo.descrizione_gruppo' => SORT_ASC],
             'desc' => ['gruppo.descrizione_gruppo' => SORT_DESC],
         ];
-        $dataProvider->sort->attributes['anagraficaDisabile.cognome_nome'] =
+        $dataProvider->sort->attributes['cognomeNome'] =
             [
-                'asc' => ['anagraficaDisabile.cognome_nome' => SORT_ASC],
-                'desc' => ['anagraficaDisabile.cognome_nome' => SORT_DESC],
+                'asc' => ['anagrafica.cognome_nome' => SORT_ASC],
+                'desc' => ['anagrafica.cognome_nome' => SORT_DESC],
+            ];
+        $dataProvider->sort->attributes['cf'] =
+            [
+                'asc' => ['anagrafica.cognome_nome' => SORT_ASC],
+                'desc' => ['anagrafica.cognome_nome' => SORT_DESC],
+            ];
+        $dataProvider->sort->attributes['distretto'] =
+            [
+                'asc' => ['distretto.nome' => SORT_ASC],
+                'desc' => ['distretto.nome' => SORT_DESC],
             ];
 
         $this->load($params);
@@ -108,8 +124,11 @@ class IstanzaSearch extends Istanza
             ->andFilterWhere(['like', 'nota_chiusura', $this->nota_chiusura])
             ->andFilterWhere(['like', 'note', $this->note])
             ->andFilterWhere(['like', 'g.descrizione_gruppo', $this->descrizione_gruppo])
-            ->andFilterWhere(['like', 'anagraficaDisabile.cognome_nome', $this->cognomeNome])
-            ->andFilterWhere(['like', 'anagraficaDisabile.codice_ficale', $this->cf]);
+            ->andFilterWhere(['like', 'anagrafica.cognome_nome', $this->cognomeNome]);
+        if ($this->cf)
+            $query->andFilterWhere(['like', 'anagrafica.codice_fiscale', $this->cf]);
+        if ($this->distretto)
+            $query->andFilterWhere(['like', 'distretto.nome', $this->distretto]);
 
         return $dataProvider;
     }

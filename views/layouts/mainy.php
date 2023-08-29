@@ -2,6 +2,7 @@
 
 
 use app\assets\MainAsset;
+use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 
 /**
@@ -13,36 +14,47 @@ $themeMazer = MainAsset::register($this);
 ?>
 
 <?php $this->beginPage() ?>
-<!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+    <!DOCTYPE html>
+    <html lang="<?= Yii::$app->language ?>">
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?= Html::encode($this->title) ?></title>
-	<?php $this->head() ?>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
-    <link rel="stylesheet" href="/style.css" />
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?= Html::encode($this->title) ?></title>
+        <?php $this->head() ?>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
+        <link rel="stylesheet" href="/style.css"/>
+    </head>
 
-<body>
-	<?php $this->beginBody() ?>
-	<div id="app">
-		<?= $this->render('/layouts/mainy_sidebar') ?>
+    <body>
+    <?php $this->beginBody() ?>
+    <div id="app">
+        <?= $this->render('/layouts/mainy_sidebar') ?>
 
-		<div id="main" class='layout-navbar navbar-fixed'>
-			<?= $this->render('/layouts/mainy_header') ?>
+        <div id="main" class='layout-navbar navbar-fixed'>
+            <?= $this->render('/layouts/mainy_header') ?>
 
-			<div id="main-content">
-				<?= $this->render('/layouts/mainy_content', compact('content')) ?>
+            <div id="main-content">
+                <?= $this->render('/layouts/mainy_content', compact('content')) ?>
 
-				<?= $this->render('/layouts/mainy_footer') ?>
-			</div>
-		</div>
-	</div>
+                <?= $this->render('/layouts/mainy_footer') ?>
+            </div>
+        </div>
+    </div>
 
-	<?php $this->endBody() ?>
-</body>
+    <?php JSRegister::begin([
+        'key' => 'globalManage',
+        'position' => \yii\web\View::POS_READY
+    ]); ?>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
 
-</html>
+    <?php JSRegister::end(); ?>
+    <?php $this->endBody() ?>
+    </body>
+
+    </html>
 <?php $this->endPage() ?>

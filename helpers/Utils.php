@@ -7,7 +7,8 @@ use DateTime;
 
 class Utils
 {
-    static function convertiDataInTimestamp($data, $formato = "d/m/Y") {
+    static function convertiDataInTimestamp($data, $formato = "d/m/Y")
+    {
         try {
             if (is_string($data)) {
                 $data = DateTime::createFromFormat($formato, $data);
@@ -24,6 +25,8 @@ class Utils
     {
         if (is_string($date)) {
             $date = DateTime::createFromFormat($originalFormat, $date);
+        } else if (is_int($date)) {
+            $date = DateTime::createFromFormat('dmY', $date);
         }
         if ($date === false || get_class($date) != "DateTime") {
             return null;

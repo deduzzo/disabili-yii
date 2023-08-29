@@ -17,7 +17,7 @@ Pjax::begin();
 
 $totalImporto = 0;
 
-foreach($dataProvider->models as $model) {
+foreach ($dataProvider->models as $model) {
     $totalImporto += $model->importo;
 }
 
@@ -26,16 +26,16 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'layout' => Html::beginForm(['istanza/scheda','id' => Yii::$app->request->queryParams['id']], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
-                "<div class='dataTable-top'>
+    'layout' => Html::beginForm(['istanza/scheda', 'id' => Yii::$app->request->queryParams['id']], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
+        "<div class='dataTable-top'>
                                 <div class='dataTable-dropdown'>
                                         <label>Mostra</label>&nbsp;
                                         <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
-                                                <option value='10' ". ($selectedPageSize == 10 ? 'selected' : '').">10</option>
-                                                <option value='20' ".($selectedPageSize == 20 ? 'selected' : '').">20</option>
-                                                <option value='40' ". ($selectedPageSize == 40 ? 'selected' : '').">40</option>
-                                                <option value='100' ". ($selectedPageSize == 100 ? 'selected' : '').">100</option>
-                                                <option value='-1' ". ($selectedPageSize == -1 ? 'selected' : '').">Tutti</option>
+                                                <option value='10' " . ($selectedPageSize == 10 ? 'selected' : '') . ">10</option>
+                                                <option value='20' " . ($selectedPageSize == 20 ? 'selected' : '') . ">20</option>
+                                                <option value='40' " . ($selectedPageSize == 40 ? 'selected' : '') . ">40</option>
+                                                <option value='100' " . ($selectedPageSize == 100 ? 'selected' : '') . ">100</option>
+                                                <option value='-1' " . ($selectedPageSize == -1 ? 'selected' : '') . ">Tutti</option>
                                         </select>
                                        
                                  </div>
@@ -81,8 +81,18 @@ echo GridView::widget([
         [
             'attribute' => 'importo',
             'format' => 'currency',
-            'contentOptions' => ['style' => 'font-weight:bold; width: 150px;'],
+            'contentOptions' => ['style' => 'font-weight:bold;'],
             'headerOptions' => ['style' => 'font-weight:bold;'],
+            'label' => 'Importo',
+        ],
+        [
+            'label' => 'iban',
+            // show the value of $model->conto->iban on mouse hover
+            'format' => 'raw',
+            'value' => function ($model) {
+                return '<div data-toggle="tooltip" data-placement="top" title="'.$model->conto->iban.'">'.
+                '*****' . substr($model->conto->iban, -4).'</div>';
+            }
         ],
         [
             'attribute' => 'gruppoPagamentoDescrizione',
