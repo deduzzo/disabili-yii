@@ -4,26 +4,13 @@ caproverOneClickApp:
     start: Just a plain Docker Compose.
     end: Docker Compose is deployed.
 ########
-version: '3.3'
+version: '3'
 
 services:
-  db-disabili:
-    image: mysql:5.7
-    volumes:
-      - db-data:/var/lib/mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: somewordpress
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-
   disapp:
-    depends_on:
-      - db-disabili
-    image: yiisoftware/yii2-php:8.0-apache
-    ports:
-      - "8000:80"
-    restart: always
+    image: yiisoftware/yii2-php:8.2-apache
+    container_name: disapp
+    volumes:
+      - disapp-data:/app
 volumes:
-  db-data: {}
+  disapp-data: { }
