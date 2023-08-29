@@ -10,7 +10,3 @@ services:
   disapp:
     image: yiisoftware/yii2-php:8.2-apache
     container_name: disapp
-    volumes:
-      - disapp-data:/app
-volumes:
-  disapp-data: { }
