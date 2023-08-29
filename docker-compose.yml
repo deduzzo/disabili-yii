@@ -1,9 +1,29 @@
-version: '2'
+captainVersion: 4
+caproverOneClickApp:
+  instructions:
+    start: Just a plain Docker Compose.
+    end: Docker Compose is deployed.
+########
+version: '3.3'
+
 services:
-  php:
-    image: yiisoftware/yii2-php:7.4-apache
+  db-disabili:
+    image: mysql:5.7
     volumes:
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      - ./:/app:delegated
+      - db-data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  disapp:
+    depends_on:
+      - db-disabili
+    image: yiisoftware/yii2-php:8.0-apache
     ports:
-      - '8000:80'
+      - "8000:80"
+    restart: always
+volumes:
+  db-data: {}
