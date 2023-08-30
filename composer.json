@@ -22,7 +22,8 @@
         "yii2mod/yii2-enum": "*",
         "kartik-v/yii2-widget-datepicker": "@dev",
         "globalcitizen/php-iban": "^4.2",
-        "richardfan1126/yii2-js-register": "^0.0.1"
+        "richardfan1126/yii2-js-register": "^0.0.1",
+        "kartik-v/yii2-icons": "^1.4"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

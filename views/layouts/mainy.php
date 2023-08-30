@@ -2,6 +2,7 @@
 
 
 use app\assets\MainAsset;
+use kartik\icons\Icon;
 use richardfan\widget\JSRegister;
 use yii\helpers\Html;
 
@@ -11,6 +12,7 @@ use yii\helpers\Html;
  */
 
 $themeMazer = MainAsset::register($this);
+Icon::map($this);
 ?>
 
 <?php $this->beginPage() ?>
@@ -54,6 +56,8 @@ $themeMazer = MainAsset::register($this);
 
     <?php JSRegister::end(); ?>
     <?php $this->endBody() ?>
+    <?php
+    $this->registerJsFile("{$themeMazer->baseUrl}/assets/original_assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js", ['depends' => [\yii\web\JqueryAsset::class]]); ?>
     </body>
 
     </html>

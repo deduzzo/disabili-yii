@@ -242,4 +242,13 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => 1])->one();
     }
+    public static function getNumIstanzeAttive()
+    {
+        return Istanza::find()->where(['attivo' => 1])->count();
+    }
+
+    public static function getNumDecedutiDaLiquidare()
+    {
+        return Istanza::find()->where(['attivo' => 1])->andWhere(['IS NOT','data_decesso', null])->andWhere(['OR',['liquidazione_decesso_completata' =>null],['liquidazione_decesso_completata' => 0]])->count();
+    }
 }
