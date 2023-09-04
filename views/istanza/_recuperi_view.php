@@ -29,10 +29,14 @@ echo GridView::widget([
             'attribute' => 'rateizzato',
             'label' => 'Rateizzato?',
             'value' => function ($model) {
-                return $model->rateizzato ? ('Si, in '.$model->num_rate.' rate '.($model->importo_rata ? ' da '.Yii::$app->formatter->asCurrency($model->importo_rata) : ' variabili')) : 'No';
-            }
+                return $model->rateizzato ? (($model->getUltimaRataSeDiversa() ? $model->num_rate -1 : $model->num_rate).' rate '.($model->importo_rata ? ' da '.Yii::$app->formatter->asCurrency($model->importo_rata) .
+                        ($model->getUltimaRataSeDiversa() ? ('<br />Ultima rata: '.Yii::$app->formatter->asCurrency($model->getUltimaRataSeDiversa())) : '')
+                        : ' variabili')) : 'No';
+            },
+            'format' => 'raw',
         ],
         // button edit
+        'note:ntext',
         [
             'class' => 'yii\grid\ActionColumn',
             'template' => '{update}',
@@ -42,7 +46,6 @@ echo GridView::widget([
                 },
             ],
         ],
-        'note:ntext',
     ],
     'emptyText' => 'Nessun altro dato presente',
 

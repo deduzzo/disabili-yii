@@ -224,7 +224,7 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($ricoveriDaRecuperare as $ricovero) {
             $importoRecuperi += $ricovero->getImportoRicovero();
         }
-        return ($importoRecuperi > 0) ? ("<div>Da recuperare:</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
+        return ($importoRecuperi !== 0) ? ("<div>Da recuperare:</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
             "<span class='badge bg-success'>In regola</span>";
     }
 

@@ -97,13 +97,13 @@ class RecuperoController extends Controller
                 $recupero->importo = $dati['tipologia'] === "negativo" ? - floatval($dati['importo']) : floatval($dati['importo']);
                 $recupero->recuperato = 0;
                 $recupero->rateizzato = array_key_exists('rateizzato', $dati) ? 1 : 0;
-                $recupero->num_rate = $recupero->rateizzato == 1 ? $dati['numRate'] : null;
-                $recupero->importo_rata = ($recupero->num_rate && $recupero->num_rate > 0) ? floatval($recupero->importo / $recupero->num_rate) : null;
+                $recupero->num_rate = $recupero->rateizzato == 1 ? ($dati['numRate'] ?? $dati['numRate_hidden']) : null;
+                $recupero->importo_rata = ($recupero->num_rate && $recupero->num_rate > 0) ? floatval($dati['importoRata'] ?? $dati['importoRata_hidden']) : null;
                 $recupero->save();
                 $errors = array_merge($errors, $recupero->errors);
                 if ($recupero->rateizzato == 1 && $recupero->num_rate && $recupero->num_rate > 1) {
                     $date = Carbon::now()->subMonth()->startofmonth();
-                    for ($i = 0; $i < intval($dati['numRatePagate']); $i++) {
+                    for ($i = 0; $i < intval($dati['numRatePagate'] ?? 0); $i++) {
                         $movimento = new Movimento();
                         $movimento->id_recupero = $recupero->id;
                         $movimento->importo = $dati['tipologia'] === "negativo" ? -$recupero->importo_rata : $recupero->importo_rata;

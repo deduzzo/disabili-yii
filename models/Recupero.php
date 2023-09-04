@@ -97,4 +97,14 @@ class Recupero extends \yii\db\ActiveRecord
         else
             return 0;
     }
+
+    public function getUltimaRataSeDiversa() {
+        $out = null;
+        if ($this->rateizzato == 1 && $this->num_rate > 0) {
+            if (($this->num_rate * $this->importo_rata) % $this->importo!== 0) {
+                $out = abs( ($this->num_rate * $this->importo_rata) % $this->importo);
+            }
+        }
+        return $out;
+    }
 }

@@ -102,10 +102,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <div class="col-md-4 mt-2">
                                                 <?= Html::label('N°Rate', 'numRate'); ?>
                                                 <?= Html::textInput('numRate', null, ['class' => 'form-control', 'id' => 'numRate', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                                                <?= Html::hiddenInput('numRate_hidden', null,['id' => "numRate_hidden"]) ?>
                                             </div>
                                             <div class="col-md-4 mt-2">
                                                 <?= Html::label('Importo rata', 'importoRata'); ?>
                                                 <?= Html::textInput('importoRata', null, ['class' => 'form-control', 'id' => 'importoRata', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                                                <?= Html::hiddenInput('importoRata_hidden', null,['id' => "importoRata_hidden"]) ?>
                                             </div>
                                             <div class="col-md-4 mt-2">
                                                 <?= Html::label('n° rate saldate', 'numRatePagate'); ?>
@@ -272,7 +274,8 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <script>
     function checkStatus() {
-        console.log('ciao');
+        document.getElementById('numRate_hidden').value = document.getElementById('numRate').value;
+        document.getElementById('importoRata_hidden').value = document.getElementById('importoRata').value;
         if (document.getElementById('rateizzato').checked) {
             document.getElementById('numRate').disabled = false;
             document.getElementById('numRatePagate').disabled = false;
@@ -309,7 +312,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             document.getElementById('numRate').value)
                         + " rate da " + document.getElementById('importoRata').value + " €<br />") : "") +
                 ((!document.getElementById('calcolo_automatico').checked && ((parseFloat(document.getElementById('importo').value) % (parseInt(document.getElementById('numRate').value) * parseFloat(document.getElementById('importoRata').value)) !== 0))) ?
-                    ("Ultima Rata:" +
+                    ("+ ultima rata: " +
                         (Math.abs(parseFloat(document.getElementById('importo').value) - (parseFloat(document.getElementById('importoRata').value) * (parseInt(document.getElementById('numRate').value) -1)))) + " €<br />")
                     : "") +
                 (document.getElementById('rateizzato').checked && document.getElementById('numRate').value && document.getElementById('numRatePagate').value && parseInt(document.getElementById('numRatePagate').value) > 0 ?
