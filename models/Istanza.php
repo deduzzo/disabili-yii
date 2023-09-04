@@ -22,6 +22,7 @@ use Yii;
  * @property int|null $chiuso
  * @property string|null $data_chiusura
  * @property string|null $nota_chiusura
+ * @property string|null $rawdata_json
  * @property string|null $note
  * @property int $id_anagrafica_disabile
  * @property int $id_distretto
@@ -58,8 +59,7 @@ class Istanza extends \yii\db\ActiveRecord
             [['data_inserimento', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura'], 'safe'],
             [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
             [['attivo', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
-            [['nota_chiusura', 'note'], 'string'],
-            [['classe_disabilita'], 'string', 'max' => 10],
+            [['nota_chiusura', 'note','rawdata_json','classe_disabilita'], 'string'],
             [['id_anagrafica_disabile'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_anagrafica_disabile' => 'id']],
             [['id_caregiver'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_caregiver' => 'id']],
             [['id_distretto'], 'exist', 'skipOnError' => true, 'targetClass' => Distretto::class, 'targetAttribute' => ['id_distretto' => 'id']],
@@ -250,5 +250,13 @@ class Istanza extends \yii\db\ActiveRecord
     public static function getNumDecedutiDaLiquidare()
     {
         return Istanza::find()->where(['attivo' => 1])->andWhere(['IS NOT','data_decesso', null])->andWhere(['OR',['liquidazione_decesso_completata' =>null],['liquidazione_decesso_completata' => 0]])->count();
+    }
+
+    public function getNominativoDisabile()
+    {
+        if ($this->anagraficaDisabile->nome)
+            return $this->anagraficaDisabile->nome . ' ' . $this->anagraficaDisabile->cognome;
+        else
+            return $this->anagraficaDisabile->cognome_nome;
     }
 }

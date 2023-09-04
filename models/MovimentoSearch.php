@@ -43,9 +43,8 @@ class MovimentoSearch extends Movimento
      */
     public function search($params, $istanza = null)
     {
-        $query = null;
         $query = Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->
-        innerJoin('gruppo_pagamento', 'movimento.id_gruppo_pagamento = gruppo_pagamento.id');
+        leftJoin('gruppo_pagamento', 'movimento.id_gruppo_pagamento = gruppo_pagamento.id');
         if ($istanza)
             $query = $query->where(['c.id_istanza' => $istanza->id]);
 
@@ -58,7 +57,7 @@ class MovimentoSearch extends Movimento
             ],
             'sort' => [
                 'defaultOrder' => [
-                    'periodo_da' => SORT_DESC, // or SORT_ASC for ascending
+                    'data' => SORT_DESC, // or SORT_ASC for ascending
                 ],
                 'attributes' => [
                     'periodo_da',

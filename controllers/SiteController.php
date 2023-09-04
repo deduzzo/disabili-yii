@@ -139,8 +139,8 @@ class SiteController extends Controller
 
     public function actionImport($importaElenchi = false, $importaFileParisi = false, $importaPagamenti = true, $importaRicoveri = true, $append = false)
     {
-        $attiva = false;
-        if ($attiva) {
+        $attivo = false;
+        if ($attivo) {
             // TEST
             //select i.id,i.id_distretto, a.cognome_nome, i.id_gruppo from istanza i, anagrafica a where i.id_anagrafica_disabile = a.id AND i.attivo= 1 AND i.id not in (
             //select DISTINCT c.id_istanza from movimento m, conto c where m.id_conto = c.id AND periodo_da >= "2023-07-01")
@@ -154,7 +154,7 @@ class SiteController extends Controller
                 Conto::deleteAll();
             }
             if ($importaFileParisi)
-                $this->importaFileParisi('../import/parisi/out.xlsx');
+                $this->importaFileParisi('../import/parisi/out.xlsx', false);
             $this->importaPagamenti($importaElenchi, $importaPagamenti);
             if ($importaRicoveri)
                 $this->importaRicoveri("../import/ricoveri/");
@@ -288,7 +288,7 @@ class SiteController extends Controller
     }
 
 
-    public function importaFileParisi($path)
+    public function importaFileParisi($path, $aggiorna = false)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -296,16 +296,18 @@ class SiteController extends Controller
         $reader->open($path);
         $header = null;
         $rowIndex = 0;
-        AnagraficaAltricampi::deleteAll();
-        Ricovero::deleteAll();
-        Isee::deleteAll();
-        ContoCessionario::deleteAll();
-        Conto::deleteAll();
-        Movimento::deleteAll();
-        Recupero::deleteAll();
-        Istanza::deleteAll();
-        Anagrafica::deleteAll();
-        //Gruppo::deleteAll();
+        if (!$aggiorna) {
+            AnagraficaAltricampi::deleteAll();
+            Ricovero::deleteAll();
+            Isee::deleteAll();
+            ContoCessionario::deleteAll();
+            Conto::deleteAll();
+            Movimento::deleteAll();
+            Recupero::deleteAll();
+            Istanza::deleteAll();
+            Anagrafica::deleteAll();
+            //Gruppo::deleteAll();
+        }
         $errors = [];
 
         foreach ($reader->getSheetIterator() as $sheet) {
@@ -319,93 +321,107 @@ class SiteController extends Controller
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[FileParisi::CHIUSO]] !== "") {
-                    $cessionario = null;
-                    // find distretto where "nome" Like the first 2 character of $newRow[$header[FileParisi::DISTRETTO]]
-                    $distretto = Distretto::find()->where(['like', 'nome', strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 0, 2)) . '%', false])->one();
-                    //$distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
-                    $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
-                    if (!$gruppo) {
-                        $gruppo = new Gruppo();
-                        $gruppo->descrizione_gruppo_old = substr($newRow[$header[FileParisi::GRUPPO]], 0, 1);
-                        $gruppo->descrizione_gruppo = $gruppo->descrizione_gruppo_old;
-                        $gruppo->save();
-                        if ($gruppo->errors)
-                            $errors = array_merge($errors, ['gruppo' => $gruppo->errors]);
-                    }
-                    $disabile = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_DISABILE]]]);
-                    if (!$disabile) {
-                        $disabile = new Anagrafica();
-                        $disabile->codice_fiscale = strtoupper(trim($newRow[$header[FileParisi::CF_DISABILE]]));
-                        $disabile->cognome_nome = strtoupper(trim($newRow[$header[FileParisi::DISABILE_NOME_COGNOME]]));
-                        // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
-                        $disabile->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
-                        $disabile->save();
-                        if ($disabile->errors)
-                            $errors = array_merge($errors, ['disabile-' . $newRow[$header[FileParisi::CF_DISABILE]] => $disabile->errors]);
-                    }
-                    if (strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]])) !== "") {
-                        $cessionario = Anagrafica::findOne(['codice_fiscale' => strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]]))]);
-                        if (!$cessionario) {
-                            $cessionario = new Anagrafica();
-                            $cessionario->codice_fiscale = strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]]));
-                            $cessionario->cognome_nome = strtoupper(trim($newRow[$header[FileParisi::CESSIONARIO_NOME_COGNOME]]));
+                    if (!$aggiorna) {
+                        $cessionario = null;
+                        // find distretto where "nome" Like the first 2 character of $newRow[$header[FileParisi::DISTRETTO]]
+                        $distretto = Distretto::find()->where(['like', 'nome', strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 0, 2)) . '%', false])->one();
+                        //$distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
+                        $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
+                        if (!$gruppo) {
+                            $gruppo = new Gruppo();
+                            $gruppo->descrizione_gruppo_old = substr($newRow[$header[FileParisi::GRUPPO]], 0, 1);
+                            $gruppo->descrizione_gruppo = $gruppo->descrizione_gruppo_old;
+                            $gruppo->save();
+                            if ($gruppo->errors)
+                                $errors = array_merge($errors, ['gruppo' => $gruppo->errors]);
+                        }
+                        $disabile = Anagrafica::findOne(['codice_fiscale' => $newRow[$header[FileParisi::CF_DISABILE]]]);
+                        if (!$disabile) {
+                            $disabile = new Anagrafica();
+                            $disabile->codice_fiscale = strtoupper(trim($newRow[$header[FileParisi::CF_DISABILE]]));
+                            $disabile->cognome_nome = strtoupper(trim($newRow[$header[FileParisi::DISABILE_NOME_COGNOME]]));
                             // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
-                            $cessionario->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
-                            $cessionario->save();
-                            if ($cessionario->errors)
-                                $errors = array_merge($errors, ['cessionario-' . $newRow[$header[FileParisi::CF_DISABILE]] => $cessionario->errors]);
+                            $disabile->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_NASCITA]]);
+                            $disabile->save();
+                            if ($disabile->errors)
+                                $errors = array_merge($errors, ['disabile-' . $newRow[$header[FileParisi::CF_DISABILE]] => $disabile->errors]);
                         }
+                        if (strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]])) !== "") {
+                            $cessionario = Anagrafica::findOne(['codice_fiscale' => strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]]))]);
+                            if (!$cessionario) {
+                                $cessionario = new Anagrafica();
+                                $cessionario->codice_fiscale = strtoupper(trim($newRow[$header[FileParisi::CF_CESSIONARIO]]));
+                                $cessionario->cognome_nome = strtoupper(trim($newRow[$header[FileParisi::CESSIONARIO_NOME_COGNOME]]));
+                                // convert $newRow[$header[FileParisi::DISABILE_DATA_NASCITA]] from string format dd/mm/yyyy to int
+                                $cessionario->data_nascita = Utils::convertDateFromFormat($newRow[$header[FileParisi::CESSIONARIO_DATA_NASCITA]]);
+                                $cessionario->save();
+                                if ($cessionario->errors)
+                                    $errors = array_merge($errors, ['cessionario-' . $newRow[$header[FileParisi::CF_DISABILE]] => $cessionario->errors]);
+                            }
+                        }
+                        if ($disabile && $distretto && $gruppo) {
+                            $istanza = new Istanza();
+                            $istanza->id_distretto = $distretto->id;
+                            $istanza->riconosciuto = 1;
+                            $istanza->id_gruppo = $gruppo->id;
+                            $istanza->classe_disabilita = $newRow[$header[FileParisi::CLASSE_DISABILITA]];
+                            $istanza->patto_di_cura = 1;
+                            $istanza->id_anagrafica_disabile = $disabile->id;
+                            if ($cessionario)
+                                $istanza->id_caregiver = $cessionario->id;
+                            $istanza->attivo = $newRow[$header[FileParisi::ATTIVO]] === "SI" ? 1 : 0;
+                            $istanza->data_decesso = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_DECESSO]]);
+                            $istanza->attivo = $newRow[$header[FileParisi::CHIUSO]] === "SI" ? 0 : 1;
+                            $istanza->note = $newRow[$header[FileParisi::NOTE]] . "<br />" . $newRow[$header[FileParisi::NOTE_ESCLUSIONE]] . "<br />" . $newRow[$header[FileParisi::NOTA_ALLERT]];
+                            $istanza->nota_chiusura = ($newRow[$header[FileParisi::RINUNZIA]] === "SI" ? "RINUNCIA - " : "") . $newRow[$header[FileParisi::NOTA_CHIUSO]];
+                            $istanza->save();
+                            if ($istanza->errors)
+                                $errors = array_merge($errors, ['istanza-' . $newRow[$header[FileParisi::CF_DISABILE]] => $istanza->errors]);
+                            $contoValido = new IBAN(strtoupper(trim($newRow[$header[FileParisi::IBAN]])) !== "" ? strtoupper(trim($newRow[$header[FileParisi::IBAN]])) : strtoupper(trim($newRow[$header[FileParisi::DISABILE_IBAN]])));
+                            if ($contoValido->Verify()) {
+                                $conto = new Conto();
+                                $conto->id_istanza = $istanza->id;
+                                if ($cessionario)
+                                    $conto->iban = strtoupper(trim($newRow[$header[FileParisi::IBAN]]));
+                                if ($conto->iban === "" || $conto->iban === null || !$cessionario)
+                                    $conto->iban = strtoupper(trim($newRow[$header[FileParisi::DISABILE_IBAN]]));
+                                $conto->save();
+                                if ($conto->errors)
+                                    $errors = array_merge($errors, ['conto-' . $newRow[$header[FileParisi::CF_DISABILE]] => $conto->errors]);
+                                $contoCessionario = new ContoCessionario();
+                                $contoCessionario->id_conto = $conto->id;
+                                if ($cessionario)
+                                    $contoCessionario->id_cessionario = $cessionario->id;
+                                else
+                                    $contoCessionario->id_cessionario = $disabile->id;
+                                $contoCessionario->save();
+                                if ($contoCessionario->errors)
+                                    $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[FileParisi::CF_DISABILE]] => $contoCessionario->errors]);
+                            }
+                            if (count($newRow) > $header[FileParisi::ISEE_INF] && $newRow[$header[FileParisi::ISEE_INF]] !== "") {
+                                $isee = new Isee();
+                                $isee->id_istanza = $istanza->id;
+                                $isee->maggiore_25mila = $newRow[$header[FileParisi::ISEE_INF]] === 1 ? 0 : 1;
+                                $isee->valido = 1;
+                                $isee->save();
+                                if ($isee->errors)
+                                    $errors = array_merge($errors, ['isee-' . $newRow[$header[FileParisi::CF_DISABILE]] => $isee->errors]);
+                            }
+                        } else
+                            $errors = array_merge($errors, ["Errore riga " . $rowIndex . ": " . $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]] . " " . $newRow[$header[FileParisi::CF_DISABILE]]]);
                     }
-                    if ($disabile && $distretto && $gruppo) {
-                        $istanza = new Istanza();
-                        $istanza->id_distretto = $distretto->id;
-                        $istanza->riconosciuto = 1;
-                        $istanza->id_gruppo = $gruppo->id;
-                        $istanza->classe_disabilita = $newRow[$header[FileParisi::CLASSE_DISABILITA]];
-                        $istanza->patto_di_cura = 1;
-                        $istanza->id_anagrafica_disabile = $disabile->id;
-                        if ($cessionario)
-                            $istanza->id_caregiver = $cessionario->id;
-                        $istanza->attivo = $newRow[$header[FileParisi::ATTIVO]] === "SI" ? 1 : 0;
-                        $istanza->data_decesso = Utils::convertDateFromFormat($newRow[$header[FileParisi::DISABILE_DATA_DECESSO]]);
-                        $istanza->attivo = $newRow[$header[FileParisi::CHIUSO]] === "SI" ? 0 : 1;
-                        $istanza->note = $newRow[$header[FileParisi::NOTE]] . "<br />" . $newRow[$header[FileParisi::NOTE_ESCLUSIONE]] . "<br />" . $newRow[$header[FileParisi::NOTA_ALLERT]];
-                        $istanza->nota_chiusura = ($newRow[$header[FileParisi::RINUNZIA]] === "SI" ? "RINUNCIA - " : "") . $newRow[$header[FileParisi::NOTA_CHIUSO]];
+
+                    // aggiorna
+                    $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[FileParisi::CF_DISABILE]]))])->one();
+                    if ($istanza) {
+                        $rawData = [];
+                        foreach ($header as $head => $valHeader) {
+                            $rawData[$head] = $newRow[$valHeader];
+                        }
+                        // save $rawData as Json in $istanza->rawdata_json
+                        $istanza->rawdata_json = json_encode($rawData);
                         $istanza->save();
-                        if ($istanza->errors)
-                            $errors = array_merge($errors, ['istanza-' . $newRow[$header[FileParisi::CF_DISABILE]] => $istanza->errors]);
-                        $contoValido = new IBAN(strtoupper(trim($newRow[$header[FileParisi::IBAN]])) !== "" ? strtoupper(trim($newRow[$header[FileParisi::IBAN]])) : strtoupper(trim($newRow[$header[FileParisi::DISABILE_IBAN]])));
-                        if ($contoValido->Verify()) {
-                            $conto = new Conto();
-                            $conto->id_istanza = $istanza->id;
-                            if ($cessionario)
-                                $conto->iban = strtoupper(trim($newRow[$header[FileParisi::IBAN]]));
-                            if ($conto->iban === "" || $conto->iban === null || !$cessionario)
-                                $conto->iban = strtoupper(trim($newRow[$header[FileParisi::DISABILE_IBAN]]));
-                            $conto->save();
-                            if ($conto->errors)
-                                $errors = array_merge($errors, ['conto-' . $newRow[$header[FileParisi::CF_DISABILE]] => $conto->errors]);
-                            $contoCessionario = new ContoCessionario();
-                            $contoCessionario->id_conto = $conto->id;
-                            if ($cessionario)
-                                $contoCessionario->id_cessionario = $cessionario->id;
-                            else
-                                $contoCessionario->id_cessionario = $disabile->id;
-                            $contoCessionario->save();
-                            if ($contoCessionario->errors)
-                                $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[FileParisi::CF_DISABILE]] => $contoCessionario->errors]);
-                        }
-                        if (count($newRow) > $header[FileParisi::ISEE_INF] && $newRow[$header[FileParisi::ISEE_INF]] !== "") {
-                            $isee = new Isee();
-                            $isee->id_istanza = $istanza->id;
-                            $isee->maggiore_25mila = $newRow[$header[FileParisi::ISEE_INF]] === 1 ? 0 : 1;
-                            $isee->valido = 1;
-                            $isee->save();
-                            if ($isee->errors)
-                                $errors = array_merge($errors, ['isee-' . $newRow[$header[FileParisi::CF_DISABILE]] => $isee->errors]);
-                        }
-                    } else
-                        $errors = array_merge($errors, ["Errore riga " . $rowIndex . ": " . $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]] . " " . $newRow[$header[FileParisi::CF_DISABILE]]]);
+                    }
                 }
                 $rowIndex++;
             }
@@ -420,7 +436,8 @@ class SiteController extends Controller
             return true;
     }
 
-    private function importaRicoveri($path)
+    private
+    function importaRicoveri($path)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);

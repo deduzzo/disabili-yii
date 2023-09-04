@@ -67,17 +67,34 @@ echo GridView::widget([
     'summary' => 'Mostro elementi da <b>{begin}</b> a <b>{end}</b> di <b>{totalCount}</b><br /><b>SOMMA TOTALE</b>: <b>' . Yii::$app->formatter->asCurrency($totalImporto) . '</b><bt /> (degli elementi mostrati)',
     'columns' => [
         [
+            'attribute' => 'data',
+            'format' => 'date',
+            'label' => 'Data',
+        ],
+        [
             'format' => 'raw',
             'attribute' => 'periodo_da',
             'label' => 'Periodo',
             'value' => function ($model) {
-                if ($model->data)
-                    return Yii::$app->formatter->asDate($model->data);
-                else
+                if ($model->periodo_da && $model->periodo_a)
                     return Yii::$app->formatter->asDate($model->periodo_da) . ' - ' . Yii::$app->formatter->asDate($model->periodo_a);
+                else
+                    return '-';
             }
         ],
-        // importo currency and bold
+        [
+            'label' => 'Tipo',
+            'value' => function ($model) {
+                if ($model->id_recupero) {
+                    $type = "Recupero";
+                    if ($model->recupero->rateizzato == 1)
+                        $type .= " (rata " . $model->num_rata . " di " . $model->recupero->num_rate . " )";
+                    return '<span class="badge bg-danger">' . $type . '</span>';
+                } else
+                    return '<span class="badge bg-success">Pagamento</span>';
+            },
+            'format' => 'raw',
+        ],
         [
             'attribute' => 'importo',
             'format' => 'currency',
@@ -90,14 +107,17 @@ echo GridView::widget([
             // show the value of $model->conto->iban on mouse hover
             'format' => 'raw',
             'value' => function ($model) {
-                return '<div data-toggle="tooltip" data-placement="top" title="'.$model->conto->iban.'">'.
-                '*****' . substr($model->conto->iban, -4).'</div>';
+                return '<div data-toggle="tooltip" data-placement="top" title="' . $model->conto->iban . '">' .
+                    '*****' . substr($model->conto->iban, -4) . '</div>';
             }
         ],
         [
             'attribute' => 'gruppoPagamentoDescrizione',
-            'value' => 'gruppoPagamento.descrizione',
+            'value' => function ($model) {
+                return $model->gruppoPagamento ? $model->gruppoPagamento->descrizione : '-';
+            },
             'label' => 'Descrizione Gruppo Pagamento',
+
         ],
     ],
     'emptyText' => 'Nessun movimento presente',

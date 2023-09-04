@@ -89,4 +89,12 @@ class Recupero extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Ricovero::class, ['id_recupero' => 'id']);
     }
+
+    public function getRateMancanti()
+    {
+        if ($this->rateizzato == 1 && $this->num_rate > 0)
+            return $this->num_rate - count($this->movimentos);
+        else
+            return 0;
+    }
 }

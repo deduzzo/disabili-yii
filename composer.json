@@ -23,7 +23,8 @@
         "kartik-v/yii2-widget-datepicker": "@dev",
         "globalcitizen/php-iban": "^4.2",
         "richardfan1126/yii2-js-register": "^0.0.1",
-        "kartik-v/yii2-icons": "^1.4"
+        "kartik-v/yii2-icons": "^1.4",
+        "nesbot/carbon": "^2.69"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -36,7 +37,8 @@
         "codeception/module-yii2": "^1.1",
         "codeception/module-filesystem": "^2.0 || ^1.1",
         "codeception/verify": "^2.2",
-        "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4"
+        "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
+        "camspiers/json-pretty": "1.0.*"
     },
     "config": {
         "allow-plugins": {

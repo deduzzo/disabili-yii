@@ -6,6 +6,7 @@
 
 use app\assets\MainAsset;
 use app\models\Istanza;
+use richardfan\widget\JSRegister;
 
 $this->title = 'Dashboard';
 $this->params['breadcrumbs'][] = $this->title;

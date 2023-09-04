@@ -32,4 +32,23 @@ class Utils
             return null;
         } else return $date->format($destFormat);
     }
+
+    static function jsonToHtml($jsonString) {
+        // Sostituisci le chiavi
+        $jsonString = preg_replace('/"([^"]+)"\s*:/', '<span class="json-key">"$1"</span>:', $jsonString);
+
+        // Sostituisci le stringhe
+        $jsonString = preg_replace('/:\s*"([^"]+)"/', ': <span class="json-string">"$1"</span>', $jsonString);
+
+        // Sostituisci i numeri
+        $jsonString = preg_replace('/:\s*([0-9]+)/', ': <span class="json-number">$1</span>', $jsonString);
+
+        // Aggiungi classi per l'indentazione
+        $jsonString = str_replace(["{\n", "[\n", "\n}", "\n]"], ["{<span class='json-indent'>", "[<span class='json-indent'>", "</span>}", "</span>]"], $jsonString);
+
+        // Sostituisci le virgole e le nuove righe
+        $jsonString = str_replace([',', "\n"], [',<br>', ''], $jsonString);
+
+        return $jsonString;
+    }
 }

@@ -22,7 +22,7 @@ echo GridView::widget([
             'attribute' => 'recuperato',
             'label' => 'Recuperato?',
             'value' => function ($model) {
-                return $model->recuperato ? 'Si' : 'No';
+                return $model->recuperato ? 'Si' : ('No, mancano '.$model->getRateMancanti().' rate');
             }
         ],
         [
@@ -31,6 +31,16 @@ echo GridView::widget([
             'value' => function ($model) {
                 return $model->rateizzato ? ('Si, in '.$model->num_rate.' rate '.($model->importo_rata ? ' da '.Yii::$app->formatter->asCurrency($model->importo_rata) : ' variabili')) : 'No';
             }
+        ],
+        // button edit
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{update}',
+            'buttons' => [
+                'update' => function ($url, $model) {
+                    return Html::a('<i class="bi bi-pencil"></i>', ['recupero/update', 'id' => $model->id], ['class' => 'btn btn-sm btn-primary']);
+                },
+            ],
         ],
         'note:ntext',
     ],

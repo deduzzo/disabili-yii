@@ -22,3 +22,21 @@ div .gruppo-5 {
     max-width: 500px !important; /* Imposta la larghezza massima a 500px */
     width: auto !important; /* Questo assicura che il tooltip non diventi troppo piccolo se il contenuto è breve */
 }
+
+.json-key {
+    color: #555;
+    font-weight: bold;
+}
+.json-string {
+    color: #c00;
+}
+.json-number {
+    color: #00c;
+}
+.json-punctuation {
+    color: #333;
+}
+.json-indent {
+    display: block;
+    margin-left: 20px;
+}
