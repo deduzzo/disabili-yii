@@ -14,6 +14,7 @@ Thumbs.db
 
 # composer vendor dir
 /vendor
+/config/db.php
 
 # composer itself is not needed
 composer.phar
@@ -35,4 +36,3 @@ tests/_support/_generated
 #vagrant folder
 /.vagrant
 /web/assets/
-config/db.php
