@@ -1,6 +1,7 @@
 <?php
 
 use app\models\AnagraficaAltricampi;
+use richardfan\widget\JSRegister;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -8,14 +9,14 @@ use yii\widgets\ActiveForm;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
-/** @var app\models\Istanza $model */
+/** @var app\models\Istanza $istanza */
 
 
 \yii\widgets\Pjax::begin(['id' => 'lista-recuperi']);
 
 echo GridView::widget([
     'dataProvider' => new ArrayDataProvider([
-        'allModels' => $model->recuperos,
+        'allModels' => $istanza->recuperos,
         'pagination' => false,
     ]),
     'options' => ['class' => 'grid-view small'],
@@ -36,7 +37,7 @@ echo GridView::widget([
             'value' => function ($model) {
                 return $model->annullato ?
                     '<span class="badge bg-warning">ANNULLATO</span>' :
-                    ($model->chiuso ? '<span class="badge bg-secondary">CHIUSO</span>' : ('<span class="badge bg-info">Attivo</span>'.($model->rateizzato == 1 ? ('<br />mancano ' . $model->getRateMancanti() . ' rate') : ''))
+                    ($model->chiuso ? '<span class="badge bg-secondary">CHIUSO</span>' : ('<span class="badge bg-info">Attivo</span>' . ($model->rateizzato == 1 ? ('<br />mancano ' . $model->getRateMancanti() . ' rate') : ''))
                     );
             },
             'format' => 'raw',
@@ -143,6 +144,88 @@ echo GridView::widget([
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="nuovo-recupero" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 700px">
+        <div class="modal-content">
+            <?= Html::beginForm(['recupero/create-by-istanza', 'id' => $istanza->id]); ?>
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Aggiungi Recupero</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-12">Inserire i dati per il recupero per l'istanza di
+                                disabilità
+                                di <?= $istanza->getNominativoDisabile(); ?></div>
+                            <div class="col-md-6 mt-4">
+                                <?= Html::label('Importo (€)', 'importo') ?>
+                                <?= Html::textInput('importo', null, ['class' => 'form-control', 'id' => 'importo', 'type' => 'number', 'oninput' => 'checkStatus()']) ?>
+                            </div>
+                            <div class="col-md-6 mt-4">
+                                <?= Html::label('Tipo', 'tipologia'); ?>
+                                <?= Html::radioList('tipologia', 'negativo', ['negativo' => 'Debito (-)', 'credito' => 'Credito (+)'], ['class' => 'form-control form-select', 'onchange' => 'checkStatus()', 'id' => 'tipologia', 'inline' => true]) ?>
+                            </div>
+                        </div>
+                        <div class="row align-items-end">
+                            <div class="col-md-12 form-check form-switch" style="margin-left:10px">
+                                <?= Html::checkbox('rateizzato', null, ['class' => 'form-control form-check-input', 'id' => 'rateizzato', 'onchange' => 'checkStatus()']) ?>
+                                <?= Html::label('Rateizzato', 'rateizzato', ['class' => 'form-check-label']); ?>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <?= Html::label('N°Rate', 'numRate'); ?>
+                                <?= Html::textInput('numRate', null, ['class' => 'form-control', 'id' => 'numRate', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                                <?= Html::hiddenInput('numRate_hidden', null, ['id' => "numRate_hidden"]) ?>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <?= Html::label('Importo rata', 'importoRata'); ?>
+                                <?= Html::textInput('importoRata', null, ['class' => 'form-control', 'id' => 'importoRata', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                                <?= Html::hiddenInput('importoRata_hidden', null, ['id' => "importoRata_hidden"]) ?>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <?= Html::label('n° rate saldate', 'numRatePagate'); ?>
+                                <?= Html::textInput('numRatePagate', null, ['class' => 'form-control', 'id' => 'numRatePagate', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <?= Html::label('n° mesi posticipo', 'numMesiPosticipo'); ?>
+                                <?= Html::textInput('numMesiPosticipo', null, ['class' => 'form-control', 'id' => 'numMesiPosticipo', 'type' => 'number', 'disabled' => true, 'oninput' => "checkStatus()"]) ?>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 form-check form-switch d-flex justify-content-center align-items-center"
+                                 style="margin-top: 3px;">
+                                <?= Html::checkbox('calcolo_automatico', false, ['class' => 'form-control form-check-input', 'id' => 'calcolo_automatico', 'onchange' => 'checkStatus()', 'disabled' => true]) ?>
+                                <?= Html::label('Calcola rata', 'calcolo_automatico', ['class' => 'form-check-label']); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+
+                            <div class="card-body" style="min-height: 200px">
+                                <h5 class="card-title text-white">Riepilogo</h5>
+                                <p class="card-text text-white" id="riepilogoRateizzazione"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla
+                </button>
+                <button type="submit" class="btn btn-danger" id="btnSalvaRateizzazione" disabled="true">
+                    Salva
+                </button>
+            </div>
+            <?= Html::endForm(); ?>
+        </div>
+    </div>
+</div>
+
 <script>
     function confirmDeleteRecupero(id) {
         if (confirm('Sei sicuro di voler eliminare questo recupero?')) {
@@ -159,4 +242,71 @@ echo GridView::widget([
             })
         }
     }
+
+    function checkStatus() {
+        document.getElementById('numRate_hidden').value = document.getElementById('numRate').value;
+        document.getElementById('importoRata_hidden').value = document.getElementById('importoRata').value;
+        if (document.getElementById('rateizzato').checked) {
+            document.getElementById('numMesiPosticipo').disabled = false;
+            document.getElementById('numRate').disabled = false;
+            document.getElementById('numRatePagate').disabled = false;
+            document.getElementById('calcolo_automatico').disabled = false;
+            if (document.getElementById('calcolo_automatico').checked) {
+                if (!isNaN(parseFloat(document.getElementById('numRate').value)) && parseFloat(document.getElementById('numRate').value) > 0)
+                    document.getElementById('importoRata').value = (parseFloat(document.getElementById('importo').value) / parseFloat(document.getElementById('numRate').value)).toFixed(2);
+            } else {
+                if (!isNaN(parseFloat(document.getElementById('importoRata').value)) && parseFloat(document.getElementById('importoRata').value) > 0)
+                    document.getElementById('numRate').value = Math.ceil(parseFloat(document.getElementById('importo').value) / parseFloat(document.getElementById('importoRata').value));
+            }
+        } else {
+            document.getElementById('numRate').disabled = true;
+            document.getElementById('numRate').value = '';
+            document.getElementById('numRatePagate').disabled = true;
+            document.getElementById('numRatePagate').value = '';
+            document.getElementById('importoRata').value = '';
+            document.getElementById('calcolo_automatico').disabled = true;
+            document.getElementById('numMesiPosticipo').disabled = true;
+            document.getElementById('numMesiPosticipo').value = '';
+        }
+        document.getElementById('importoRata').disabled = !document.getElementById('rateizzato').checked || document.getElementById('calcolo_automatico').checked;
+        document.getElementById('numRate').disabled = !document.getElementById('rateizzato').checked || !document.getElementById('calcolo_automatico').checked;
+
+        let riassunto = "Inserire tutti i valori richiesti";
+        if (!isNaN(document.getElementById('importoRata').value) && document.getElementById('importo').value &&
+            (!document.getElementById('rateizzato').checked || (document.getElementById('rateizzato').checked && !isNaN(document.getElementById('numRate').value) && document.getElementById('numRate').value > 0))) {
+            riassunto = "Tipo: " + $("input[name='tipologia']:checked").next('label').text() + "<br />" +
+                "Importo: " + document.getElementById('importo').value + " €<br />" +
+                "Rateizzato: " + (document.getElementById('rateizzato').checked ? "SI" : "NO") + "<br />" +
+                (document.getElementById('rateizzato').checked && document.getElementById('numRate').value ?
+                    ((!document.getElementById('calcolo_automatico').checked ?
+                            ((parseFloat(document.getElementById('importo').value) % (parseInt(document.getElementById('numRate').value) * parseFloat(document.getElementById('importoRata').value)) === 0) ?
+                                document.getElementById('numRate').value :
+                                (parseInt(document.getElementById('numRate').value) - 1)) :
+                            document.getElementById('numRate').value)
+                        + " rate da " + document.getElementById('importoRata').value + " €<br />") : "") +
+                ((!document.getElementById('calcolo_automatico').checked && ((parseFloat(document.getElementById('importo').value) % (parseInt(document.getElementById('numRate').value) * parseFloat(document.getElementById('importoRata').value)) !== 0))) ?
+                    ("+ ultima rata: " +
+                        (Math.abs(parseFloat(document.getElementById('importo').value) - (parseFloat(document.getElementById('importoRata').value) * (parseInt(document.getElementById('numRate').value) - 1)))) + " €<br />")
+                    : "") +
+                (document.getElementById('rateizzato').checked && document.getElementById('numRate').value && document.getElementById('numRatePagate').value && parseInt(document.getElementById('numRatePagate').value) > 0 ?
+                    (document.getElementById('numRatePagate').value + " rate già pagate<br />") : "") +
+                "<p class='text-danger' style='margin-top: 10px'>RESIDUO: " + (document.getElementById('rateizzato').checked ? (document.getElementById('importo').value - (document.getElementById('importoRata').value * document.getElementById('numRatePagate').value)) : document.getElementById('importo').value) + " €</p>";
+            document.getElementById('btnSalvaRateizzazione').disabled = false;
+        } else
+            document.getElementById('btnSalvaRateizzazione').disabled = true;
+
+        document.getElementById('riepilogoRateizzazione').innerHTML = riassunto
+    }
+
 </script>
+
+<?php JSRegister::begin([
+    'key' => 'manage',
+    'position' => \yii\web\View::POS_READY
+]); ?>
+    <script>
+        $(document).ready(function () {
+            checkStatus();
+        });
+    </script>
+<?php JSRegister::end(); ?>

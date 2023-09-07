@@ -87,7 +87,7 @@ class RecuperoController extends Controller
                 $recupero->save();
                 $errors = array_merge($errors, $recupero->errors);
                 if ($recupero->rateizzato == 1 && $recupero->num_rate && $recupero->num_rate > 1) {
-                    $date = Carbon::now()->subMonth()->endOfMonth();
+                    $date = Carbon::now()->startOfMonth()->sub( (!isset($dati['numMesiPosticipo']) || $dati['numMesiPosticipo'] === '') ? 1 : intval($dati['numMesiPosticipo']), 'months')->endOfMonth();
                     for ($i = 0; $i < intval($dati['numRatePagate'] ?? 0); $i++) {
                         $movimento = new Movimento();
                         $movimento->id_recupero = $recupero->id;
@@ -98,7 +98,7 @@ class RecuperoController extends Controller
                         $movimento->id_conto = $istanza->getContoValido()->id;
                         $movimento->save();
                         $errors = array_merge($errors, $movimento->errors);
-                        $date->subMonth()->startOfMonth();
+                        $date->startOfMonth()->subMonth()->endOfMonth();
                     }
                 }
                 Yii::$app->session->setFlash('success', 'Recupero creato correttamente');

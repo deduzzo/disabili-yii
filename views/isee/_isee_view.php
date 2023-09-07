@@ -1,6 +1,7 @@
 <?php
 
 use app\models\AnagraficaAltricampi;
+use app\models\enums\IseeType;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -27,7 +28,7 @@ echo GridView::widget([
             'label' => 'Stato',
             'value' => function ($model) {
                 return $model->maggiore_25mila ?
-                    '<span class="badge bg-warning">&#62; 25.000 €</span>' : '<span class="badge bg-primary">&#60; 25.000 €</span>';
+                    '<span class="badge '.IseeType::MAGGIORE_25K_COLOR.'">&#62; 25.000 €</span>' : '<span class="badge '.IseeType::MINORE_25K_COLOR.'">&#60; 25.000 €</span>';
             },
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
@@ -100,7 +101,7 @@ echo GridView::widget([
             <div class="modal-footer">
                 <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
                     <i class="bx bx-x d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Chiudi</span>
+                    <span class="d-none d-sm-block">Annulla</span>
                 </button>
 
                 <button type="submit" class="btn btn-warning ms-1">
