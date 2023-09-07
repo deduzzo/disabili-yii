@@ -9,20 +9,23 @@ use Yii;
  *
  * @property int $id
  * @property float $importo
+ * @property bool $is_movimento_bancario
  * @property string|null $data
  * @property string|null $periodo_da
  * @property string|null $periodo_a
- * @property int $tornato_indietro
+ * @property bool $tornato_indietro
  * @property int|null $data_invio_notifica
  * @property int|null $data_incasso
  * @property int|null $id_recupero
  * @property int|null $num_rata
- * @property int|null $contabilizzare
- * @property int|null $id_gruppo_pagamento
- * @property int|null $id_conto
+ * @property bool $contabilizzare
  * @property string|null $note
+ * @property int|null $id_gruppo_pagamento
+ * @property int|null $id_determina
+ * @property int|null $id_conto
  *
  * @property Conto $conto
+ * @property Determina $determina
  * @property GruppoPagamento $gruppoPagamento
  * @property Recupero $recupero
  */
@@ -44,10 +47,12 @@ class Movimento extends \yii\db\ActiveRecord
         return [
             [['importo'], 'required'],
             [['importo'], 'number'],
+            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare'], 'boolean'],
             [['data', 'periodo_da', 'periodo_a'], 'safe'],
-            [['tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'contabilizzare', 'id_gruppo_pagamento', 'id_conto'], 'integer'],
+            [['data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'id_gruppo_pagamento', 'id_determina', 'id_conto'], 'integer'],
             [['note'], 'string'],
             [['id_conto'], 'exist', 'skipOnError' => true, 'targetClass' => Conto::class, 'targetAttribute' => ['id_conto' => 'id']],
+            [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
             [['id_gruppo_pagamento'], 'exist', 'skipOnError' => true, 'targetClass' => GruppoPagamento::class, 'targetAttribute' => ['id_gruppo_pagamento' => 'id']],
             [['id_recupero'], 'exist', 'skipOnError' => true, 'targetClass' => Recupero::class, 'targetAttribute' => ['id_recupero' => 'id']],
         ];
@@ -61,6 +66,7 @@ class Movimento extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'importo' => 'Importo',
+            'is_movimento_bancario' => 'Is Movimento Bancario',
             'data' => 'Data',
             'periodo_da' => 'Periodo Da',
             'periodo_a' => 'Periodo A',
@@ -70,9 +76,10 @@ class Movimento extends \yii\db\ActiveRecord
             'id_recupero' => 'Id Recupero',
             'num_rata' => 'Num Rata',
             'contabilizzare' => 'Contabilizzare',
-            'id_gruppo_pagamento' => 'Id Gruppo Pagamento',
-            'id_conto' => 'Id Conto',
             'note' => 'Note',
+            'id_gruppo_pagamento' => 'Id Gruppo Pagamento',
+            'id_determina' => 'Id Determina',
+            'id_conto' => 'Id Conto',
         ];
     }
 
@@ -104,5 +111,15 @@ class Movimento extends \yii\db\ActiveRecord
     public function getRecupero()
     {
         return $this->hasOne(Recupero::class, ['id' => 'id_recupero']);
+    }
+
+    /**
+     * Gets query for [[Determina]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDetermina()
+    {
+        return $this->hasOne(Determina::class, ['id' => 'id_determina']);
     }
 }

@@ -11,6 +11,8 @@ use app\models\DeterminaGruppoPagamento;
 use app\models\Distretto;
 use app\models\enums\FileParisi;
 use app\models\enums\FileRicoveri;
+use app\models\enums\ImportoBase;
+use app\models\enums\IseeType;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
 use app\models\Gruppo;
@@ -159,6 +161,40 @@ class SiteController extends Controller
             if ($importaRicoveri)
                 $this->importaRicoveri("../import/ricoveri/");
         }
+    }
+
+    public function actionAggiornaIsee() {
+        $nonTrovati = [];
+        $errors = [];
+        $res = Yii::$app->getDb()->createCommand("select distinct istanza.id from istanza where istanza.attivo = true AND istanza.id not in
+                                     (select distinct istanza.id from istanza, isee where isee.id_istanza = istanza.id)")->queryAll();
+        foreach ($res as $istanza) {
+            $istanza = Istanza::findOne($istanza['id']);
+            $iseeMaggiore25 = null;
+            $lastMovimento = $istanza->getLastMovimentoBancario();
+            if ($lastMovimento) {
+                if ($lastMovimento->importo === floatval(ImportoBase::MINORE_25K_V1))
+                    $iseeMaggiore25 = false;
+                else if ($lastMovimento->importo === floatval(ImportoBase::MAGGIORE_25K_V1))
+                    $iseeMaggiore25 = true;
+                if ($iseeMaggiore25 !== null) {
+                    $isee = new Isee();
+                    $isee->id_istanza = $istanza->id;
+                    $isee->maggiore_25mila = $iseeMaggiore25;
+                    $isee->valido = true;
+                    $isee->save();
+                    if ($isee->errors)
+                        $errors = array_merge($errors, ['isee-' . $istanza->id => $isee->errors]);
+                } else
+                    $nonTrovati[] = $istanza->id;
+            }
+            else
+                $nonTrovati[] = $istanza->id;
+        }
+        // save $nonTrovati keys as text file
+        $fp = fopen('../import/non_trovati.txt', 'w');
+        fwrite($fp, implode("\t", $nonTrovati));
+        fclose($fp);
     }
 
     private function importaPagamenti($importaElenchi, $importaPagamenti)

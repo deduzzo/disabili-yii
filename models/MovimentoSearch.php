@@ -18,7 +18,8 @@ class MovimentoSearch extends Movimento
     public function rules()
     {
         return [
-            [['id', 'tornato_indietro', 'data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'contabilizzare', 'id_gruppo_pagamento', 'id_conto'], 'integer'],
+            [['id', 'data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'id_gruppo_pagamento', 'id_conto'], 'integer'],
+            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare'], 'boolean'],
             [['importo'], 'number'],
             [['data', 'periodo_da', 'periodo_a', 'note'], 'safe'],
             [['gruppoPagamentoDescrizione'], 'safe'],
@@ -62,6 +63,7 @@ class MovimentoSearch extends Movimento
                 'attributes' => [
                     'periodo_da',
                     'importo',
+                    'is_movimento_bancario',
                     'data',
                     'periodo_da',
                     'periodo_a',
@@ -105,6 +107,7 @@ class MovimentoSearch extends Movimento
             'contabilizzare' => $this->contabilizzare,
             'id_gruppo_pagamento' => $this->id_gruppo_pagamento,
             'id_conto' => $this->id_conto,
+            'is_movimento_bancario' => $this->is_movimento_bancario,
         ]);
 
         $query->andFilterWhere(['like', 'note', $this->note]);

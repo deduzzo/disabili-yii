@@ -6,6 +6,7 @@ use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
 use richardfan\widget\JSRegister;
+use yii\bootstrap5\Alert;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -20,11 +21,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Istanze', 'url' => ['istanze/index
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<!--    <div class="container-fluid">
-        <?php /*echo $this->render('_search', ['model' => $searchModel]); */ ?>
-    </div>-->
-
-<?php $formatter = \Yii::$app->formatter; ?>
 
 <div class="card">
     <div class="card-header">
@@ -46,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php else: ?>
                 <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
                     <span class="badge rounded-pill bg-danger text-xl">Deceduto</span>
-                    <span class="badge rounded-pill bg-danger small">il <?= $formatter->asDate($istanza->data_decesso) ?></span>
+                    <span class="badge rounded-pill bg-danger small">il <?= Yii::$app->formatter->asDate($istanza->data_decesso) ?></span>
                 </div>
             <?php endif; ?>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
@@ -56,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?php $ultimo = $istanza->getLastIseeType(); ?>
                 <div class="text-sm">Ultimo ISEE</div>
-                <span class='badge <?= (!$ultimo || $ultimo === IseeType::MAGGIORE_25K) ? 'bg-secondary' : 'bg-primary' ?>'><?= ($ultimo !== null) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
+                <span class='badge <?= !$ultimo ? 'bg-secondary' :  (($ultimo !== IseeType::MAGGIORE_25K) ?  'bg-warning' : 'bg-primary') ?>'><?= ($ultimo !== null) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
             </div>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?= $istanza->getStatoRecupero() ?>
@@ -225,10 +221,40 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-6">
                 <div class="card bg-body p-10">
                     <div class="card-body">
-                        <h5 class="card-title">Conti</h5>
+                        <div class="row">
+                            <!-- Titolo -->
+                            <div class="col-md-6 d-flex align-items-center">
+                                <h5 class="card-title mb-0">Conti</h5>
+                            </div>
+                        </div>
+
                         <?=
                         $this->render('../conto/_conti_view', [
                             'istanza' => $istanza,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-body p-10">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Titolo -->
+                            <div class="col-md-6 d-flex align-items-center">
+                                <h5 class="card-title mb-0">Isee</h5>
+                            </div>
+
+                            <!-- Pulsante -->
+                            <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuovo-isee">
+                                    <i class="fas fa-solid fa-plus"></i> Isee
+                                </button>
+                            </div>
+                        </div>
+
+                        <?=
+                        $this->render('../isee/_isee_view', [
+                            'model' => $istanza,
                         ]) ?>
                     </div>
                 </div>

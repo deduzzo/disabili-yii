@@ -55,9 +55,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                         </select>
                                         <label> per pagina</label>
                                  </div>
-                                <div class='dataTable-search'>
+<!--                                <div class='dataTable-search'>
                                     <input class='dataTable-input' placeholder='Search...' type='text'>
-                                </div>
+                                </div>-->
                            </div>
                            " . Html::endForm() .
                 "<div class='table-container'>{items}</div>

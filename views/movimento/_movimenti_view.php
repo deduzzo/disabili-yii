@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 $searchModel = new MovimentoSearch();
 $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanza);
 
-Pjax::begin();
+
 
 $totalImporto = 0;
 
@@ -22,15 +22,17 @@ foreach ($dataProvider->models as $model) {
 }
 
 $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 20;
+?>
+<?= Html::beginForm(['istanza/scheda', 'id' => Yii::$app->request->queryParams['id']], 'get', ['data-pjax' => '', 'id'=>'movimentiForm', 'class' => 'form-inline']) ?>
+<?= Html::activeHiddenInput($searchModel, 'is_movimento_bancario', ['id' => 'filtroMovimenti']) ?>
 
-echo GridView::widget([
+<?php echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'layout' => Html::beginForm(['istanza/scheda', 'id' => Yii::$app->request->queryParams['id']], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
-        "<div class='dataTable-top'>
+    'layout' => "<div class='dataTable-top'>
                                 <div class='dataTable-dropdown'>
                                         <label>Mostra</label>&nbsp;
-                                        <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
+                                        <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit();'>
                                                 <option value='10' " . ($selectedPageSize == 10 ? 'selected' : '') . ">10</option>
                                                 <option value='20' " . ($selectedPageSize == 20 ? 'selected' : '') . ">20</option>
                                                 <option value='40' " . ($selectedPageSize == 40 ? 'selected' : '') . ">40</option>
@@ -40,13 +42,13 @@ echo GridView::widget([
                                        
                                  </div>
                            </div>
-                           " . Html::endForm() . "<div class='table-container'>{items}</div>
+                            <div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
                                   <div class='dataTable-info'>{summary}</div>
                                   <nav class='dataTable-pagination'>
                                         {pager}
                                   </nav>
-                            </div>",
+                            </div>" . Html::endForm(),
     'pager' => [
         'class' => 'yii\bootstrap5\LinkPager',
         'firstPageLabel' => 'PRIMA',
@@ -67,6 +69,11 @@ echo GridView::widget([
     'summary' => 'Mostro elementi da <b>{begin}</b> a <b>{end}</b> di <b>{totalCount}</b><br /><b>SOMMA TOTALE</b>: <b>' . Yii::$app->formatter->asCurrency($totalImporto) . '</b><bt /> (degli elementi mostrati)',
     'columns' => [
         [
+            'attribute' => 'id',
+            'label' => '#',
+            'contentOptions' => ['style' => 'font-weight:bold; width: 50px;'],
+        ],
+        [
             'attribute' => 'data',
             'format' => 'date',
             'label' => 'Data',
@@ -84,16 +91,23 @@ echo GridView::widget([
         ],
         [
             'label' => 'Tipo',
+            'attribute' => 'is_movimento_bancario',
+            'filter' => Html::activeDropDownList($searchModel, 'is_movimento_bancario', ['0' => "CONTABILE", '1' => "BANCARIO"], ['class' => 'form-control', 'prompt' => 'Tutti','onchange'=>'this.form.submit()']),
             'value' => function ($model) {
-                if ($model->id_recupero) {
-                    $type = "Recupero";
-                    if ($model->recupero->rateizzato == 1)
-                        $type .= " (rata " . $model->num_rata . " di " . $model->recupero->num_rate . " )";
-                    return '<span class="badge bg-danger">' . $type . '</span>';
-                } else
-                    return '<span class="badge bg-success">Pagamento</span>';
+            $out = "";
+                if (!$model->is_movimento_bancario) {
+                    $out = '<span class="badge badge bg-secondary">CONTABILE</span><br />';
+                    if ($model->recupero)
+                        $out .= '<span class="badge bg-success">RECUPERO'.($model->recupero->rateizzato ? (' ['.$model->num_rata . " di " . $model->recupero->num_rate.']') : '').'</span>';
+                }
+                else {
+                    $out.= '<span class="badge bg-primary">BANCARIO</span>';
+                }
+                return $out;
             },
             'format' => 'raw',
+            // center the content in the column vertical and horizontal
+            'contentOptions' => ['style' => 'text-align:center; vertical-align:middle;'],
         ],
         [
             'attribute' => 'importo',
@@ -117,11 +131,16 @@ echo GridView::widget([
                 return $model->gruppoPagamento ? $model->gruppoPagamento->descrizione : '-';
             },
             'label' => 'Descrizione Gruppo Pagamento',
-
         ],
+        [
+            'attribute' => 'determina',
+            'value' => function ($model) {
+                return $model->determina ? $model->determina->numero : '-';
+            },
+        ]
     ],
     'emptyText' => 'Nessun movimento presente',
 
 ]);
 
-Pjax::end();
+?>

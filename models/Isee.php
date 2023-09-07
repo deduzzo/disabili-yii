@@ -8,10 +8,11 @@ use Yii;
  * This is the model class for table "isee".
  *
  * @property int $id
- * @property int $maggiore_25mila
- * @property int|null $data_presentazione
- * @property int|null $data_scadenza
- * @property int $valido
+ * @property float|null $importo
+ * @property bool $maggiore_25mila
+ * @property string|null $data_presentazione
+ * @property string|null $data_scadenza
+ * @property bool $valido
  * @property int|null $id_istanza
  *
  * @property Istanza $istanza
@@ -32,8 +33,10 @@ class Isee extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['maggiore_25mila'], 'required'],
-            [['maggiore_25mila', 'data_presentazione', 'data_scadenza', 'valido', 'id_istanza'], 'integer'],
+            [['importo'], 'number'],
+            [['maggiore_25mila', 'valido'], 'boolean'],
+            [['data_presentazione', 'data_scadenza'], 'safe'],
+            [['id_istanza'], 'integer'],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
         ];
     }
@@ -45,6 +48,7 @@ class Isee extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'importo' => 'Importo',
             'maggiore_25mila' => 'Maggiore 25mila',
             'data_presentazione' => 'Data Presentazione',
             'data_scadenza' => 'Data Scadenza',

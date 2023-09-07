@@ -10,16 +10,16 @@ use Yii;
  *
  * @property int $id
  * @property string|null $data_inserimento
- * @property int $riconosciuto
+ * @property bool $riconosciuto
  * @property string|null $classe_disabilita
  * @property string|null $data_riconoscimento
- * @property int|null $patto_di_cura
+ * @property bool $patto_di_cura
  * @property string|null $data_firma_patto
- * @property int $attivo
+ * @property bool $attivo
  * @property string|null $data_decesso
- * @property int|null $liquidazione_decesso_completata
+ * @property bool|null $liquidazione_decesso_completata
  * @property string|null $data_liquidazione_decesso
- * @property int|null $chiuso
+ * @property bool $chiuso
  * @property string|null $data_chiusura
  * @property string|null $nota_chiusura
  * @property string|null $rawdata_json
@@ -36,7 +36,6 @@ use Yii;
  * @property Documento[] $documentos
  * @property Gruppo $gruppo
  * @property Isee[] $isees
- * @property IstanzaLog[] $istanzaLogs
  * @property Recupero[] $recuperos
  * @property Ricovero[] $ricoveros
  */
@@ -57,9 +56,10 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return [
             [['data_inserimento', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura'], 'safe'],
-            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
-            [['attivo', 'id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
-            [['nota_chiusura', 'note','rawdata_json','classe_disabilita'], 'string'],
+            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso'], 'boolean'],
+            [['classe_disabilita', 'nota_chiusura', 'rawdata_json', 'note'], 'string'],
+            [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
+            [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
             [['id_anagrafica_disabile'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_anagrafica_disabile' => 'id']],
             [['id_caregiver'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_caregiver' => 'id']],
             [['id_distretto'], 'exist', 'skipOnError' => true, 'targetClass' => Distretto::class, 'targetAttribute' => ['id_distretto' => 'id']],
@@ -87,6 +87,7 @@ class Istanza extends \yii\db\ActiveRecord
             'chiuso' => 'Chiuso',
             'data_chiusura' => 'Data Chiusura',
             'nota_chiusura' => 'Nota Chiusura',
+            'rawdata_json' => 'Rawdata Json',
             'note' => 'Note',
             'id_anagrafica_disabile' => 'Id Anagrafica Disabile',
             'id_distretto' => 'Id Distretto',
@@ -165,15 +166,6 @@ class Istanza extends \yii\db\ActiveRecord
         return $this->hasMany(Isee::class, ['id_istanza' => 'id']);
     }
 
-    /**
-     * Gets query for [[IstanzaLogs]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getIstanzaLogs()
-    {
-        return $this->hasMany(IstanzaLog::class, ['id_istanza' => 'id']);
-    }
 
     /**
      * Gets query for [[Recuperos]].
@@ -212,7 +204,7 @@ class Istanza extends \yii\db\ActiveRecord
     public function getStatoRecupero()
     {
         $importoRecuperi = 0;
-        $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'recuperato' => 0])->all();
+        $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => 0])->all();
         $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null,'contabilizzare' => 1])->all();
         foreach ($recuperiInCorso as $recupero) {
             $importoRecuperi += $recupero->importo;
@@ -235,7 +227,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function haRecuperiInCorso()
     {
-        return Recupero::find()->where(['id_istanza' => $this->id, 'recuperato' => 0])->count() > 0;
+        return Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => 0])->count() > 0;
     }
 
     public function getContoValido()
@@ -258,5 +250,10 @@ class Istanza extends \yii\db\ActiveRecord
             return $this->anagraficaDisabile->nome . ' ' . $this->anagraficaDisabile->cognome;
         else
             return $this->anagraficaDisabile->cognome_nome;
+    }
+
+    public function getLastMovimentoBancario()
+    {
+        return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id,'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
     }
 }
