@@ -205,7 +205,7 @@ class SiteController extends Controller
             6533, 6586, 6617, 6688, 6761, 6799, 6921, 6946, 6961, 7146,
             7168, 7174, 7175, 7177, 7180, 7205, 7300, 7301, 7302
         ];
-        $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids);
+        $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids,true);
 
     }
 
@@ -251,7 +251,7 @@ class SiteController extends Controller
         return $out;
     }
 
-    private function importaFileConElenchi($path, $soloQuestiId = [])
+    private function importaFileConElenchi($path, $soloQuestiId = [],$azzeraPagamenti = false)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -291,6 +291,8 @@ class SiteController extends Controller
                     if ($istanze && count($soloQuestiId) > 0) {
                         if (count($istanze) === 1) {
                             $istanza = $istanze[0];
+                            if ($azzeraPagamenti)
+                                $istanza->cancellaMovimentiCollegati();
                             if (!in_array($istanza->id, $soloQuestiId))
                                 $istanze = null;
                         } else

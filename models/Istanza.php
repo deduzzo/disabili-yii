@@ -258,4 +258,12 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id,'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
     }
+
+    public function cancellaMovimentiCollegati()
+    {
+        $movimenti = Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id])->all();
+        foreach ($movimenti as $movimento) {
+            $movimento->delete();
+        }
+    }
 }
