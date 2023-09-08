@@ -263,6 +263,8 @@ class SiteController extends Controller
         $errors = [];
         $gruppiPagamento = GruppoPagamento::find([])->all();
         $gruppiPagamentoMap = [];
+        $istanze = null;
+        $lastCf = null;
         foreach ($gruppiPagamento as $gruppo) {
             $gruppiPagamentoMap[$gruppo->progressivo] = $gruppo;
         }
@@ -278,10 +280,14 @@ class SiteController extends Controller
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[PagamentiConIban::IMPORTO]] !== "") {
                     $consideraSoloAttivi = true;
-                    $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
-                    if ($consideraSoloAttivi)
-                        $istanze = $istanze->andWhere(['istanza.attivo' => true]);
-                    $istanze = $istanze->all();
+                    if ($lastCf !== strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))) {
+                        $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
+                        if ($consideraSoloAttivi)
+                            $istanze = $istanze->andWhere(['istanza.attivo' => true]);
+                        $istanze = $istanze->all();
+
+                        $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
+                    }
                     if ($istanze && count($soloQuestiId) > 0) {
                         if (count($istanze) === 1) {
                             $istanza = $istanze[0];

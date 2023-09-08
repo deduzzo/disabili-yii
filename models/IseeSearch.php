@@ -38,14 +38,25 @@ class IseeSearch extends Isee
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$istanza = null)
     {
         $query = Isee::find();
+
+        if($istanza){
+            $query->andWhere(['id_istanza' => $istanza->id]);
+        }
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => array('pageSize' => 10),
+            'sort' => [
+                'defaultOrder' => [
+                    'data_presentazione' => SORT_DESC,
+                    'valido' => SORT_DESC,
+                ]
+            ],
         ]);
 
         $this->load($params);

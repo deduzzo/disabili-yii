@@ -17,7 +17,7 @@ use yii\widgets\DetailView;
         'classe_disabilita',
         'attivo:boolean',
         'data_decesso',
-        'liquidazione_decesso_completata:date',
+        'liquidazione_decesso_completata:boolean',
         'chiuso:boolean',
     ],
 ]) ?>

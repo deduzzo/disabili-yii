@@ -8,9 +8,8 @@ class IseeType extends BaseEnum
 {
     const MAGGIORE_25K = ">MAGGIORE 25k";
     const MINORE_25K = "<MINORE 25k";
-
-    const MINORE_25K_COLOR = "bg-warning";
-    const MAGGIORE_25K_COLOR = "bg-primary";
+    const MINORE_25K_COLOR = "bg-primary";
+    const MAGGIORE_25K_COLOR = "bg-warning";
     const NO_ISEE_COLOR = "bg-secondary";
     /**
      * @var string message category

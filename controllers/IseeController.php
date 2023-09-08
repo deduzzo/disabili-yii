@@ -101,7 +101,6 @@ class IseeController extends Controller
      */
     public function actionDelete($id)
     {
-
         $isee = $this->findModel($id);
         if ($isee) {
             $idIstanza = $isee->id_istanza;
@@ -122,6 +121,11 @@ class IseeController extends Controller
         $data = $this->request->post();
         $istanza = Istanza::findOne($data['id_istanza']);
         if ($istanza && $this->request->isPost && ($data['tipologia'] === 'maggiore' || $data['tipologia'] === 'minore')) {
+            $iseeIstanza = Isee::find()->where(['id_istanza' => $istanza->id])->all();
+            foreach ($iseeIstanza as $isee) {
+                $isee->valido = false;
+                $isee->save();
+            }
             $model = new Isee();
             $model->id_istanza = $istanza->id;
             $model->data_presentazione = Carbon::createFromFormat('d/m/Y', $data['data_presentazione'])->toDateString();

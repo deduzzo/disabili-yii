@@ -2,6 +2,7 @@
 
 use app\models\AnagraficaAltricampi;
 use app\models\enums\IseeType;
+use app\models\IseeSearch;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -11,14 +12,14 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Istanza $model */
 
+$searchModel = new IseeSearch();
+$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $model);
 
 \yii\widgets\Pjax::begin(['id' => 'lista-isee']);
 
 echo GridView::widget([
-    'dataProvider' => new ArrayDataProvider([
-        'allModels' => $model->isees,
-        'pagination' => false,
-    ]),
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'options' => ['class' => 'grid-view small'],
     'columns' => [
         'id',

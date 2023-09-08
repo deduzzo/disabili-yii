@@ -16,7 +16,7 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var Istanza $istanza */
-$this->title = 'Scheda ' . $istanza->anagraficaDisabile->cognome_nome;
+$this->title = $istanza->anagraficaDisabile->cognome_nome;
 $this->params['breadcrumbs'][] = ['label' => 'Istanze', 'url' => ['istanze/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -35,19 +35,25 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div class="card-body" id="card-content">
         <div class="row p-1">
-            <?php if ($istanza->data_decesso === null): ?>
-                <div class="col-md-2 h4 d-flex flex-column align-items-center justify-content-center">
-                    <span class="badge rounded-pill bg-success">In vita</span>
-                </div>
-            <?php else: ?>
-                <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
-                    <span class="badge rounded-pill bg-danger text-xl">Deceduto</span>
-                    <span class="badge rounded-pill bg-danger small">il <?= Yii::$app->formatter->asDate($istanza->data_decesso) ?></span>
-                </div>
-            <?php endif; ?>
+            <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+                <?php if (!$istanza->rinuncia): ?>
+                <span class="badge rounded-pill bg-<?= $istanza->data_decesso === null ? "success": "danger" ?> text-small"><?= $istanza->data_decesso ? ("DECEDUTO ". Yii::$app->formatter->asDate($istanza->data_decesso)) : "IN VITA" ?></span>
+                <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null && $istanza->patto_di_cura && !$istanza->chiuso) ? "success": "danger" ?> text-small"><?=
+                    $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : "ATTIVO DA LIQUIDARE") : ($istanza->attivo ? "ATTIVO":  ($istanza->patto_di_cura ? "CHIUSO": "NON ATTIVO")) ?></span>
+                <?php endif; ?>
+                <?php if ($istanza->rinuncia): ?>
+                    <span class="badge rounded-pill bg-danger text-large">RINUNCIA</span>
+                <?php elseif(!$istanza->patto_di_cura): ?>
+                    <span class="badge rounded-pill bg-warning text-large">MANCA PATTO DI CURA</span>
+                <?php endif; ?>
+            </div>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <div class="text-sm">Distretto</div>
                 <div class="text-success"><?= $istanza->distretto->nome ?></div>
+            </div>
+            <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
+                <div class="text-sm">GRUPPO</div>
+                <div class="text-success"><?= '<div style="display: flex; align-items: center; justify-content: center;"><h5 style="margin-right: 10px;"><span class="badge bg-primary">' . $istanza->gruppo->descrizione_gruppo_old . '</span></h5><h6><span class="badge bg-primary">' . $istanza->gruppo->descrizione_gruppo . '</span></h6></div>' ?></div>
             </div>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?php $ultimo = $istanza->getLastIseeType(); ?>

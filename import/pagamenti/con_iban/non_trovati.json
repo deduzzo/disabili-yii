@@ -1,0 +1,29 @@
+{
+  "CRCNTN61E54G377N": [
+    "DISTRETTO S. AGATA",
+    "1000005",
+    "157394",
+    "CARCIONE ANTONIA",
+    "CRCNTN61E54G377N",
+    {
+      "date": "2020-01-01 00:00:00.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    {
+      "date": "2020-01-31 00:00:00.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "ISEE INFERIORE 25.000\u20ac",
+    "",
+    "",
+    1200,
+    "IT",
+    "73",
+    "T",
+    "08913",
+    "82110",
+    "000000600772"
+  ]
+}

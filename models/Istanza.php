@@ -20,6 +20,7 @@ use Yii;
  * @property bool|null $liquidazione_decesso_completata
  * @property string|null $data_liquidazione_decesso
  * @property bool $chiuso
+ * @property bool $rinuncia
  * @property string|null $data_chiusura
  * @property string|null $nota_chiusura
  * @property string|null $rawdata_json
@@ -56,7 +57,7 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return [
             [['data_inserimento', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura'], 'safe'],
-            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso'], 'boolean'],
+            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso','rinuncia'], 'boolean'],
             [['classe_disabilita', 'nota_chiusura', 'rawdata_json', 'note'], 'string'],
             [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
             [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
@@ -85,6 +86,7 @@ class Istanza extends \yii\db\ActiveRecord
             'liquidazione_decesso_completata' => 'Liquidazione Decesso Completata',
             'data_liquidazione_decesso' => 'Data Liquidazione Decesso',
             'chiuso' => 'Chiuso',
+            'rinuncia' => 'Rinuncia',
             'data_chiusura' => 'Data Chiusura',
             'nota_chiusura' => 'Nota Chiusura',
             'rawdata_json' => 'Rawdata Json',
