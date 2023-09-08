@@ -199,12 +199,19 @@ class SiteController extends Controller
 
     public function actionImportaSoloAlcuniPagamenti()
     {
+        $azzeraPagamenti = true;
         $ids = [
             5595, 5694, 5694, 5886, 5927, 5971, 5976, 6017, 6068, 6073, 6088,
             6152, 6270, 6395, 6466, 6494, 6495, 6505, 6512, 6520, 6530,
             6533, 6586, 6617, 6688, 6761, 6799, 6921, 6946, 6961, 7146,
             7168, 7174, 7175, 7177, 7180, 7205, 7300, 7301, 7302
         ];
+        if ($azzeraPagamenti) {
+            foreach ($ids as $id) {
+                $istanza = Istanza::findOne($id);
+                $istanza->cancellaMovimentiCollegati();
+            }
+        }
         $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids,true);
 
     }
@@ -251,7 +258,7 @@ class SiteController extends Controller
         return $out;
     }
 
-    private function importaFileConElenchi($path, $soloQuestiId = [],$azzeraPagamenti = false)
+    private function importaFileConElenchi($path, $soloQuestiId = [])
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -286,13 +293,11 @@ class SiteController extends Controller
                             $istanze = $istanze->andWhere(['istanza.attivo' => true]);
                         $istanze = $istanze->all();
 
-                        $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
                     }
                     if ($istanze && count($soloQuestiId) > 0) {
                         if (count($istanze) === 1) {
                             $istanza = $istanze[0];
-                            if ($azzeraPagamenti)
-                                $istanza->cancellaMovimentiCollegati();
+                            $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
                             if (!in_array($istanza->id, $soloQuestiId))
                                 $istanze = null;
                         } else
