@@ -62,8 +62,8 @@ echo GridView::widget([
     ],
     'summary' => 'Mostro elementi da <b>{begin}</b> a <b>{end}</b> di <b>{totalCount}</b>',
     'columns' => [
+        'id',
         'iban',
-        //'contoCessionarios',
         'attivo:boolean',
         'note',
     ],

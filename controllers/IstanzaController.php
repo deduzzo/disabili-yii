@@ -90,12 +90,17 @@ class IstanzaController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $fromScheda = false)
     {
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($fromScheda) {
+                Yii::$app->session->setFlash('success', 'Istanza aggiornata con successo.');
+                return $this->redirect(['scheda', 'id' => $model->id]);
+            }
+            else
+                return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [

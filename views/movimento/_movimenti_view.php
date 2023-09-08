@@ -121,7 +121,7 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
             // show the value of $model->conto->iban on mouse hover
             'format' => 'raw',
             'value' => function ($model) {
-                return '<div data-toggle="tooltip" data-placement="top" title="' . $model->conto->iban . '">' .
+                return '<div data-bs-toggle="tooltip" data-bs-placement="top" title="' . $model->conto->iban . '">' .
                     '*****' . substr($model->conto->iban, -4) . '</div>';
             }
         ],

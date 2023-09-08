@@ -163,7 +163,8 @@ class SiteController extends Controller
         }
     }
 
-    public function actionAggiornaIsee() {
+    public function actionAggiornaIsee()
+    {
         $nonTrovati = [];
         $errors = [];
         $res = Yii::$app->getDb()->createCommand("select distinct istanza.id from istanza where istanza.attivo = true AND istanza.id not in
@@ -187,14 +188,25 @@ class SiteController extends Controller
                         $errors = array_merge($errors, ['isee-' . $istanza->id => $isee->errors]);
                 } else
                     $nonTrovati[] = $istanza->id;
-            }
-            else
+            } else
                 $nonTrovati[] = $istanza->id;
         }
         // save $nonTrovati keys as text file
         $fp = fopen('../import/non_trovati.txt', 'w');
         fwrite($fp, implode("\t", $nonTrovati));
         fclose($fp);
+    }
+
+    public function actionImportaSoloAlcuniPagamenti()
+    {
+        $ids = [
+            5595, 5694, 5694, 5886, 5927, 5971, 5976, 6017, 6068, 6073, 6088,
+            6152, 6270, 6395, 6466, 6494, 6495, 6505, 6512, 6520, 6530,
+            6533, 6586, 6617, 6688, 6761, 6799, 6921, 6946, 6961, 7146,
+            7168, 7174, 7175, 7177, 7180, 7205, 7300, 7301, 7302
+        ];
+        $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids);
+
     }
 
     private function importaPagamenti($importaElenchi, $importaPagamenti)
@@ -239,7 +251,7 @@ class SiteController extends Controller
         return $out;
     }
 
-    private function importaFileConElenchi($path)
+    private function importaFileConElenchi($path, $soloQuestiId = [])
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -265,8 +277,21 @@ class SiteController extends Controller
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[PagamentiConIban::IMPORTO]] !== "") {
-                    $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))])->one();
-                    if ($istanza) {
+                    $consideraSoloAttivi = true;
+                    $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
+                    if ($consideraSoloAttivi)
+                        $istanze = $istanze->andWhere(['istanza.attivo' => true]);
+                    $istanze = $istanze->all();
+                    if ($istanze && count($soloQuestiId) > 0) {
+                        if (count($istanze) === 1) {
+                            $istanza = $istanze[0];
+                            if (!in_array($istanza->id, $soloQuestiId))
+                                $istanze = null;
+                        } else
+                            $error = true;
+                    }
+                    if ($istanze && count($istanze) === 1) {
+                        $istanza = $istanze[0];
                         $ultimoConto = $istanza->getContoValido();
                         $iban = $newRow[$header[PagamentiConIban::IBAN1]] . $newRow[$header[PagamentiConIban::IBAN2]] . $newRow[$header[PagamentiConIban::IBAN3]] . $newRow[$header[PagamentiConIban::IBAN4]] . $newRow[$header[PagamentiConIban::IBAN5]] . $newRow[$header[PagamentiConIban::IBAN6]];
                         if ($iban === "")
@@ -291,8 +316,10 @@ class SiteController extends Controller
                         }
                         $movimento = new Movimento();
                         $movimento->id_conto = $conto->id;
+                        $movimento->is_movimento_bancario = true;
                         $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
                         $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                        $movimento->data = $movimento->periodo_a;
                         $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
                         $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
                         if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
@@ -306,8 +333,9 @@ class SiteController extends Controller
                         if ($movimento->errors)
                             $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
                     } else {
-                        if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
-                            $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
+                        if (($istanze && count($soloQuestiId) > 0 && count($istanze) !== 1) || count($soloQuestiId) === 0)
+                            if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
+                                $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
                     }
                 }
                 $rowIndex++;

@@ -24,7 +24,8 @@
         "globalcitizen/php-iban": "^4.2",
         "richardfan1126/yii2-js-register": "^0.0.1",
         "kartik-v/yii2-icons": "^1.4",
-        "nesbot/carbon": "^2.69"
+        "nesbot/carbon": "^2.69",
+        "kartik-v/yii2-editors": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

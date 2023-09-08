@@ -194,9 +194,9 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getLastIseeType()
     {
-        $last = Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
+        $last = Isee::find()->where(['id_istanza' => $this->id, 'valido' => true])->orderBy(['data_presentazione' => SORT_DESC])->one();
         if ($last)
-            return ($last->maggiore_25mila === 0) ? IseeType::MINORE_25K : IseeType::MAGGIORE_25K;
+            return ($last->maggiore_25mila) ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
         else
             return null;
     }

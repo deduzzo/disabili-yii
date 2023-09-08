@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Isee;
 use app\models\IseeSearch;
 use app\models\Istanza;
+use app\models\Movimento;
 use Carbon\Carbon;
 use Yii;
 use yii\web\Controller;
@@ -19,20 +20,6 @@ class IseeController extends Controller
     /**
      * @inheritDoc
      */
-    public function behaviors()
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
-            ]
-        );
-    }
 
     /**
      * Lists all Isee models.
@@ -114,10 +101,21 @@ class IseeController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
 
+        $isee = $this->findModel($id);
+        if ($isee) {
+            $idIstanza = $isee->id_istanza;
+            $isee->delete();
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->session->setFlash('success', 'ISEE cancellato con successo.');
+                return $this->redirect(['/istanza/scheda', 'id' => $idIstanza]);
+            } else {
+                return $this->redirect(['index']);
+            }
+        }
         return $this->redirect(['index']);
     }
+
 
     public function actionAggiungiDaIstanza()
     {
