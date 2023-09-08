@@ -212,8 +212,8 @@ class SiteController extends Controller
                 $istanza->cancellaMovimentiCollegati();
             }
         }
-        $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids,true);
-
+        $this->importaFileConElenchi('../import/pagamenti/con_iban/con_iban.xlsx', $ids);
+        echo "OK";
     }
 
     private function importaPagamenti($importaElenchi, $importaPagamenti)
