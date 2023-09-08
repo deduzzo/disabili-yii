@@ -243,7 +243,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public static function getNumDecedutiDaLiquidare()
     {
-        return Istanza::find()->where(['attivo' => 1])->andWhere(['IS NOT','data_decesso', null])->andWhere(['OR',['liquidazione_decesso_completata' =>null],['liquidazione_decesso_completata' => 0]])->count();
+        return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT','data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
     }
 
     public function getNominativoDisabile()
