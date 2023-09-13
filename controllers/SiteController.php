@@ -35,31 +35,6 @@ use app\models\ContactForm;
 
 class SiteController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
 
     /**
      * {@inheritdoc}
@@ -600,6 +575,10 @@ class SiteController extends Controller
     function actionAbout()
     {
         return $this->render('about');
+    }
+
+    public function actionError() {
+        return $this->render('error'); // puoi personalizzare questo per visualizzare una vista o un messaggio specifico
     }
 
 }

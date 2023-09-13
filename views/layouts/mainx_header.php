@@ -30,7 +30,7 @@ $themeMazer = MainAsset::register($this);
 						</div>
 						<div class="text">
 							<h6 class="user-dropdown-name">
-								Anov Siradj
+								<?= ArrayHelper::getValue(Yii::$app->user->identity, 'username') ?>
 							</h6>
 							<p class="user-dropdown-status text-sm text-muted">
 								Administrator

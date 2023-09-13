@@ -27,6 +27,10 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl'=> ['auth/login'],
+            'authTimeout' => 60*60*24*7, // 7 days
+            // set 404 url
+            'returnUrl' => ['/site/index'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -45,6 +49,11 @@ $config = [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+            // uncomment if you want to cache RBAC items hierarchy
+            // 'cache' => 'cache',
         ],
         'db' => $db,
 /*        'assetManager' => [
@@ -68,6 +77,20 @@ $config = [
             'dateFormat' => 'dd/MM/yyyy',
             'currencyCode' => 'EUR',
         ],
+    ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'except' => ['auth/login', 'site/error', 'site/non-autorizzato'], // elenco delle azioni escluse
+        'rules' => [
+            // Se hai regole specifiche, puoi aggiungerle qui. Altrimenti, puoi semplicemente negare tutto e gestire le autorizzazioni a livello di controller.
+            [
+                'allow' => true,
+                'roles' => ['@'],
+            ],
+        ],
+        'denyCallback' => function ($rule, $action) {
+            Yii::$app->response->redirect(['auth/login']);
+        },
     ],
     'params' => $params,
 ];

@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $cognome_nome
+ * @property string|null $cognome
  * @property string|null $nome
  * @property string|null $codice_fiscale
  * @property string|null $data_nascita
@@ -40,7 +41,7 @@ class Anagrafica extends \yii\db\ActiveRecord
         return [
             [['cognome_nome'], 'required'],
             [['data_nascita'], 'safe'],
-            [['cognome_nome', 'nome', 'comune_nascita', 'comune_residenza'], 'string', 'max' => 100],
+            [['cognome_nome', 'nome','cognome', 'comune_nascita', 'comune_residenza'], 'string', 'max' => 100],
             [['codice_fiscale'], 'string', 'max' => 20],
             [['indirizzo_residenza'], 'string', 'max' => 200],
             [['codice_fiscale'], 'unique'],
@@ -56,6 +57,7 @@ class Anagrafica extends \yii\db\ActiveRecord
             'id' => 'ID',
             'cognome_nome' => 'Nominativo',
             'nome' => 'Nome',
+            'cognome' => 'Cognome',
             'codice_fiscale' => 'Codice Fiscale',
             'data_nascita' => 'Data Nascita',
             'comune_nascita' => 'Comune Nascita',
