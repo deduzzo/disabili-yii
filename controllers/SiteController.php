@@ -12,7 +12,6 @@ use app\models\Distretto;
 use app\models\enums\FileParisi;
 use app\models\enums\FileRicoveri;
 use app\models\enums\ImportoBase;
-use app\models\enums\IseeType;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
 use app\models\Gruppo;
@@ -51,6 +50,7 @@ class SiteController extends Controller
             ],
         ];
     }
+    // add permission
 
     /**
      * Displays homepage.
@@ -571,14 +571,20 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public
-    function actionAbout()
+    public function actionAbout()
     {
         return $this->render('about');
     }
 
-    public function actionError() {
-        return $this->render('error'); // puoi personalizzare questo per visualizzare una vista o un messaggio specifico
+    public function actionErrore()
+    {
+        $this->layout = "errore";
+        $exception = Yii::$app->errorHandler->exception;
+        if ($exception !== null) {
+            return $this->render('errore', ['exception' => $exception]);
+        }
+        else
+            return $this->redirect(['site/index']);
     }
 
 }

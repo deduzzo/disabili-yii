@@ -33,7 +33,7 @@ $config = [
             'returnUrl' => ['/site/index'],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'site/errore',
         ],
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
@@ -80,9 +80,8 @@ $config = [
     ],
     'as access' => [
         'class' => 'yii\filters\AccessControl',
-        'except' => ['auth/login', 'site/error', 'site/non-autorizzato'], // elenco delle azioni escluse
+        'except' => ['auth/login', 'site/error', 'site/non-autorizzato','auth/password-dimenticata'], // elenco delle azioni escluse
         'rules' => [
-            // Se hai regole specifiche, puoi aggiungerle qui. Altrimenti, puoi semplicemente negare tutto e gestire le autorizzazioni a livello di controller.
             [
                 'allow' => true,
                 'roles' => ['@'],

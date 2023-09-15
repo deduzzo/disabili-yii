@@ -7,29 +7,6 @@ use yii\filters\AccessControl;
 
 class AuthController extends \yii\web\Controller
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'actions' => ['login', 'reset-password'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'actions' => ['logout', 'profile'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => false,
-                    ],
-                ],
-            ],
-        ];
-    }
 
 
 
@@ -39,11 +16,6 @@ class AuthController extends \yii\web\Controller
         return $this->render('password_dimenticata');
     }
 
-    public function actionResetPassword()
-    {
-        $this->layout = 'auth';
-        return $this->render('reset_password');
-    }
 
 /*    public function actionSignup()
     {
