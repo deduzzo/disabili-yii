@@ -127,7 +127,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => "ISEE",
                     'format' => 'raw',
                     'value' => function ($model) {
-                        return '<span class="badge '.($model->getLastIseeType() === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : (IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)).'">'.Html::encode($model->getLastIseeType()).'</span>';
+                        $isee = $model->getLastIseeType();
+                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($model->getLastIseeType()) . '</span>';
                     },
                     // set column size max 100px and text center
                     'contentOptions' => function ($model) {
