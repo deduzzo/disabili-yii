@@ -15,6 +15,7 @@ class IstanzaSearch extends Istanza
     public $cognomeNome;
     public $cf;
     public $distretto;
+    public $isee;
 
     /**
      * {@inheritdoc}
@@ -46,6 +47,7 @@ class IstanzaSearch extends Istanza
      */
     public function search($params)
     {
+        $this->isee = $params['IstanzaSearch']['isee'] ?? null;
         $this->descrizione_gruppo = $params['IstanzaSearch']['descrizione_gruppo'] ?? null;
         $this->cognomeNome = $params['IstanzaSearch']['cognomeNome'] ?? null;
         $this->cf = $params['IstanzaSearch']['cf'] ?? null;
@@ -87,7 +89,6 @@ class IstanzaSearch extends Istanza
                 'asc' => ['distretto.nome' => SORT_ASC],
                 'desc' => ['distretto.nome' => SORT_DESC],
             ];
-
         $this->load($params);
 
         if (!$this->validate()) {
@@ -118,6 +119,7 @@ class IstanzaSearch extends Istanza
             'id_distretto' => $this->id_distretto,
             'id_gruppo' => $this->id_gruppo,
             'id_caregiver' => $this->id_caregiver,
+            'isee' => $this->isee
         ]);
 
         $query->andFilterWhere(['like', 'classe_disabilita', $this->classe_disabilita])

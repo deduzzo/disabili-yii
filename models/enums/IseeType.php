@@ -10,6 +10,7 @@ class IseeType extends BaseEnum
     const MINORE_25K = "<MINORE 25k";
     const MINORE_25K_COLOR = "bg-primary";
     const MAGGIORE_25K_COLOR = "bg-warning";
+    const NO_ISEE = "N/D";
     const NO_ISEE_COLOR = "bg-secondary";
     /**
      * @var string message category
@@ -24,5 +25,6 @@ class IseeType extends BaseEnum
     public static $list = [
         self::MAGGIORE_25K => 'Maggiore di 25.000€',
         self::MINORE_25K => 'Minore di 25.000€',
+        self::NO_ISEE => 'N/D',
     ];
 }

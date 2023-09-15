@@ -13,9 +13,9 @@ use yii\widgets\DetailView;
 /** @var app\models\Istanza $istanza */
 
 ?>
-<button class="btn btn-primary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#note-panel"
-        aria-expanded="false" aria-controls="collapseExample">
-    <span data-bs-toggle="tooltip" data-bs-placement="top" title="<?= htmlspecialchars($istanza->note) ?>"  data-bs-html="true" class="badge bg-primary">Note <i class="bi bi-info-circle"></i></span>
+<button class="btn btn-<?=trim(strip_tags($istanza->note)) === "" ? "primary" : "danger" ?> collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#note-panel"
+        aria-expanded="false" aria-controls="collapseExample" >
+    <span data-bs-toggle="tooltip" data-bs-placement="top" title="<?= trim(strip_tags($istanza->note)) === "" ? "Nessuna nota presente" : htmlspecialchars($istanza->note) ?>"  data-bs-html="true" class="badge <?=trim(strip_tags($istanza->note)) === "" ? "bg-primary" : "bg-danger" ?>">Note <i class="bi bi-info-circle"></i></span>
 </button>
 <div class="collapse" id="note-panel" style="">
     <?php

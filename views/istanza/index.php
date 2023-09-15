@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Distretto;
+use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
 use yii\bootstrap5\Html;
@@ -121,6 +122,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
+                    'attribute' => 'isee',
+                    'filter' => Html::activeDropDownList($searchModel, 'isee', ['Maggiore' => IseeType::MAGGIORE_25K, 'Minore' => IseeType::MINORE_25K, "N/D" => IseeType::NO_ISEE], ['class' => 'form-control', 'prompt' => 'Tutti']),
+                    'label' => "ISEE",
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        return '<span class="badge '.($model->getLastIseeType() === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : (IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)).'">'.Html::encode($model->getLastIseeType()).'</span>';
+                    },
+                    // set column size max 100px and text center
+                    'contentOptions' => function ($model) {
+                        return ['style' => 'width:150px; text-align:center;'];
+                    },
+                ],
+                [
                     'attribute' => 'cf',
                     'value' => 'anagraficaDisabile.codice_fiscale',
                     'label' => "CF",
@@ -137,12 +151,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     // set column size max 100px and text center
                     'contentOptions' => function ($model) {
                         return ['style' => 'width:400px; text-align:center;'];
-                    },
-                ],
-                [
-                    'label' => "n°Ricoveri",
-                    'value' => function ($model) {
-                        return count($model->ricoveros);
                     },
                 ],
                 [

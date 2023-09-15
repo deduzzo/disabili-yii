@@ -200,7 +200,7 @@ class Istanza extends \yii\db\ActiveRecord
         if ($last)
             return ($last->maggiore_25mila) ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
         else
-            return null;
+            return IseeType::NO_ISEE;
     }
 
     public function getStatoRecupero()

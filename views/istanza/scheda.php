@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?php $ultimo = $istanza->getLastIseeType(); ?>
                 <div class="text-sm">Ultimo ISEE</div>
-                <span class='badge <?= !$ultimo ? IseeType::NO_ISEE_COLOR : (($ultimo !== IseeType::MAGGIORE_25K) ? IseeType::MINORE_25K_COLOR : IseeType::MAGGIORE_25K_COLOR) ?>'><?= ($ultimo !== null) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
+                <span class='badge <?= $ultimo === IseeType::NO_ISEE ? IseeType::NO_ISEE_COLOR : (($ultimo !== IseeType::MAGGIORE_25K) ? IseeType::MINORE_25K_COLOR : IseeType::MAGGIORE_25K_COLOR) ?>'><?= ($ultimo !== IseeType::NO_ISEE) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
             </div>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?= $istanza->getStatoRecupero() ?>
