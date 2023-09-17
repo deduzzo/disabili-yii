@@ -88,13 +88,29 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => [
                 [
                     'attribute' => 'attivo',
-                    'filter' => Html::activeDropDownList($searchModel, 'attivo', ['1' => "ATTIVO", '0' => "CHIUSO"], ['class' => 'form-control', 'prompt' => 'Tutti']),
+                    'filter' => Html::activeDropDownList($searchModel, 'attivo', ['1' => "ATTIVO", '0' => "NON ATTIVO"], ['class' => 'form-control', 'prompt' => 'Tutti']),
                     'content' => function ($model) {
                         return Html::tag('span', $model->attivo ? 'Attivo' : 'Non attivo', [
                             'class' => $model->attivo ? 'badge bg-success' : 'badge bg-danger'
-                        ]);
+                        ]).($model->chiuso ? Html::tag('span', 'Chiuso', [
+                            'class' => 'badge bg-danger'
+                        ]) : (!$model->attivo ? Html::tag('span', 'Aperto', [
+                            'class' => 'badge bg-success'
+                        ]): ""));
                     },
                     'contentOptions' => ['style' => 'width:150px; text-align:center;'],
+                ],
+                [
+                    'attribute' => 'cognomeNome',
+                    'label' => "Nominativo",
+                    'filter' => Html::activeTextInput($searchModel, 'cognomeNome', ['class' => 'form-control']),
+                    // set column size max 100px and text center
+                    'contentOptions' => function ($model) {
+                        return ['style' => 'width:400px; text-align:center;'];
+                    },
+                    'value' => function ($model) {
+                        return $model->getNominativoDisabile();
+                    },
                 ],
                 [
                     'attribute' => 'gruppo.descrizione_gruppo',
@@ -144,15 +160,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         return ['style' => 'width:200px; text-align:center;'];
                     },
                 ],
+                // eta
                 [
-                    'value' => 'anagraficaDisabile.cognome_nome',
-                    'attribute' => 'cognomeNome',
-                    'label' => "Nominativo",
-                    'filter' => Html::activeTextInput($searchModel, 'cognomeNome', ['class' => 'form-control']),
-                    // set column size max 100px and text center
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:400px; text-align:center;'];
+                    'attribute' => 'eta',
+                    'label' => "Età",
+                    'value' => function ($model) {
+                        return $model->anagraficaDisabile->getEta();
                     },
+                    'contentOptions' => function ($model) {
+                        return ['style' => 'width:100px; text-align:center;'];
+                    },
+                ],
+                [
+                    'attribute' => 'recuperos',
+                    'label' => "Recupero?",
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        return $model->haRecuperiInCorso()
+                            ? '<span class="badge bg-warning text-dark h6">SI</span>'
+                            : '<span class="badge bg-success">NO</span>';
+                    }
                 ],
                 [
                     'class' => ActionColumn::className(),

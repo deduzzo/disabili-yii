@@ -4,10 +4,12 @@ namespace app\models\enums;
 
 use yii2mod\enum\helpers\BaseEnum;
 
-class TipologiaDatiTipologia extends BaseEnum
+class AnagraficaType extends BaseEnum
 {
-    const AZIONE = 'azione';
-    const DATO = "dato";
+    const MINORE_18_COLOR = 'bg-warning';
+    const MAGGIORE_18_COLOR = 'bg-info';
+
+
 
     /**
      * @var string message category
@@ -20,7 +22,7 @@ class TipologiaDatiTipologia extends BaseEnum
      * @var array
      */
     public static $list = [
-        self::AZIONE => 'Azione',
-        self::DATO => 'Dato',
+        self::MINORE_18_COLOR => 'Minore di 18 anni',
+        self::MAGGIORE_18_COLOR => 'Maggiore di 18 anni',
     ];
 }

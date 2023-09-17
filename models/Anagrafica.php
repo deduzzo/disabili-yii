@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use Carbon\Carbon;
 use Yii;
 
 /**
@@ -114,5 +115,16 @@ class Anagrafica extends \yii\db\ActiveRecord
     public function getResidenzas()
     {
         return $this->hasMany(Residenza::class, ['id_anagrafica' => 'id']);
+    }
+
+    public function getEta()
+    {
+        if (!$this->data_nascita)
+            return null;
+        return Carbon::parse($this->data_nascita)->age;
+    }
+
+    public function isMinorenne() {
+        return $this->getEta() < 18;
     }
 }

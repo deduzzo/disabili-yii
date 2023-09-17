@@ -17,6 +17,10 @@ $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $model);
 
 \yii\widgets\Pjax::begin(['id' => 'lista-isee']);
 
+if ($model->anagraficaDisabile->isMinorenne())
+    // echo badge "Isee non necessario in quanto <18"
+    echo '<span class="badge bg-info">Isee non necessario in quanto minorenne</span>';
+
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,

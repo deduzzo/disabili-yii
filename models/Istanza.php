@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use app\models\enums\DatiTipologia;
 use app\models\enums\IseeType;
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "istanza".
@@ -50,6 +52,27 @@ class Istanza extends \yii\db\ActiveRecord
         return 'istanza';
     }
 
+    public static function getTotaliAttivi(string $tipoDato, $distretto = null, $gruppo = null)
+    {
+        $query = Istanza::find()->
+        innerJoin('anagrafica a', 'istanza.id_anagrafica_disabile = a.id')->
+        where(['istanza.attivo' => true, 'istanza.chiuso' => false]);
+        switch ($tipoDato) {
+            case DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI:
+                break;
+            case DatiTipologia::LISTA_MINORI18:
+                $query->andWhere('a.data_nascita > DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
+                break;
+            case DatiTipologia::LISTA_MAGGIORI_18:
+                $query->andWhere('a.data_nascita <= DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
+                break;
+            case DatiTipologia::LISTA_NO_DATA_NASCITA:
+                $query->andWhere(['a.data_nascita' => null]);
+                break;
+        }
+        return $query->count();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -57,7 +80,7 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return [
             [['data_inserimento', 'data_riconoscimento', 'data_firma_patto', 'data_decesso', 'data_liquidazione_decesso', 'data_chiusura'], 'safe'],
-            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso','rinuncia'], 'boolean'],
+            [['riconosciuto', 'patto_di_cura', 'attivo', 'liquidazione_decesso_completata', 'chiuso', 'rinuncia'], 'boolean'],
             [['classe_disabilita', 'nota_chiusura', 'rawdata_json', 'note'], 'string'],
             [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo'], 'required'],
             [['id_anagrafica_disabile', 'id_distretto', 'id_gruppo', 'id_caregiver'], 'integer'],
@@ -196,18 +219,22 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getLastIseeType()
     {
-        $last = Isee::find()->where(['id_istanza' => $this->id, 'valido' => true])->orderBy(['data_presentazione' => SORT_DESC])->one();
-        if ($last)
-            return ($last->maggiore_25mila) ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
-        else
-            return IseeType::NO_ISEE;
+        if ($this->anagraficaDisabile->isMinorenne())
+            return IseeType::MINORE_25K;
+        else {
+            $last = $this->getLastIsee();
+            if ($last)
+                return ($last->maggiore_25mila) ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
+            else
+                return IseeType::NO_ISEE;
+        }
     }
 
     public function getStatoRecupero()
     {
         $importoRecuperi = 0;
         $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => 0])->all();
-        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null,'contabilizzare' => 1])->all();
+        $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null, 'contabilizzare' => 1])->all();
         foreach ($recuperiInCorso as $recupero) {
             $importoRecuperi += $recupero->importo;
             $recuperato = Movimento::find()->where(['id_recupero' => $recupero->id, 'tornato_indietro' => 0])->all();
@@ -224,7 +251,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function haRicoveriDaRecuperare()
     {
-        return Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null,'contabilizzare' => 1])->count() > 0;
+        return Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null, 'contabilizzare' => 1])->count() > 0;
     }
 
     public function haRecuperiInCorso()
@@ -236,6 +263,7 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => 1])->one();
     }
+
     public static function getNumIstanzeAttive()
     {
         return Istanza::find()->where(['attivo' => 1])->count();
@@ -243,20 +271,20 @@ class Istanza extends \yii\db\ActiveRecord
 
     public static function getNumDecedutiDaLiquidare()
     {
-        return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT','data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
+        return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT', 'data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
     }
 
     public function getNominativoDisabile()
     {
         if ($this->anagraficaDisabile->nome)
-            return $this->anagraficaDisabile->nome . ' ' . $this->anagraficaDisabile->cognome;
+            return $this->anagraficaDisabile->cognome . ' ' . $this->anagraficaDisabile->nome;
         else
             return $this->anagraficaDisabile->cognome_nome;
     }
 
     public function getLastMovimentoBancario()
     {
-        return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id,'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
+        return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
     }
 
     public function cancellaMovimentiCollegati()

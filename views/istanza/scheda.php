@@ -2,6 +2,7 @@
 
 use app\helpers\Utils;
 use app\models\Distretto;
+use app\models\enums\AnagraficaType;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
@@ -63,7 +64,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
                 <?= $istanza->getStatoRecupero() ?>
             </div>
-
+            <div class="col-md-1 h6 d-flex flex-column align-items-center justify-content-center">
+                <div class="badge text-sm text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->isMinorenne() ? "<18 ANNI" : "MAGGIORENNE" ?></div>
+                <div class="badge text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->getEta().' anni' ?></div>
         </div>
         <div class="row">
             <div class="col-md-6">
