@@ -11,15 +11,18 @@ use yii\db\Query;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex()
+    public function actionIndex($distretto = null)
     {
-
         $searchModel = new SimulazioneDeterminaSearch();
-        $allIstanze = Istanza::find()->where(['attivo' => true, 'chiuso' => false,'id_distretto' => 4])->all();
+        $allIstanze = Istanza::find()->where(['attivo' => true, 'chiuso' => false]);
+        if ($distretto)
+            $allIstanze->andWhere(['id_distretto' => $distretto]);
+        $allIstanze = $allIstanze->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
         foreach ($allIstanze as $istanza) {
             /* @var $istanza Istanza */
+            $differenza =  $istanza->getDifferenzaUltimoImportoArray();
             $istanzeArray[] = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
@@ -30,6 +33,8 @@ class DeterminaController extends \yii\web\Controller
                 'eta' => $istanza->anagraficaDisabile->getEta(),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo,
                 'importo' => $istanza->getProssimoImporto(),
+                'opArray' => $differenza,
+                'operazione' => $differenza['op'],
             ];
         }
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
@@ -37,6 +42,7 @@ class DeterminaController extends \yii\web\Controller
         return $this->render('simulazione', [
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
+            'distretto' => $distretto,
         ]);
     }
 

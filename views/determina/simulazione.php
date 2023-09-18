@@ -26,33 +26,48 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="card">
     <div class="row">
         <div class="col-md-6">
-
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-toolbar">
+                        <h4 class="card-title">Opzioni</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- add select box for distretto -->
+                    <?= Html::beginForm(['determina/'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) ?>
+                    <?= Html::dropDownList('distretto', $distretto, ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'), ['class' => 'form-control', 'prompt' => 'Tutti i distretti']) ?>
+                    <?= Html::submitButton('Filtra', ['class' => 'btn btn-primary']) ?>
+                    <?= Html::endForm() ?>
+                </div>
+            </div>
         </div>
         <div class="col-md-6">
             <!-- add card header title "Verifica dati" -->
-            <div class="card-header">
-                <div class="card-toolbar">
-                    <h4 class="card-title">Sommario</h4>
+            <div clas="card">
+                <div class="card-header">
+                    <div class="card-toolbar">
+                        <h4 class="card-title">Sommario</h4>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>TOTALI Attivi e Non chiusi</span>
-                        <span class="badge bg-info badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI) ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Minori di 18 anni</span>
-                        <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MINORI18) ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Maggiori di 18 anni</span>
-                        <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MAGGIORI_18) ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>NO data nascita</span>
-                        <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_NO_DATA_NASCITA) ?></span>
-                </ul>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>TOTALI Attivi e Non chiusi</span>
+                            <span class="badge bg-info badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI) ?></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Minori di 18 anni</span>
+                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MINORI18) ?></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Maggiori di 18 anni</span>
+                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MAGGIORI_18) ?></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>NO data nascita</span>
+                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_NO_DATA_NASCITA) ?></span>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -95,6 +110,32 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'table table-striped dataTable-table',
                     'id' => 'table1',
                 ],
+                'columns' => [
+                    'id',
+                    'cf',
+                    'cognome',
+                    'nome',
+                    'distretto',
+                    'isee',
+                    'eta',
+                    'gruppo',
+                    [
+                        'attribute' => 'importo',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
+                        }
+                    ],
+                    [
+                        'attribute' => 'operazione',
+                        'format' => 'raw',
+                        'label' => "Operazione",
+                        'value' => function ($model) {
+                            return "<span class='badge bg-" . ($model['opArray']['alert'] ? 'danger' : 'warning') . "'>" . $model['operazione'] . "</span>";
+                        },
+                        'contentOptions' => ['class' => 'text-center'],
+                    ]
+                ]
             ]);
             ?>
         </div>

@@ -298,11 +298,11 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getProssimoImporto()
     {
-        /* @var $lastIsee Isee */
-        $lastIsee = $this->getLastIsee();
-        if (!$this->getLastIsee())
+        if ($this->isInAlert())
             return null;
         else {
+            /* @var $lastIsee Isee */
+            $lastIsee = $this->getLastIsee();
             $totale = $lastIsee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
             foreach ($this->recuperos as $recupero) {
                 if (!$recupero->chiuso && !$recupero->annullato) {
@@ -319,5 +319,28 @@ class Istanza extends \yii\db\ActiveRecord
             }
         }
         return $totale;
+    }
+
+    public function getDifferenzaUltimoImportoArray()
+    {
+        $op = $this->isInAlert();
+        $lastMovimento = $this->getLastMovimentoBancario();
+        if (!$this->attivo)
+            return ['alert' => $op != null, 'presenteScorsoMese' => true, 'importo' =>  0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE'];
+        $prossimoImporto = $this->getProssimoImporto();
+        $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0);
+        if ($prossimoImporto < 0.0)
+            return ['alert' => $op != null,'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> (importo '.$prossimoImporto.')'];
+        if ($lastMovimento)
+            return ['alert' => $op != null,'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'differenza' => $differenza , 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "")];
+        else
+            return ['alert' => $op != null,'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'differenza' => $differenza , 'op' => $op ?? "AGGIUNGERE"];
+    }
+
+    public function isInAlert() {
+        $out = null;
+        if (!$this->getLastIsee())
+            $out = "MANCA ISEE";
+        return $out;
     }
 }

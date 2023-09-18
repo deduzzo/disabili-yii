@@ -123,7 +123,7 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionImport($importaElenchi = false, $importaFileParisi = false, $importaPagamenti = true, $importaRicoveri = true, $append = false)
+    public function actionImport($importaElenchi = false, $importaFileParisi = false, $importaPagamenti = false, $append = true)
     {
         $attivo = false;
         if ($attivo) {
@@ -140,10 +140,8 @@ class SiteController extends Controller
                 Conto::deleteAll();
             }
             if ($importaFileParisi)
-                $this->importaFileParisi('../import/parisi/out.xlsx', false);
+                $this->importaFileParisi('../import/parisi/out2.xlsx', true);
             $this->importaPagamenti($importaElenchi, $importaPagamenti);
-            if ($importaRicoveri)
-                $this->importaRicoveri("../import/ricoveri/");
         }
     }
 
@@ -184,15 +182,10 @@ class SiteController extends Controller
     public function actionImportaSoloAlcuniPagamenti()
     {
         $azzeraPagamenti = true;
-        $ids = [
-            5595, 5694, 5694, 5886, 5927, 5971, 5976, 6017, 6068, 6073, 6088,
-            6152, 6270, 6395, 6466, 6494, 6495, 6505, 6512, 6520, 6530,
-            6533, 6586, 6617, 6688, 6761, 6799, 6921, 6946, 6961, 7146,
-            7168, 7174, 7175, 7177, 7180, 7205, 7300, 7301, 7302
-        ];
+        $ids = Istanza::find()->where(['id_distretto' => 7])->select(['id'])->column();
         if ($azzeraPagamenti) {
             foreach ($ids as $id) {
-                $istanza = Istanza::findOne($id);
+                $istanza = Istanza::findOne(intval($id));
                 $istanza->cancellaMovimentiCollegati();
             }
         }
@@ -382,10 +375,12 @@ class SiteController extends Controller
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[FileParisi::CHIUSO]] !== "") {
-                    if (!$aggiorna) {
+                    $d = strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 1, 5));
+                    if (!$aggiorna || strpos($d, "IST") !== false) {
                         $cessionario = null;
                         // find distretto where "nome" Like the first 2 character of $newRow[$header[FileParisi::DISTRETTO]]
-                        $distretto = Distretto::find()->where(['like', 'nome', strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 0, 2)) . '%', false])->one();
+                        // if d includes "MISTRETTA"
+                        $distretto = Distretto::find()->where(['like', 'nome', '%'. strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 1, 4)) . '%', false])->one();
                         //$distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
                         $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
                         if (!$gruppo) {
@@ -470,18 +465,19 @@ class SiteController extends Controller
                             }
                         } else
                             $errors = array_merge($errors, ["Errore riga " . $rowIndex . ": " . $newRow[$header[FileParisi::DISABILE_NOME_COGNOME]] . " " . $newRow[$header[FileParisi::CF_DISABILE]]]);
-                    }
 
-                    // aggiorna
-                    $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[FileParisi::CF_DISABILE]]))])->one();
-                    if ($istanza) {
-                        $rawData = [];
-                        foreach ($header as $head => $valHeader) {
-                            $rawData[$head] = $newRow[$valHeader];
+
+                        // aggiorna
+                        $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[FileParisi::CF_DISABILE]]))])->one();
+                        if ($istanza) {
+                            $rawData = [];
+                            foreach ($header as $head => $valHeader) {
+                                $rawData[$head] = $newRow[$valHeader];
+                            }
+                            // save $rawData as Json in $istanza->rawdata_json
+                            $istanza->rawdata_json = json_encode($rawData);
+                            $istanza->save();
                         }
-                        // save $rawData as Json in $istanza->rawdata_json
-                        $istanza->rawdata_json = json_encode($rawData);
-                        $istanza->save();
                     }
                 }
                 $rowIndex++;
@@ -498,7 +494,6 @@ class SiteController extends Controller
     }
 
 
-
     /**
      * Displays about page.
      *
@@ -510,14 +505,11 @@ class SiteController extends Controller
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
             $model->files = UploadedFile::getInstances($model, 'files');
-            if ($model->upload()) {
-
-            }
+            $model->upload();
         }
 
         return $this->render('upload', [
             'files' => $model,
-
         ]);
     }
 

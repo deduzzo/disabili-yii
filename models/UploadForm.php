@@ -66,6 +66,8 @@ class UploadForm extends Model
             }
             switch ($this->tipo) {
                 case TipologiaDatiCategoria::RICOVERI:
+                    // put in $okFiles the files of the path "../import/ricoveri"
+                    //$okFiles = glob("../import/ricoveri" . '/*.xlsx');
                     $stats = $this->importaRicoveri($okFiles);
             }
         }

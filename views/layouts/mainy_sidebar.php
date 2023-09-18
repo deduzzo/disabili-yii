@@ -77,6 +77,9 @@ JS) ?>
 						<li class="submenu-item">
 							<a href="/istanza">Istanze</a>
 						</li>
+                        <li class="submenu-item">
+                            <a href="/determina">Simulazione Pagamenti</a>
+                        </li>
 <!--						<li class="submenu-item">
 							<a href="?layout=mainx">Horizontal Menu</a>
 						</li>
@@ -102,7 +105,7 @@ JS) ?>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a href="/tipologia-dati">Tipologie Dati</a>
+                            <a href="/site/upload">Carica Files</a>
                         </li>
                     </ul>
                 </li>
