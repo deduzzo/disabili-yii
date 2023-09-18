@@ -62,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <span class='badge <?= $ultimo === IseeType::NO_ISEE ? IseeType::NO_ISEE_COLOR : (($ultimo !== IseeType::MAGGIORE_25K) ? IseeType::MINORE_25K_COLOR : IseeType::MAGGIORE_25K_COLOR) ?>'><?= ($ultimo !== IseeType::NO_ISEE) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
             </div>
             <div class="col-md-1 h6 d-flex flex-column align-items-center justify-content-center">
+                <div>Contabilità</div>
                 <?= $istanza->getStatoRecupero() ?>
             </div>
             <div class="col-md-1 h6 d-flex flex-column align-items-center justify-content-center">
@@ -69,7 +70,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="badge text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->getEta().' anni' ?></div>
             </div>
             <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
-                Importo mese:<br/>
+                <div>Importo</div>
+                <div>prossimo mese:</div>
                 <span class="badge bg-primary"><?= Yii::$app->formatter->asCurrency($istanza->getProssimoImporto()) ?></span>
             </div>
         </div>
