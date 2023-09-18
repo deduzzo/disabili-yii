@@ -188,35 +188,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         return Url::toRoute([$action, 'id' => $model->id]);
                     },
                     'buttons' => [
-                        'update' => function ($url, $model) {
-                            return Html::a('<i class="fa fa-solid fa-edit" style="color: #ffffff;"></i>', $url, [
-                                'title' => Yii::t('yii', 'Modifica'),
-                                'class' => 'btn btn-icon btn-sm btn-primary',
-                            ]);
-                        },
                         'scheda' => function ($url, $model) {
                             return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
-                                'title' => Yii::t('yii', 'Elimina'),
+                                'title' => Yii::t('yii', 'Vai alla scheda'),
                                 'class' => 'btn btn-icon btn-sm btn-primary',
                             ]);
                         },
                     ]
                 ],
             ],
-        ]); ?>
-
-        <!--        --><?php /*Pjax::end();
-        $this->registerJs("
-    $(document).on('change', '#pagesize', function() {
-    console.log('ciao');
-        $.pjax.reload({
-            container: '#datatable-pjax',
-            data: $(this).closest('form').serialize(),
-            push: false,
-            replace: false
-        });
-    });
-", \yii\web\View::POS_READY); */ ?>
+        ]); ?>>
     </div>
 </div>
 

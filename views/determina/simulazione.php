@@ -14,6 +14,7 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 $this->title = 'Simulazione determina';
 $this->params['breadcrumbs'][] = $this->title;
@@ -62,6 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- show datagrid title "Elenco istanze" -->
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
                 'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
                     "<div class='dataTable-top'>
 <!--                                <div class='dataTable-search'>

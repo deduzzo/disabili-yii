@@ -61,12 +61,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="text-sm">Ultimo ISEE</div>
                 <span class='badge <?= $ultimo === IseeType::NO_ISEE ? IseeType::NO_ISEE_COLOR : (($ultimo !== IseeType::MAGGIORE_25K) ? IseeType::MINORE_25K_COLOR : IseeType::MAGGIORE_25K_COLOR) ?>'><?= ($ultimo !== IseeType::NO_ISEE) ? Html::encode($ultimo) : "Nessun ISEE presente" ?></span>
             </div>
-            <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
+            <div class="col-md-1 h6 d-flex flex-column align-items-center justify-content-center">
                 <?= $istanza->getStatoRecupero() ?>
             </div>
             <div class="col-md-1 h6 d-flex flex-column align-items-center justify-content-center">
-                <div class="badge text-sm text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->isMinorenne() ? "<18 ANNI" : "MAGGIORENNE" ?></div>
+                <div class="badge text-sm text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->isMinorenne() ? "<18" : ">18" ?></div>
                 <div class="badge text-<?= $istanza->anagraficaDisabile->isMinorenne() ? AnagraficaType::MINORE_18_COLOR : AnagraficaType::MAGGIORE_18_COLOR ?>"><?= $istanza->anagraficaDisabile->getEta().' anni' ?></div>
+            </div>
+            <div class="col-md-2 h6 d-flex flex-column align-items-center justify-content-center">
+                Importo mese:<br/>
+                <span class="badge bg-primary"><?= Yii::$app->formatter->asCurrency($istanza->getProssimoImporto()) ?></span>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-6">

@@ -1,6 +1,7 @@
 <?php
 
 use app\models\AnagraficaAltricampi;
+use app\models\RicoveroSearch;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -10,11 +11,13 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Istanza $model */
 
+$searchModel = new RicoveroSearch();
+$searchModel->id_istanza = $model->id;
+$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
 echo GridView::widget([
-    'dataProvider' => new ArrayDataProvider([
-        'allModels' => $model->ricoveros,
-        'pagination' => false,
-    ]),
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'options' => ['class' => 'grid-view small'],
     'columns' => [
         [
@@ -39,10 +42,13 @@ echo GridView::widget([
         ],
         'cod_struttura',
         [
-            'attribute' => 'recupero',
+            'attribute' => 'contabilizzare',
             'label' => 'Recuperato?',
+            'format' => 'raw',
             'value' => function ($model) {
-                return $model->contabilizzare ? ($model->recupero ? ('Si, det. '.$model->determina->numero) : 'No') : "Importazione";
+                return $model->contabilizzare ?
+                    ($model->recupero ? ("<span class='badge bg-success'>Si, det. ".$model->determina->numero."</span>") : "<span class='badge bg-warning'>DA RECUPERARE</span>") : "<span class='badge bg-primary'>IMPORT. PREC.</span>";
+
             }
         ],
     ],

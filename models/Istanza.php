@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\enums\DatiTipologia;
+use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
 use Yii;
 use yii\db\Query;
@@ -245,8 +246,8 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($ricoveriDaRecuperare as $ricovero) {
             $importoRecuperi += $ricovero->getImportoRicovero();
         }
-        return ($importoRecuperi !== 0) ? ("<div>Da recuperare:</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
-            "<span class='badge bg-success'>In regola</span>";
+        return ($importoRecuperi !== 0) ? ("<div>Da recup:</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
+            "<span class='badge bg-success'>OK</span>";
     }
 
     public function haRicoveriDaRecuperare()
@@ -293,5 +294,30 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($movimenti as $movimento) {
             $movimento->delete();
         }
+    }
+
+    public function getProssimoImporto()
+    {
+        /* @var $lastIsee Isee */
+        $lastIsee = $this->getLastIsee();
+        if (!$this->getLastIsee())
+            return null;
+        else {
+            $totale = $lastIsee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
+            foreach ($this->recuperos as $recupero) {
+                if (!$recupero->chiuso && !$recupero->annullato) {
+                    if ($recupero->importo > 0)
+                        $totale += $recupero->getProssimaRata();
+                    else
+                        $totale -= $recupero->getProssimaRata();
+                }
+            }
+            foreach ($this->ricoveros as $ricovero) {
+                if ($ricovero->contabilizzare) {
+                    $totale -= $ricovero->getImportoRicovero();
+                }
+            }
+        }
+        return $totale;
     }
 }

@@ -8,8 +8,10 @@ class TipologiaDatiCategoria extends BaseEnum
 {
     const ISTANZA = 'istanza';
     const ANAGRAFICA = "anagrafica";
-
     const SERVIZI_ESTERNI = 'servizi-esterni';
+    const RICOVERI = 'ricoveri';
+    const MOVIMENTI_CON_IBAN = 'movimenti-con-iban';
+    const MOVIMENTI_CON_ELENCHI = 'movimenti-con-elenco';
 
     /**
      * @var string message category
@@ -25,5 +27,8 @@ class TipologiaDatiCategoria extends BaseEnum
         self::ISTANZA => 'Istanza',
         self::ANAGRAFICA => 'Anagrafica',
         self::SERVIZI_ESTERNI => 'Servizi Esterni',
+        self::RICOVERI => 'Ricoveri',
+        self::MOVIMENTI_CON_IBAN => 'Movimenti con IBAN',
+        self::MOVIMENTI_CON_ELENCHI => 'Movimenti con Elenco',
     ];
 }

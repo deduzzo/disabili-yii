@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\batch\ImportDatirealiJob;
 use app\helpers\Utils;
 use app\models\Anagrafica;
 use app\models\AnagraficaAltricampi;
@@ -12,25 +13,33 @@ use app\models\Distretto;
 use app\models\enums\FileParisi;
 use app\models\enums\FileRicoveri;
 use app\models\enums\ImportoBase;
+use app\models\enums\ImportTipologiaProcessi;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
+use app\models\enums\QueueContext;
 use app\models\Gruppo;
 use app\models\GruppoPagamento;
+use app\models\ImportProcessi;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
+use app\models\Quinquenni;
 use app\models\Recupero;
 use app\models\Ricovero;
+use app\models\SettingsModel;
+use app\models\UploadForm;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use PHP_IBAN\IBAN;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\web\UploadedFile;
 
 class SiteController extends Controller
 {
@@ -488,92 +497,28 @@ class SiteController extends Controller
             return true;
     }
 
-    private
-    function importaRicoveri($path)
-    {
-        ini_set('memory_limit', '-1');
-        set_time_limit(0);
-        $nonTrovati = [];
-        $errors = [];
-        Ricovero::deleteAll();
-        // for each files with extension ".xlsx" in folder: $path
-        foreach (glob($path . "*.xlsx") as $filename) {
-            $reader = ReaderEntityFactory::createReaderFromFile($filename);
-            $reader->open($filename);
-            foreach ($reader->getSheetIterator() as $sheet) {
-                /* @var Sheet $sheet */
-                $header = [];
-                foreach ($sheet->getRowIterator() as $idxRow => $row) {
-                    try {
-                        $newRow = [];
-                        foreach ($row->getCells() as $idxcel => $cel) {
-                            $newRow[$idxcel] = $cel->getValue();
-                        }
-                        if (in_array(FileRicoveri::getLabel(FileRicoveri::COD_FISCALE), $newRow)) {
-                            foreach ($newRow as $idx => $cell)
-                                $header[$cell] = $idx;
-                        } else if (count($header) > 0) {
-                            if ($newRow[$header[FileRicoveri::getLabel(FileRicoveri::COD_FISCALE)]] !== "") {
-                                $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $newRow[$header[FileRicoveri::getLabel(FileRicoveri::COD_FISCALE)]]])->one();
-                                if ($istanza) {
-                                    $ricoveroPresente = Ricovero::find()->where([
-                                        'id_istanza' => $istanza->id,
-                                        'cod_struttura' => isset($header[FileRicoveri::getLabel(FileRicoveri::COD_STRUTTURA)]) ? strval($newRow[$header[FileRicoveri::getLabel(FileRicoveri::COD_STRUTTURA)]]) : null,
-                                        'da' => Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_RICOVERO)]])
-                                    ])->one();
-                                    if (!$ricoveroPresente) {
-                                        $ricovero = new Ricovero();
-                                        $ricovero->id_istanza = $istanza->id;
-                                        $ricovero->cod_struttura = isset($header[FileRicoveri::getLabel(FileRicoveri::COD_STRUTTURA)]) ? strval($newRow[$header[FileRicoveri::getLabel(FileRicoveri::COD_STRUTTURA)]]) : null;
-                                        $ricovero->da = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_RICOVERO)]]);
-                                        $ricovero->a = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]]);
-                                        $ricovero->contabilizzare = 0;
-                                        $ricovero->note = "Comunicazione con file " . basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow;
-                                        $ricovero->save();
-                                        if ($ricovero->errors)
-                                            $errors = array_merge($errors, ['ricovero' => $ricovero->errors]);
-                                    } else {
-                                        if ($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]] !== "" || $newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]] !== null) {
-                                            $ricoveroPresente->a = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]]);
-                                            $ricoveroPresente->save();
-                                            if ($ricoveroPresente->errors)
-                                                $errors = array_merge($errors, ['ricoveroModifica' => $ricoveroPresente->errors]);
-                                        }
-                                    }
-                                } else
-                                    $nonTrovati[] = [
-                                        'codFiscale' => $newRow[$header[FileRicoveri::getLabel(FileRicoveri::COD_FISCALE)]] ?? null,
-                                        'row' => $newRow,
-                                        'file' => $filename,
-                                        'sheet' => $sheet->getName(),
-                                    ];
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        $errors[] = [$errors, ['errore' => basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow . " - " . $e->getMessage(), 'header' => $header]];
-                    }
-                }
-                if (count($header) === 0)
-                    $errors[] = [$errors, ['errore' => [basename($filename) . " - " . $sheet->getName() . " - " . "Header non trovato"]]];
-            }
-            $reader->close();
-        }
-        var_dump(['nonTrovati' => $nonTrovati, 'errors' => $errors]);
-        // save $nonTrovati as Json File
-        $fp = fopen('../import/ricoveri/esito-importazione.json', 'w');
-        fwrite($fp, json_encode(['nonTrovati' => $nonTrovati, 'errors' => $errors]));
-        fclose($fp);
-        //return $nonTrovati;
-    }
+
 
     /**
      * Displays about page.
      *
      * @return string
      */
-    public function actionAbout()
+    public function actionUpload()
     {
-        return $this->render('about');
+        $model = new UploadForm();
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            $model->files = UploadedFile::getInstances($model, 'files');
+            if ($model->upload()) {
+
+            }
+        }
+
+        return $this->render('upload', [
+            'files' => $model,
+
+        ]);
     }
 
     public function actionErrore()
@@ -582,8 +527,7 @@ class SiteController extends Controller
         $exception = Yii::$app->errorHandler->exception;
         if ($exception !== null) {
             return $this->render('errore', ['exception' => $exception]);
-        }
-        else
+        } else
             return $this->redirect(['site/index']);
     }
 
