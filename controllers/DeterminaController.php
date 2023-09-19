@@ -10,6 +10,8 @@ class DeterminaController extends \yii\web\Controller
 {
     public function actionIndex($distretto = null)
     {
+        // unlimited memory_limit
+        ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
         $allIstanze = Istanza::find()->where(['attivo' => true, 'chiuso' => false]);
         if ($distretto)

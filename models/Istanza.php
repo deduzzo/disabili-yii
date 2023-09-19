@@ -302,7 +302,7 @@ class Istanza extends \yii\db\ActiveRecord
             return null;
         else {
             /* @var $lastIsee Isee */
-            $lastIsee = $this->getLastIsee();
+            $lastIsee = $this->getLastIseeType();
             $totale = $lastIsee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
             foreach ($this->recuperos as $recupero) {
                 if (!$recupero->chiuso && !$recupero->annullato) {
