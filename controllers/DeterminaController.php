@@ -5,9 +5,6 @@ namespace app\controllers;
 use app\models\Istanza;
 use app\models\SimulazioneDeterminaSearch;
 use Yii;
-use yii\data\ArrayDataProvider;
-use yii\data\SqlDataProvider;
-use yii\db\Query;
 
 class DeterminaController extends \yii\web\Controller
 {

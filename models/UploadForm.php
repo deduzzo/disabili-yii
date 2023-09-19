@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\Utils;
 use app\models\enums\DatiTipologia;
 use app\models\enums\FileRicoveri;
+use app\models\enums\PagamentiConIban;
 use app\models\enums\TipologiaDatiCategoria;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
@@ -66,13 +67,134 @@ class UploadForm extends Model
             }
             switch ($this->tipo) {
                 case TipologiaDatiCategoria::RICOVERI:
-                    // put in $okFiles the files of the path "../import/ricoveri"
-                    //$okFiles = glob("../import/ricoveri" . '/*.xlsx');
                     $stats = $this->importaRicoveri($okFiles);
+                    break;
+                case TipologiaDatiCategoria::MOVIMENTI_CON_IBAN:
+                    foreach ($okFiles as $file)
+                        $stats = $this->importaFileConElenchi($file);
+                    break;
             }
         }
         return $stats;
     }
+
+    private function importaFileConElenchi($path, $soloQuestiId = [],$update = false, $skip = true)
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $reader = ReaderEntityFactory::createReaderFromFile($path);
+        $reader->open($path);
+        $header = null;
+        $rowIndex = 0;
+        $nonTrovati = [];
+        $errors = [];
+        $gruppiPagamento = GruppoPagamento::find([])->all();
+        $gruppiPagamentoMap = [];
+        $istanze = null;
+        $lastCf = null;
+        foreach ($gruppiPagamento as $gruppo) {
+            $gruppiPagamentoMap[$gruppo->progressivo] = $gruppo;
+        }
+        foreach ($reader->getSheetIterator() as $sheet) {
+            /* @var Sheet $sheet */
+            foreach ($sheet->getRowIterator() as $row) {
+                $newRow = [];
+                foreach ($row->getCells() as $idxcel => $cel) {
+                    $newRow[$idxcel] = $cel->getValue();
+                }
+                if ($rowIndex === 0) {
+                    foreach ($newRow as $idx => $cell)
+                        $header[$cell] = $idx;
+                } else if ($newRow[$header[PagamentiConIban::IMPORTO]] !== "") {
+                    $consideraSoloAttivi = true;
+                    if ($lastCf !== strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))) {
+                        $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
+                        if ($consideraSoloAttivi)
+                            $istanze = $istanze->andWhere(['istanza.attivo' => true]);
+                        $istanze = $istanze->all();
+
+                    }
+                    if ($istanze && count($soloQuestiId) > 0) {
+                        if (count($istanze) === 1) {
+                            $istanza = $istanze[0];
+                            $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
+                            if (!in_array($istanza->id, $soloQuestiId))
+                                $istanze = null;
+                        } else
+                            $error = true;
+                    }
+                    if ($istanze && count($istanze) === 1) {
+                        $istanza = $istanze[0];
+                        $ultimoConto = $istanza->getContoValido();
+                        $iban = $newRow[$header[PagamentiConIban::IBAN1]] . $newRow[$header[PagamentiConIban::IBAN2]] . $newRow[$header[PagamentiConIban::IBAN3]] . $newRow[$header[PagamentiConIban::IBAN4]] . $newRow[$header[PagamentiConIban::IBAN5]] . $newRow[$header[PagamentiConIban::IBAN6]];
+                        if ($iban === "")
+                            $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
+                        $conto = Conto::findOne(['iban' => $iban, 'id_istanza' => $istanza->id]);
+                        if (!$conto) {
+                            $conto = new Conto();
+                            $conto->id_istanza = $istanza->id;
+                            if ($iban === "")
+                                $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
+                            $conto->iban = $iban;
+                            $conto->attivo = $ultimoConto ? 0 : 1;
+                            $conto->save();
+                            if ($conto->errors)
+                                $errors = array_merge($errors, ['conto' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $conto->errors]);
+                            $contoCessionario = new ContoCessionario();
+                            $contoCessionario->id_conto = $conto->id;
+                            $contoCessionario->attivo = 0;
+                            $contoCessionario->save();
+                            if ($contoCessionario->errors)
+                                $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
+                        }
+                        $movimentoExists = Movimento::find()->where(['id_conto' => $conto->id, 'periodo_da' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]), 'periodo_a' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]])])->one();
+                        $movimento = null;
+                        if (!$movimentoExists || ($movimentoExists && !$skip)) {
+                            if ($movimentoExists && $update)
+                                $movimento = $movimentoExists;
+                            else if (!$movimentoExists || !$skip) {
+                                $movimento = new Movimento();
+                                $movimento->id_conto = $conto->id;
+                                $movimento->is_movimento_bancario = true;
+                                $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
+                                $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                                $movimento->data = $movimento->periodo_a;
+                                $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
+                                $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
+                                if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
+                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->save();
+                                    if ($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors)
+                                        $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors]);
+                                }
+                                $movimento->contabilizzare = 0;
+                                $movimento->save();
+                                if ($movimento->errors)
+                                    $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
+                            }
+                        }
+                    } else {
+                        if (($istanze && count($soloQuestiId) > 0 && count($istanze) !== 1) || count($soloQuestiId) === 0)
+                            if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
+                                $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
+                    }
+
+                }
+                $rowIndex++;
+            }
+        }
+        $reader->close();
+        // save $nonTrovati as Json File
+        $fp = fopen('../import/pagamenti/con_iban/non_trovati.json', 'w');
+        $fp2 = fopen('../import/pagamenti/con_iban/errori.json', 'w');
+        fwrite($fp, json_encode($nonTrovati));
+        fwrite($fp2, json_encode($errors));
+        fclose($fp);
+        return $nonTrovati;
+    }
+
+
+
 
     private function importaRicoveri($files, $clearAll = false)
     {

@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
+use Carbon\Carbon;
 use DateTime;
 use Yii;
 
@@ -100,11 +101,12 @@ class Ricovero extends \yii\db\ActiveRecord
         return $this->hasOne(Recupero::class, ['id' => 'id_recupero']);
     }
 
-    public function getNumGiorni() {
+    public function getNumGiorni()
+    {
         if (!$this->da || !$this->a) return null;
-        $da = new DateTime($this->da);
-        $a = new DateTime($this->a);
-        return $a->diff($da)->days;
+        $da = Carbon::createFromFormat('Y-m-d', $this->da);
+        $a = Carbon::createFromFormat('Y-m-d', $this->a);
+        return $a->diffInDays($da) + 1;
     }
 
     public function getImportoRicovero()

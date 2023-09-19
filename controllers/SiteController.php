@@ -380,7 +380,7 @@ class SiteController extends Controller
                         $cessionario = null;
                         // find distretto where "nome" Like the first 2 character of $newRow[$header[FileParisi::DISTRETTO]]
                         // if d includes "MISTRETTA"
-                        $distretto = Distretto::find()->where(['like', 'nome', '%'. strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 1, 4)) . '%', false])->one();
+                        $distretto = Distretto::find()->where(['like', 'nome', '%' . strtoupper(substr($newRow[$header[FileParisi::DISTRETTO]], 1, 4)) . '%', false])->one();
                         //$distretto = Distretto::findOne(['nome' => $newRow[$header[FileParisi::DISTRETTO]]]);
                         $gruppo = Gruppo::findOne(['descrizione_gruppo_old' => substr($newRow[$header[FileParisi::GRUPPO]], 0, 1)]);
                         if (!$gruppo) {
@@ -522,5 +522,104 @@ class SiteController extends Controller
         } else
             return $this->redirect(['site/index']);
     }
+
+    /*public function actionAggiornaMistretta()
+    {
+        $cf = [
+            "RAUGTN26T05H228Y",
+            "BNOFNC26R62L478X",
+            "CRRTRS31E46H850N",
+            "CSCVCN92C03I854N",
+            "CSSNGL34R64F251T",
+            "CSTNTN33P56L478A",
+            "CCLMRA86C57F251U",
+            "CNSLBR64A71F251W",
+            "DFRFPP50R14F251L",
+            "DFRGTN54E31F251T",
+            "DGRLRI02T20F251F",
+            "DMGGPP64D12F158P",
+            "DMGSML04L16F251R",
+            "FMLSST28A15I370Z",
+            "FRNNTN80H27I199B",
+            "GGLNHL10E12F251S",
+            "GZZTSC35P69I370F",
+            "GRDVCN62P27C094I",
+            "GSTLCU37T54F251K",
+            "NCPBDT33C01F251E",
+            "LBBNNN34T07I370M",
+            "LPRSST29M15F773C",
+            "MNTMGR25H55F251T",
+            "MSCGRZ81H42F251L",
+            "MSCMRC83C17F158H",
+            "MSCFNC90R02F251N",
+            "MCLRSO30A55L478J",
+            "NOINNN34L07C094W",
+            "NOIMLV79E63F251X",
+            "PCNMRA06A70G273I",
+            "PCNTRS40A58C094V",
+            "PNTGPP82P21F251R",
+            "PTTSST84P20F251Z",
+            "RVLMRA36C52C094Y",
+            "SMMGPP31E55L478R",
+            "SCCPCD35E28C094B",
+            "SREPMG24S53I370D",
+            "SRRNGL28R70L478V",
+            "SPNLNZ29H62L478J",
+            "TCHNTL62T57Z154H",
+            "TTILCU57T50C094T",
+            "TRCMLV46R71G522Z",
+            "ZFFSRG93E18F251L",
+            "ZNGRSO34R46F773M",
+            "ZZLLCU29T41F251F",
+            "BRNMRA37B44H228N",
+            "CLANNN55B01C471V",
+            "GVLBDT51B42F251B",
+            "PTTNNZ29S47L478F",
+            "PSCVCN28A25L478K",
+            "BRBCRP11T53G273Q",
+            "BSCGNN39R08F773L",
+            "TRCMSN63B61G273S",
+            "CRRSNT29H59F773Y",
+            "LNGDNC49A61L478Y",
+            "PCNVCN39E71F251H",
+            "SPNDNI94H67Z129J",
+            "GRZBDT34T54H850X",
+            "CTNRNG36L69F773L",
+            "RAIGPP34D41I370S",
+            "MCNNNA28R44C094Y",
+            "DCLCRN23M55C094X",
+            "TMBFPP37R13F251Q",
+            "GRCGPP28R13A028I",
+            "SCCSNT28D46C094G",
+            "TCNSVT17E11I199I",
+            "MTATRS24M69C094C",
+            "LGNVCN48C30F251G",
+            "LNGNNN58T06L478S",
+            "MZZMLY19M45C421H"
+        ];
+        foreach ($cf as $item) {
+            $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $item])->all();
+            if (count($istanza) > 1) {
+                foreach ($istanza as $i) {
+                    if ($i->id_distretto == 6) {
+                        $i->id_distretto = 7;
+                        $i->save();
+                    } else {
+                        Isee::deleteAll(['id_istanza' => $i->id]);
+                        foreach ($i->contos as $conto) {
+                            ContoCessionario::deleteAll(['id_conto' => $conto->id]);
+                            Conto::deleteAll(['id' => $conto->id]);
+                        }
+                        $i->delete();
+                    }
+                }
+            } else if (count($istanza) == 1) {
+                if ($istanza[0]->id_distretto == 6) {
+                    $istanza[0]->id_distretto = 7;
+                    $istanza[0]->save();
+                }
+            }
+        }
+    }*/
 
 }

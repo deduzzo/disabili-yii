@@ -213,7 +213,7 @@ class Istanza extends \yii\db\ActiveRecord
         return $this->hasMany(Ricovero::class, ['id_istanza' => 'id']);
     }
 
-    public function getLastIsee()
+    private function getLastIsee()
     {
         return Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
     }
@@ -339,7 +339,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function isInAlert() {
         $out = null;
-        if (!$this->getLastIsee())
+        if ($this->getLastIseeType() == IseeType::NO_ISEE)
             $out = "MANCA ISEE";
         return $out;
     }

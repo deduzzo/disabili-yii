@@ -12,3 +12,8 @@ select * from istanza i, anagrafica a where i.id_anagrafica_disabile = a.id AND
         attivo = true AND i.data_decesso is not null
 
 update istanza set attivo = false where data_decesso is not null
+
+isee non presenti
+select i.id, a.cognome_nome from istanza i, anagrafica a where i.id_anagrafica_disabile = a.id AND i.attivo = true AND
+        ((YEAR(CURDATE()) - YEAR(a.data_nascita)) - (RIGHT(CURDATE(), 5) < RIGHT(a.data_nascita, 5))) > 18 AND i.id not in (
+        select distinct i.id from istanza i, isee where i.id = isee.id_istanza AND isee.valido = 1)
