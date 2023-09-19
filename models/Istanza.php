@@ -318,7 +318,7 @@ class Istanza extends \yii\db\ActiveRecord
                 }
             }
         }
-        return $totale;
+        return $totale >0 ? $totale : 0;
     }
 
     public function getDifferenzaUltimoImportoArray()
