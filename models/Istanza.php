@@ -340,6 +340,8 @@ class Istanza extends \yii\db\ActiveRecord
         $out = null;
         if ($this->getLastIseeType() == IseeType::NO_ISEE)
             $out = "MANCA ISEE";
+        else if (!$this->attivo)
+            $out = "NON ATTIVO";
         return $out;
     }
 }
