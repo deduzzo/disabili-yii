@@ -78,7 +78,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-3">
                     <?= Html::dropDownList('distretto', $distretto, ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'), ['class' => 'form-select', 'prompt' => 'Tutti i distretti','onchange' =>"this.form.submit()"]) ?>
-                    <?= Html::label('Distretto', 'distretto', ['class' => 'form-label']) ?>
                 </div>
                 <div class="col-md-3">
                     <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
@@ -164,7 +163,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => ActionColumn::className(),
                     'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
                     'urlCreator' => function ($action, $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model['id']]);
+                        return Url::toRoute(['istanza/'.$action, 'id' => $model['id']]);
                     },
                     'buttons' => [
                         'scheda' => function ($url, $model) {
