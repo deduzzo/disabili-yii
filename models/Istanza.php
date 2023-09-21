@@ -346,7 +346,7 @@ class Istanza extends \yii\db\ActiveRecord
             $out = "MANCA ISEE";
         else if (!$this->attivo)
             $out = "NON ATTIVO";
-        else if (!$this->rinuncia)
+        else if ($this->rinuncia)
             $out = "RINUNCIA";
         else if ($this->haRicoveriInCorso())
             $out = "ATTUALMENTE RICOVERATO";
