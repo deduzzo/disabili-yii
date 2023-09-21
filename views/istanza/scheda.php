@@ -172,7 +172,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php if (!$istanza->rinuncia): ?>
                     <span class="badge rounded-pill bg-<?= $istanza->data_decesso === null ? "success" : "danger" ?> text-small"><?= $istanza->data_decesso ? ("DECEDUTO " . Yii::$app->formatter->asDate($istanza->data_decesso)) : "IN VITA" ?></span>
                     <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null && $istanza->patto_di_cura && !$istanza->chiuso && $istanza->attivo) ? "success" : "danger" ?> text-small"><?=
-                        $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : ($istanza->attivo ? "DECEDUTO ANCORA ATTIVO" : ($istanza->liquidazione_decesso_completata ? "LIQUIDATO NON ATTIVO <br />APERTO (CHIUDERE)" : ($istanza->attivo ? "ATTIVO DA LIQUIDARE" : "NON ATTIVO DA LIQUIDARE")))) : ($istanza->attivo ? "ATTIVO" : (!$istanza->patto_di_cura ? "NO PATTO CURA" : ($istanza->rinuncia ? "RINUNCIA" : "NON ATTIVO, ATTENZIONARE"))) ?></span>
+                        $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : ($istanza->attivo ? "DECEDUTO ANCORA ATTIVO" : ($istanza->liquidazione_decesso_completata ? "LIQUIDATO NON ATTIVO <br />APERTO (CHIUDERE)" : ($istanza->attivo ? "ATTIVO DA LIQUIDARE" : "NON ATTIVO DA LIQUIDARE")))) : ($istanza->attivo ? "ATTIVO" : (!$istanza->patto_di_cura ? "" : ($istanza->rinuncia ? "RINUNCIA" : "NON ATTIVO, ATTENZIONARE"))) ?></span>
                 <?php endif; ?>
                 <?php if ($istanza->rinuncia): ?>
                     <span class="badge rounded-pill bg-danger text-large">RINUNCIA</span>

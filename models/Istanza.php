@@ -342,14 +342,16 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function isInAlert() {
         $out = null;
+        if (!$this->attivo || $this->chiuso)
+            $out .= "NON ATTIVO - ";
+        if (!$this->patto_di_cura)
+            $out .= "MANCA PATTO - ";
         if ($this->getLastIseeType() == IseeType::NO_ISEE)
-            $out = "MANCA ISEE";
-        else if (!$this->attivo)
-            $out = "NON ATTIVO";
-        else if ($this->rinuncia)
-            $out = "RINUNCIA";
-        else if ($this->haRicoveriInCorso())
-            $out = "ATTUALMENTE RICOVERATO";
-        return $out;
+            $out .= "MANCA ISEE - ";
+        if ($this->rinuncia)
+            $out .= "RINUNCIA - ";
+        if ($this->haRicoveriInCorso())
+            $out .= "ATTUALMENTE RICOVERATO -";
+        return $out ? substr($out,0,strlen($out) -3) : null;
     }
 }
