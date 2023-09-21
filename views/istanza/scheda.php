@@ -160,9 +160,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <div class="card">
-    <div class="card-header">
+    <div class="card-header"  style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
         <?php if ($istanza->isInAlert()): ?>
-            <span class="badge bg-danger">ALERT!</span>
+            <span class="badge bg-danger" style="margin-right: 10px">ALERT!</span>
             <span class="badge bg-warning"><?= $istanza->isInAlert() ?></span>
         <?php endif; ?>
     </div>
