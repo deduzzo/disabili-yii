@@ -1,10 +1,7 @@
 <?php
 
 use app\models\Distretto;
-use app\models\enums\DatiTipologia;
-use app\models\enums\IseeType;
-use app\models\Gruppo;
-use app\models\Istanza;
+use kartik\select2\Select2;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -14,8 +11,8 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
-/** @var int $distretto */
 /** @var string $soloProblematici */
+/** @var array $statistiche */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 
@@ -24,73 +21,77 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <?php Pjax::begin(['id' => 'simulazione-determina']) ?>
-<?php $formatter = \Yii::$app->formatter; ?>
+<?php $formatter = \Yii::$app->formatter;
+$distretto = Yii::$app->request->get()['distretto'] ?? null;
+?>
 
-<div class="card">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-toolbar">
-                        <h4 class="card-title">Informazioni</h4>
-                    </div>
-                </div>
-                <div class="card-body">
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <!-- add card header title "Verifica dati" -->
-            <div clas="card">
-                <div class="card-header">
-                    <div class="card-toolbar">
-                        <h4 class="card-title">Sommario</h4>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>TOTALI Attivi e Non chiusi</span>
-                            <span class="badge bg-info badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI) ?></span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Minori di 18 anni</span>
-                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MINORI18) ?></span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Maggiori di 18 anni</span>
-                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_MAGGIORI_18) ?></span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>NO data nascita</span>
-                            <span class="badge bg-warning badge-pill badge-round ms-1"><?= Istanza::getTotaliAttivi(DatiTipologia::LISTA_NO_DATA_NASCITA) ?></span>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 <div class="card">
     <div class="card-header">
         <div class="card-toolbar">
-            <!-- add select box for distretto -->
-            <?= Html::beginForm(['determina/'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) ?>
             <div class="row">
-                <div class="col-md-3">
-                    <?= Html::dropDownList('distretto', $distretto, ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'), ['class' => 'form-select', 'prompt' => 'Tutti i distretti','onchange' =>"this.form.submit()"]) ?>
+                <div class="col-4 col-sm-12 col-md-4">
+                    <div class="list-group" role="tablist">
+                        <?php foreach (Distretto::find()->all() as $di): ?>
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between"
+                               id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
+                               href="#<?= "dettagli_" . $di->id ?>" role="tab">
+                                <?= $di->nome ?>
+                                <span class="badge bg-warning badge-pill badge-round ms-1"><?= $statistiche[$di->id] ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
-                           id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>
-                           onchange="this.form.submit()">
-                    <label class="form-check-label text-danger bold"
-                           for="solo-problematici">Mostra solo istanze con variazioni</label>
+                <div class="col-8 col-sm-12 col-md-8 mt-1">
+                    <div class="tab-content text-justify" id="nav-tabContent">
+                        <?php foreach (Distretto::find()->all() as $di2): ?>
+                            <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" role="tabpanel"
+                                 aria-labelledby="<?= "dettagli_" . $di2->id . "_list" ?>">
+                                <?= $di2->nome ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
-            <?= Html::endForm() ?>
         </div>
     </div>
-    <div class="card-body" id="card-content">
+    <div class="card-body">
+        <!-- add select box for distretto -->
+        <?= Html::beginForm(['determina/'], 'post', ['data-pjax' => '', 'class' => 'form-inline']) ?>
+
+        <div class="row">
+            <div class="divider">
+                <div class="divider-text">Filtri</div>
+            </div>
+            <div class="col-md-6">
+                <?= Select2::widget([
+                        'name' => 'distretti',
+                    'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
+                    'value' => $distretti,
+                    'options' => ['placeholder' => 'Seleziona un distretto ...'],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'multiple' => true,
+                        'class' => 'form-control'
+                    ],
+                ]); ?>
+            </div>
+            <div class="col-md-3">
+                <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
+                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>
+                       onchange="this.form.submit()">
+                <label class="form-check-label text-danger bold"
+                       for="solo-problematici">Mostra solo istanze con variazioni</label>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Filtra</button>
+            </div>
+            <div class="divider">
+                <div class="divider-text"></div>
+            </div>
+        </div>
+        <?= Html::endForm() ?>
+
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
@@ -103,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
                            " . Html::endForm() .
                 "<div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
-                                  <div class='dataTable-info'>{summary}</div>
+                                  <div class='dataTable-info'>{summary}<br />TOTALE:</div>
                                   <nav class='dataTable-pagination'>
                                         {pager}
                                   </nav>
@@ -163,7 +164,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => ActionColumn::className(),
                     'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
                     'urlCreator' => function ($action, $model, $key, $index, $column) {
-                        return Url::toRoute(['istanza/'.$action, 'id' => $model['id']]);
+                        return Url::toRoute(['istanza/' . $action, 'id' => $model['id']]);
                     },
                     'buttons' => [
                         'scheda' => function ($url, $model) {

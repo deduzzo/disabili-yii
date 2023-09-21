@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Distretto;
 use app\models\Istanza;
 use app\models\SimulazioneDeterminaSearch;
 use Yii;
@@ -9,11 +10,13 @@ use yii\db\Query;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($distretto = null, $soloProblematici = null)
+    public function actionIndex()
     {
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
+        $distretti = isset($this->request->post()['distretti']) ? $this->request->post()['distretti'] : [];
+        $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'on';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
@@ -21,11 +24,15 @@ class DeterminaController extends \yii\web\Controller
         $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
         $pagamentiPrecedentiPerDistretti = [];
         $pagamentiAttualiPerDistretti = [];
+        $statistiche = [];
+        foreach (Distretto::find()->all() as $dist) {
+            $statistiche[$dist->id] = 0;
+        }
         foreach ($allPagamentiPrecedenti as $pagamento) {
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
-        if ($distretto)
-            $allIstanzeAttive->andWhere(['id_distretto' => $distretto]);
+        if ($distretti)
+            $allIstanzeAttive->andWhere(['id_distretto' => $distretti]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
@@ -49,15 +56,21 @@ class DeterminaController extends \yii\web\Controller
                         'opArray' => $differenza,
                         'operazione' => $differenza['op'],
                     ];
+                    $statistiche[$istanza->distretto->id] += 1;
                 }
             }
-            if ($distretto) {
-                $pagamentiPrecedentiPerDistretti[$distretto] = array_diff($pagamentiPrecedentiPerDistretti[$distretto], [$istanza->id]);
-                $pagamentiAttualiPerDistretti[$distretto][] = $istanza->id;
-            }
+                $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
+                $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
             $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
-        $nonPagati = $distretto ? $pagamentiPrecedentiPerDistretti[$distretto] : $allIdPagatiMeseScorso;
+        $nonPagati = [];
+        if (count($distretti) >0) {
+            foreach ($distretti as $disPag) {
+                $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag]);
+            }
+        }
+        else
+            $nonPagati = $allIdPagatiMeseScorso;
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
@@ -81,10 +94,10 @@ class DeterminaController extends \yii\web\Controller
         return $this->render('simulazione', [
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
-            'distretto' => $distretto,
             'allIdPagati' => $allIdPagatiMeseScorso,
             'soloProblematici' => $soloProblematici,
-        ]);
+            'statistiche' => $statistiche,
+            'distretti' => $distretti]);
     }
 
 }

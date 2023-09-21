@@ -57,7 +57,8 @@ Icon::map($this);
     <?php JSRegister::end(); ?>
     <?php $this->endBody() ?>
     <?php
-    $this->registerJsFile("{$themeMazer->baseUrl}/assets/original_assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js", ['depends' => [\yii\web\JqueryAsset::class]]); ?>
+    $this->registerJsFile("{$themeMazer->baseUrl}/assets/original_assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js", ['depends' => [\yii\web\JqueryAsset::class]]);
+    ?>
     </body>
 
     </html>

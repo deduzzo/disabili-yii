@@ -70,6 +70,9 @@ class Istanza extends \yii\db\ActiveRecord
             case DatiTipologia::LISTA_NO_DATA_NASCITA:
                 $query->andWhere(['a.data_nascita' => null]);
                 break;
+            case DatiTipologia::LISTA_MAGGIORI_25K:
+                $query->innerJoin(['isee is','']);
+                break;
         }
         return $query->count();
     }
