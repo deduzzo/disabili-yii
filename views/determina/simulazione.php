@@ -120,11 +120,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     'eta',
                     'gruppo',
                     [
+                        'attribute' => 'importoPrecedente',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-".($model['importoPrecedente'] == $model['importo'] ? "success" : "warning")."'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
+                        },
+                        'contentOptions' => ['class' => 'text-center'],
+                    ],
+                    [
                         'attribute' => 'importo',
                         'format' => 'raw',
                         'value' => function ($model) {
                             return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
-                        }
+                        },
+                        'contentOptions' => ['class' => 'text-center'],
                     ],
                     [
                         'attribute' => 'operazione',

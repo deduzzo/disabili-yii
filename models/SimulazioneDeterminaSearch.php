@@ -16,6 +16,7 @@ class SimulazioneDeterminaSearch extends Model
     public $isee;
     public $eta;
     public $importo;
+    public $importoPrecedente;
     public $operazione;
 
     public function rules()
@@ -23,7 +24,8 @@ class SimulazioneDeterminaSearch extends Model
         return [
             [['id', 'isee', 'eta'], 'integer'],
             [['cf', 'cognome', 'nome', 'gruppo', 'distretto'], 'safe'],
-            [['importo'], 'number'],
+            [['importo','importoPrecedente'], 'number'],
+            [['operazione'], 'string'],
         ];
     }
 
@@ -50,7 +52,7 @@ class SimulazioneDeterminaSearch extends Model
                 'pageSize' => 50,
             ],
             'sort' => [
-                'attributes' => ['id', 'cf', 'cognome', 'nome', 'gruppo', 'distretto', 'isee', 'eta','importo','operazione'],
+                'attributes' => ['id', 'cf', 'cognome', 'nome', 'gruppo', 'distretto', 'isee', 'eta','importo','importoPrecedente','operazione'],
             ],
         ]);
     }

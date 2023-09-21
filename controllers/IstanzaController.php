@@ -98,8 +98,7 @@ class IstanzaController extends Controller
             if ($fromScheda) {
                 Yii::$app->session->setFlash('success', 'Istanza aggiornata con successo.');
                 return $this->redirect(['scheda', 'id' => $model->id]);
-            }
-            else
+            } else
                 return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -144,6 +143,25 @@ class IstanzaController extends Controller
         return $this->render('scheda', [
             'istanza' => $model,
         ]);
+    }
+
+    public function actionModifica()
+    {
+        if ($this->request->isPost) {
+            $istanza = $this->findModel($this->request->post('id-istanza'));
+            if ($istanza) {
+                $istanza->attivo = $this->request->post('stato') === "attivo";
+                $istanza->chiuso = $this->request->post('aperto-chiuso') === "chiuso";
+                $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata') !== null;
+                $istanza->rinuncia = $this->request->post('rinuncia') !== null;
+                $istanza->save();
+                if ($istanza->errors)
+                    Yii::$app->session->setFlash('error', 'Errore durante il salvataggio dell\'istanza.');
+                else
+                    Yii::$app->session->setFlash('success', 'Istanza aggiornata con successo.');
+            }
+            return $this->redirect(['scheda', 'id' => $istanza->id]);
+        }
     }
 
 }

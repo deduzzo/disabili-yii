@@ -31,6 +31,7 @@ class DeterminaController extends \yii\web\Controller
                 'isee' => $istanza->getLastIseeType(),
                 'eta' => $istanza->anagraficaDisabile->getEta(),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo,
+                'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => $istanza->getProssimoImporto(),
                 'opArray' => $differenza,
                 'operazione' => $differenza['op'],

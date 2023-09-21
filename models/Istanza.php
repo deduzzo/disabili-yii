@@ -329,11 +329,11 @@ class Istanza extends \yii\db\ActiveRecord
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0);
         if ($prossimoImporto < 0.0)
-            return ['alert' => $op != null,'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> (importo '.$prossimoImporto.')'];
+            return ['alert' => $op != null,'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> (importo '.$prossimoImporto.')'];
         if ($lastMovimento)
-            return ['alert' => $op != null,'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'differenza' => $differenza , 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "")];
+            return ['alert' => $op != null,'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza , 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "")];
         else
-            return ['alert' => $op != null,'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'differenza' => $differenza , 'op' => $op ?? "AGGIUNGERE"];
+            return ['alert' => $op != null,'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza , 'op' => $op ?? "AGGIUNGERE"];
     }
 
     public function isInAlert() {
