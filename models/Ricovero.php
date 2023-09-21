@@ -105,16 +105,21 @@ class Ricovero extends \yii\db\ActiveRecord
     public function getNumGiorni(): ?array
     {
         $out = ['giorni' => 0, 'mesi' => 0];
-        if (!$this->da || !$this->a) return null;
         $da = Carbon::createFromFormat('Y-m-d', $this->da);
-        $a = Carbon::createFromFormat('Y-m-d', $this->a);
-        // id $da and $a are in different months
         list($daAnno, $daMese, $daGiorno) = explode('-', $this->da);
-        list($aAnno, $aMese, $aGiorno) = explode('-', $this->a);
+        if ($this->contabilizzare && !$this->a) {
+            $a = Carbon::now();
+            list($aAnno, $aMese, $aGiorno) = explode('-', $a->toDateString());
+        }
+        else if (!$this->da || !$this->a) return null;
+        else {
+            $a = Carbon::createFromFormat('Y-m-d', $this->a);
+            // id $da and $a are in different months
+            list($aAnno, $aMese, $aGiorno) = explode('-', $this->a);
+        }
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThan($a)) {
             return null;
-        }
-        else {
+        } else {
             if ($da->month !== $a->month) {
                 if ($da->day !== 1)
                     $out['giorni'] += $da->daysInMonth - $da->day + 1;
@@ -137,6 +142,9 @@ class Ricovero extends \yii\db\ActiveRecord
     {
         $valoreMese = $this->istanza->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
         $ricovero = $this->getNumGiorni();
-        return ($ricovero['giorni'] * ($valoreMese / 30)) + ($ricovero['mesi'] * $valoreMese);
+        if ($ricovero)
+            return ($ricovero['giorni'] * ($valoreMese / 30)) + ($ricovero['mesi'] * $valoreMese);
+        else
+            return 0;
     }
 }

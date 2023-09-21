@@ -405,13 +405,14 @@ $this->params['breadcrumbs'][] = $this->title;
     function pattoDiCuraCheck() {
         console.log("patto di cura")
         document.getElementById("data-patto-cura").disabled = !document.getElementById("patto-di-cura").checked;
-        document.getElementById("stato-nonattivo").checked = true;
+        if (document.getElementById("data-patto-cura").disabled)
+        document.getElementById("stato-nonattivo").checked = document.getElementById("data-patto-cura").disabled;
         attivoCheck();
     }
     function check() {
+        attivoCheck();
         pattoDiCuraCheck();
         decedutoCheck();
-        attivoCheck();
     }
 </script>
 
