@@ -78,8 +78,7 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
             </div>
             <div class="col-md-3">
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
-                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>
-                       onchange="this.form.submit()">
+                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
                        for="solo-problematici">Mostra solo istanze con variazioni</label>
             </div>

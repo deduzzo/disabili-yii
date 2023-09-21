@@ -16,7 +16,7 @@ class DeterminaController extends \yii\web\Controller
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
         $distretti = isset($this->request->post()['distretti']) ? $this->request->post()['distretti'] : [];
-        $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'on';
+        $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
