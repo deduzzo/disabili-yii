@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="modal fade text-left" id="modifica-istanza" tabindex="-1" aria-labelledby="label-modifica"
      style="display: none;"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" style="min-width: 800px">
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h5 class="modal-title white" id="label-modifica">
@@ -43,29 +43,95 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="modal-body">
                 <?= Html::beginForm(['/istanza/modifica'], 'post', ['id' => 'aggiungi-isee', 'class' => 'form-horizontal']) ?>
                 <input type="hidden" name="id-istanza" value="<?= $istanza->id ?>">
-                <h4>Stato</h4>
-                <p>Inserire lo stato, solo le istanze con stato "Attivo" verranno considerate nel pagamento mensile</p>
-                <input type="radio" class="btn-check" name="stato" id="stato-attivo" autocomplete="off"
-                       <?= $istanza->attivo ? 'checked' : "" ?> value="attivo" onclick="checkrinuncia(this)">
-                <label class="btn btn-outline-success" for="stato-attivo">Attivo</label>
-
-                <input type="radio" class="btn-check" name="stato" id="stato-nonattivo" autocomplete="off" value="non-attivo" <?= !$istanza->attivo ? 'checked' : "" ?>>
-                <label class="btn btn-outline-warning" for="stato-nonattivo">NON ATTIVO</label>
-
-                <p style="margin-top: 20px"><b>Chiudere SOLO le istanze che sono state completamente liquidate e che non necessitano di ulteriori azioni</b> (recuperi decessi, recuperi ecc)</p>
-                <input type="radio" class="btn-check" name="aperto-chiuso" id="stato-aperto" autocomplete="off"
-                    <?= !$istanza->chiuso ? 'checked' : "" ?> value="aperto" onclick="checkrinuncia(this)">
-                <label class="btn btn-outline-success" for="stato-aperto">Aperto</label>
-
-                <input type="radio" class="btn-check" name="aperto-chiuso" id="stato-chiuso" autocomplete="off" value="chiuso" onchange="setStatoAttivo()" <?= $istanza->chiuso ? 'checked' : "" ?>>
-                <label class="btn btn-outline-danger" for="stato-chiuso">CHIUSO</label>
-                <div class="custom-control custom-checkbox" style="margin-top: 10px">
-                    <input type="checkbox" class="form-check-input form-check-danger form-check-glow" <?= $istanza->rinuncia ? "checked" : "" ?> name="rinuncia" id="rinuncia" onchange="setStatoAttivo()">
-                    <label class="form-check-label text-danger bold" for="rinuncia">RINUNCIA</label>
+                <div class="divider">
+                    <div class="divider-text">Patto di cura e rinuncia</div>
                 </div>
-                <div class="custom-control custom-checkbox" style="margin-top: 20px">
-                    <input type="checkbox" class="form-check-input form-check-primary form-check-glow" name="liquidazione-decesso-completata" id="liquidazione-decesso-completata" <?= $istanza->liquidazione_decesso_completata ? 'checked' : "" ?>>
-                    <label class="form-check-label" for="liquidazione-decesso-completata">Liquidazione decesso completata</label>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="patto-di-cura" name="patto-di-cura" <?= $istanza->patto_di_cura ? "checked" : "" ?> onchange="pattoDiCuraCheck()">
+                            <label class="form-check-label" for="patto-di-cura">Patto di cura</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="data-patto-cura">Data firma patto:</label>
+                        <input type="date" class="form-control" name="data-patto-cura" id="data-patto-cura"
+                               value="<?= $istanza->data_firma_patto ?>">
+                    </div>
+                    <div class="col-md-3">
+                        <div class="custom-control custom-checkbox">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" name="rinuncia"
+                                       id="rinuncia" <?= $istanza->rinuncia ? "checked" : "" ?>
+                                       onchange="attivoCheck()">
+                                <label class="form-check-label text-danger bold"
+                                       for="rinuncia">Rinuncia</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="data-chiusura">Data chiusura:</label>
+                        <input type="date" class="form-control" name="data-chiusura" id="data-chiusura"
+                               value="<?= $istanza->data_chiusura ?>" disabled="<?= $istanza->data_chiusura === null ? "true" : "false"?>" >
+                    </div>
+                    <div class="divider">
+                        <div class="divider-text">Dati Istanza</div>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="stato" id="stato-attivo" autocomplete="off"
+                            <?= $istanza->attivo ? 'checked' : "" ?> value="attivo" onclick="attivoCheck()">
+                        <label class="btn btn-outline-success" for="stato-attivo">Attivo</label>
+
+                        <input type="radio" class="btn-check" name="stato" id="stato-nonattivo" autocomplete="off"
+                               value="non-attivo" <?= !$istanza->attivo ? 'checked' : "" ?> onclick="attivoCheck()">
+                        <label class="btn btn-outline-warning" for="stato-nonattivo">NON ATTIVO</label>
+                        <p style="margin-top: 20px; padding: 10px; text-align: justify">Solo le istanze con stato "Attivo" verranno considerate nel
+                            pagamento mensile.  Un istanza non può essere attiva se manca il patto di cura o è chiusa.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="aperto-chiuso" id="stato-aperto" autocomplete="off"
+                            <?= !$istanza->chiuso ? 'checked' : "" ?> value="aperto" onclick="attivoCheck()">
+                        <label class="btn btn-outline-success" for="stato-aperto">Aperto</label>
+                        <input type="radio"  class="btn-check" name="aperto-chiuso" id="stato-chiuso" autocomplete="off"
+                               value="chiuso"  <?= $istanza->chiuso ? 'checked' : "" ?> onclick="attivoCheck()">
+                        <label class="btn btn-outline-danger" for="stato-chiuso">CHIUSO</label>
+                        <p style="margin-top: 20px; text-align: justify; padding: 10px;"><b>Chiudere SOLO le istanze che sono state completamente liquidate
+                                e
+                                che
+                                non
+                                necessitano di ulteriori azioni</b> (recuperi decessi, recuperi ecc)</p>
+                    </div>
+                    <div class="divider">
+                        <div class="divider-text">Decesso</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-control custom-checkbox">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" name="deceduto"
+                                       id="deceduto" <?= $istanza->data_decesso !== null ? "checked" : "" ?>
+                                       onchange="decedutoCheck()">
+                                <label class="form-check-label text-danger bold"
+                                       for="deceduto">Deceduto</label>
+                            </div>
+                        </div>
+                        <label for="data-decesso">Data decesso:</label>
+                        <input type="date" class="form-control" name="data-decesso" id="data-decesso"
+                               value="<?= $istanza->data_decesso ?>" disabled="<?= $istanza->data_decesso === null ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-control custom-checkbox" style="margin-top: 20px">
+                            <input type="checkbox" class="form-check-input form-check-primary form-check-glow"
+                                   name="liquidazione-decesso-completata"
+                                   id="liquidazione-decesso-completata" <?= $istanza->liquidazione_decesso_completata ? 'checked' : "" ?> onchange="decedutoCheck()" disabled="<?= $istanza->data_decesso === null ?>">
+                            <label class="form-check-label" for="liquidazione-decesso-completata">Deceduto
+                                liquidato</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="data-liquidazione">Data liquidazione decesso</label>
+                        <input type="date" class="form-control" name="data-liquidazione" id="data-liquidazione"
+                               value="<?= $istanza->data_liquidazione_decesso ?>" disabled="<?= $istanza->liquidazione_decesso_completata !== null ?>">
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -102,7 +168,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php if (!$istanza->rinuncia): ?>
                     <span class="badge rounded-pill bg-<?= $istanza->data_decesso === null ? "success" : "danger" ?> text-small"><?= $istanza->data_decesso ? ("DECEDUTO " . Yii::$app->formatter->asDate($istanza->data_decesso)) : "IN VITA" ?></span>
                     <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null && $istanza->patto_di_cura && !$istanza->chiuso) ? "success" : "danger" ?> text-small"><?=
-                        $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : ($istanza->attivo ? "DECEDUTO ANCORA ATTIVO" : ($istanza->liquidazione_decesso_completata ? "LIQUIDATO NON ATTIVO <br />APERTO (CHIUDERE)" :($istanza->attivo? "ATTIVO DA LIQUIDARE" : "NON ATTIVO DA LIQUIDARE")))) : ($istanza->attivo ? "ATTIVO" : ($istanza->patto_di_cura ? "NO PATTO CURA" : ($istanza->rinuncia ? "RINUNCIA": "NON ATTIVO"))) ?></span>
+                        $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : ($istanza->attivo ? "DECEDUTO ANCORA ATTIVO" : ($istanza->liquidazione_decesso_completata ? "LIQUIDATO NON ATTIVO <br />APERTO (CHIUDERE)" : ($istanza->attivo ? "ATTIVO DA LIQUIDARE" : "NON ATTIVO DA LIQUIDARE")))) : ($istanza->attivo ? "ATTIVO" : ($istanza->patto_di_cura ? "NO PATTO CURA" : ($istanza->rinuncia ? "RINUNCIA" : "NON ATTIVO"))) ?></span>
                 <?php endif; ?>
                 <?php if ($istanza->rinuncia): ?>
                     <span class="badge rounded-pill bg-danger text-large">RINUNCIA</span>
@@ -286,7 +352,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     originali</a>
                             </div>
                             <div class="col-md-2">
-                                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modifica-istanza">Modifica
+                                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modifica-istanza" onclick="check()">Modifica
                                     Istanza</a>
                             </div>
                             <div class="col-md-8"></div>
@@ -308,15 +374,44 @@ $this->params['breadcrumbs'][] = $this->title;
     </div><!--end::Card body-->
 </div>
 <script>
-    function setStatoAttivo() {
-        document.getElementById("stato-nonattivo").checked = true;
-        document.getElementById("stato-chiuso").checked = true;
+    function attivoCheck() {
+        console.log("attivo")
+        if (!document.getElementById("patto-di-cura").checked) {
+            document.getElementById("stato-attivo").checked = false;
+            document.getElementById("stato-nonattivo").checked = true;
+        }
+        if (document.getElementById("deceduto").checked) {
+            document.getElementById("stato-nonattivo").checked = true;
+        }
+        if (document.getElementById("rinuncia").checked) {
+            document.getElementById("stato-nonattivo").checked = true;
+            document.getElementById("stato-chiuso").checked = true;
+        }
+        if (document.getElementById("stato-chiuso").checked)
+            document.getElementById("stato-nonattivo").checked = true;
+        document.getElementById("data-chiusura").disabled = !document.getElementById("rinuncia").checked && !document.getElementById("stato-chiuso").checked;
     }
 
-    function checkrinuncia(radioButton) {
-        if (radioButton.checked) {
-            document.getElementById("rinuncia").checked = false;
-        }
+    function decedutoCheck() {
+        console.log("deceduto")
+        document.getElementById("data-decesso").disabled = !document.getElementById("deceduto").checked;
+        document.getElementById("liquidazione-decesso-completata").disabled = !document.getElementById("deceduto").checked;
+        document.getElementById("data-liquidazione").disabled = !document.getElementById("liquidazione-decesso-completata").checked || !document.getElementById("deceduto").checked;
+        if (!document.getElementById("deceduto").checked)
+            document.getElementById("liquidazione-decesso-completata").checked = document.getElementById("deceduto").checked;
+        attivoCheck();
+    }
+
+    function pattoDiCuraCheck() {
+        console.log("patto di cura")
+        document.getElementById("data-patto-cura").disabled = !document.getElementById("patto-di-cura").checked;
+        document.getElementById("stato-nonattivo").checked = true;
+        attivoCheck();
+    }
+    function check() {
+        pattoDiCuraCheck();
+        decedutoCheck();
+        attivoCheck();
     }
 </script>
 

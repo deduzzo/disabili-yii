@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Istanza;
 use app\models\IstanzaSearch;
+use Carbon\Carbon;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -150,10 +151,15 @@ class IstanzaController extends Controller
         if ($this->request->isPost) {
             $istanza = $this->findModel($this->request->post('id-istanza'));
             if ($istanza) {
+                $istanza->patto_di_cura = $this->request->post('patto-di-cura') === "on";
+                $istanza->data_firma_patto = $this->request->post('data-patto-cura') ?? null;
+                $istanza->rinuncia = $this->request->post('rinuncia') !== null;
+                $istanza->data_chiusura = $this->request->post('data-chiusura') ?? null;
                 $istanza->attivo = $this->request->post('stato') === "attivo";
                 $istanza->chiuso = $this->request->post('aperto-chiuso') === "chiuso";
-                $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata') !== null;
-                $istanza->rinuncia = $this->request->post('rinuncia') !== null;
+                $istanza->data_decesso = $this->request->post('data-decesso') ?? null;
+                $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata')  === "on";
+                $istanza->data_liquidazione_decesso = $this->request->post('data-liquidazione') ?? null;
                 $istanza->save();
                 if ($istanza->errors)
                     Yii::$app->session->setFlash('error', 'Errore durante il salvataggio dell\'istanza.');
@@ -163,5 +169,4 @@ class IstanzaController extends Controller
             return $this->redirect(['scheda', 'id' => $istanza->id]);
         }
     }
-
 }
