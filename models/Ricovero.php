@@ -142,6 +142,7 @@ class Ricovero extends \yii\db\ActiveRecord
     {
         $valoreMese = $this->istanza->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
         $ricovero = $this->getNumGiorni();
+        if  (!$this->a) return null;
         if ($ricovero)
             return ($ricovero['giorni'] * ($valoreMese / 30)) + ($ricovero['mesi'] * $valoreMese);
         else

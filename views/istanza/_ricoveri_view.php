@@ -43,7 +43,8 @@ echo GridView::widget([
             'label' => 'Importo',
             'value' => function ($model) {
                 return Yii::$app->formatter->asCurrency($model->getImportoRicovero());
-            }
+            },
+            'format' => 'raw'
         ],
         'cod_struttura',
         [

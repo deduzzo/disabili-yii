@@ -275,6 +275,10 @@ class Istanza extends \yii\db\ActiveRecord
         return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT', 'data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
     }
 
+    public function haRicoveriInCorso() {
+        return Ricovero::find()->where(['contabilizzare' => 1])->andWhere(['IS', 'a', null])->count() > 0;
+    }
+
     public function getNominativoDisabile()
     {
         if ($this->anagraficaDisabile->nome)
@@ -342,6 +346,8 @@ class Istanza extends \yii\db\ActiveRecord
             $out = "MANCA ISEE";
         else if (!$this->attivo)
             $out = "NON ATTIVO";
+        else if ($this->haRicoveriInCorso())
+            $out = "ATTUALMENTE RICOVERATO";
         return $out;
     }
 }
