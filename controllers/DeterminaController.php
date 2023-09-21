@@ -33,21 +33,23 @@ class DeterminaController extends \yii\web\Controller
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if ($soloProblematici === null || ($soloProblematici == "on" && $differenza['op'] !== "")) {
-                $istanzeArray[] = [
-                    'id' => $istanza->id,
-                    'cf' => $istanza->anagraficaDisabile->codice_fiscale,
-                    'cognome' => $istanza->anagraficaDisabile->cognome,
-                    'nome' => $istanza->anagraficaDisabile->nome,
-                    'distretto' => $istanza->distretto->nome,
-                    'isee' => $istanza->getLastIseeType(),
-                    'eta' => $istanza->anagraficaDisabile->getEta(),
-                    'gruppo' => $istanza->gruppo->descrizione_gruppo,
-                    'importoPrecedente' => $differenza['importoPrecedente'],
-                    'importo' => $istanza->getProssimoImporto(),
-                    'opArray' => $differenza,
-                    'operazione' => $differenza['op'],
-                ];
+            if (!$differenza['alert'] && in_array(strval($istanza->id), $allIdPagati)) {
+                if ($soloProblematici === null || ($soloProblematici == "on" && $differenza['op'] !== "")) {
+                    $istanzeArray[] = [
+                        'id' => $istanza->id,
+                        'cf' => $istanza->anagraficaDisabile->codice_fiscale,
+                        'cognome' => $istanza->anagraficaDisabile->cognome,
+                        'nome' => $istanza->anagraficaDisabile->nome,
+                        'distretto' => $istanza->distretto->nome,
+                        'isee' => $istanza->getLastIseeType(),
+                        'eta' => $istanza->anagraficaDisabile->getEta(),
+                        'gruppo' => $istanza->gruppo->descrizione_gruppo,
+                        'importoPrecedente' => $differenza['importoPrecedente'],
+                        'importo' => $istanza->getProssimoImporto(),
+                        'opArray' => $differenza,
+                        'operazione' => $differenza['op'],
+                    ];
+                }
             }
             if ($distretto) {
                 $perDistrettiMapPagamentoPrecedente[$distretto] = array_diff($perDistrettiMapPagamentoPrecedente[$distretto], [$istanza->id]);
