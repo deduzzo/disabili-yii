@@ -14,26 +14,26 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $allIstanze = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
+        $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
-        $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])->all();
-        $allIdPagati = $allPagamenti ? array_column($allPagamenti, 'id_istanza') : [];
-        $perDistrettiMapPagamentoPrecedente = [];
-        $perDistrettiMapAttuale = [];
-        foreach ($allPagamenti as $pagamento) {
-            $perDistrettiMapPagamentoPrecedente[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
+        $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])->all();
+        $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
+        $pagamentiPrecedentiPerDistretti = [];
+        $pagamentiAttualiPerDistretti = [];
+        foreach ($allPagamentiPrecedenti as $pagamento) {
+            $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
         if ($distretto)
-            $allIstanze->andWhere(['id_distretto' => $distretto]);
-        $allIstanze = $allIstanze->all();
+            $allIstanzeAttive->andWhere(['id_distretto' => $distretto]);
+        $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
-        foreach ($allIstanze as $istanza) {
+        foreach ($allIstanzeAttive as $istanza) {
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if (!$differenza['alert'] && in_array(strval($istanza->id), $allIdPagati)) {
+            if (!$differenza['alert'] && in_array(strval($istanza->id), $allIdPagatiMeseScorso)) {
                 if ($soloProblematici === null || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istanzeArray[] = [
                         'id' => $istanza->id,
@@ -52,12 +52,12 @@ class DeterminaController extends \yii\web\Controller
                 }
             }
             if ($distretto) {
-                $perDistrettiMapPagamentoPrecedente[$distretto] = array_diff($perDistrettiMapPagamentoPrecedente[$distretto], [$istanza->id]);
-                $perDistrettiMapAttuale[$distretto][] = $istanza->id;
+                $pagamentiPrecedentiPerDistretti[$distretto] = array_diff($pagamentiPrecedentiPerDistretti[$distretto], [$istanza->id]);
+                $pagamentiAttualiPerDistretti[$distretto][] = $istanza->id;
             }
-            $allIdPagati = array_diff($allIdPagati, [$istanza->id]);
+            $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
-        $nonPagati = $distretto ? $perDistrettiMapPagamentoPrecedente[$distretto] : $allIdPagati;
+        $nonPagati = $distretto ? $pagamentiPrecedentiPerDistretti[$distretto] : $allIdPagatiMeseScorso;
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
@@ -82,9 +82,7 @@ class DeterminaController extends \yii\web\Controller
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
             'distretto' => $distretto,
-            'allIdPagati' => $allIdPagati,
-            'perDistrettiMapPagamentoPrecedente' => $perDistrettiMapPagamentoPrecedente,
-            'perDistrettiMapAttuale' => $perDistrettiMapAttuale,
+            'allIdPagati' => $allIdPagatiMeseScorso,
             'soloProblematici' => $soloProblematici,
         ]);
     }
