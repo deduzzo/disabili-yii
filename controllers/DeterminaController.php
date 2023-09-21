@@ -31,7 +31,7 @@ class DeterminaController extends \yii\web\Controller
         foreach ($allPagamentiPrecedenti as $pagamento) {
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
-        if ($distretti)
+        if (count($distretti) >0)
             $allIstanzeAttive->andWhere(['id_distretto' => $distretti]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
