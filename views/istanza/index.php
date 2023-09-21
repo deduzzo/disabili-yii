@@ -185,7 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => ActionColumn::className(),
                     'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
                     'urlCreator' => function ($action, Istanza $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
+                        return Url::toRoute(["/istanza/".$action, 'id' => $model->id]);
                     },
                     'buttons' => [
                         'scheda' => function ($url, $model) {

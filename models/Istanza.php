@@ -353,7 +353,7 @@ class Istanza extends \yii\db\ActiveRecord
         if ($this->rinuncia)
             $out .= "RINUNCIA - ";
         if ($this->haRicoveriInCorso())
-            $out .= "ATTUALMENTE RICOVERATO -";
+            $out .= "ATTUALMENTE RICOVERATO - ";
         return $out ? substr($out, 0, strlen($out) - 3) : null;
     }
 }
