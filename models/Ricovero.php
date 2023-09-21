@@ -102,21 +102,35 @@ class Ricovero extends \yii\db\ActiveRecord
         return $this->hasOne(Recupero::class, ['id' => 'id_recupero']);
     }
 
-    public function getNumGiorni()
+    public function getNumGiorni(): ?array
     {
         $out = ['giorni' => 0, 'mesi' => 0];
         if (!$this->da || !$this->a) return null;
         $da = Carbon::createFromFormat('Y-m-d', $this->da);
         $a = Carbon::createFromFormat('Y-m-d', $this->a);
         // id $da and $a are in different months
-        if ($da->month !== $a->month) {
-            $out['giorni'] = $da->daysInMonth - $da->day + 1;
-            $out['mesi'] = $a->diffInMonths($da);
-            $out['giorni'] += $a->day;
-        } else {
-            $out['giorni'] = $a->diffInDays($da) + 1;
+        list($daAnno, $daMese, $daGiorno) = explode('-', $this->da);
+        list($aAnno, $aMese, $aGiorno) = explode('-', $this->a);
+        if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThan($a)) {
+            return null;
         }
-        return $out;
+        else {
+            if ($da->month !== $a->month) {
+                if ($da->day !== 1)
+                    $out['giorni'] += $da->daysInMonth - $da->day + 1;
+                $out['mesi'] += $a->diffInMonths($da);
+                if ($a->day !== $a->daysInMonth)
+                    $out['giorni'] += $a->day;
+                else
+                    $out['mesi'] += 1;
+            } else {
+                if ($da->day === 1 && $a->day === $a->daysInMonth)
+                    $out['mesi'] += 1;
+                else
+                    $out['giorni'] += $a->diffInDays($da) + 1;
+            }
+            return $out;
+        }
     }
 
     public function getImportoRicovero()

@@ -145,6 +145,13 @@ class SiteController extends Controller
         }
     }
 
+/*    public function actionRicoveri() {
+        $ricovero = new Ricovero();
+        $ricovero->da = "2024-01-01";
+        $ricovero->a = "2024-02-10";
+        print_r($ricovero->getNumGiorni());
+    }*/
+
     public function actionAggiornaIsee()
     {
         $nonTrovati = [];
