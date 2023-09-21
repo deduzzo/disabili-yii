@@ -29,10 +29,12 @@ echo GridView::widget([
             }
         ],
         [
-            'label' => 'Giorni',
+            'label' => 'Durata',
             'value' => function ($model) {
-                return $model->getNumGiorni();
-            }
+                $numGiorni = $model->getNumGiorni();
+                return "<b>".($numGiorni['mesi'] > 0 ? $numGiorni["mesi"]." mes" . ($numGiorni["mesi"] === 1 ?"e e " : "i e ") : "") .$numGiorni["giorni"]. " giorni" . "</b>";
+            },
+            'format' => 'raw'
         ],
         [
             'label' => 'Importo',
@@ -47,7 +49,7 @@ echo GridView::widget([
             'format' => 'raw',
             'value' => function ($model) {
                 return $model->contabilizzare ?
-                    ($model->recupero ? ("<span class='badge bg-success'>Si, det. ".$model->determina->numero."</span>") : "<span class='badge bg-warning'>DA RECUPERARE</span>") : "<span class='badge bg-primary'>IMPORT. PREC.</span>";
+                    ($model->recupero ? ("<span class='badge bg-success'>Si, det. " . $model->determina->numero . "</span>") : "<span class='badge bg-warning'>DA RECUPERARE</span>") : "<span class='badge bg-primary'>IMPORT. PREC.</span>";
 
             }
         ],

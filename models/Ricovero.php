@@ -7,6 +7,7 @@ use app\models\enums\IseeType;
 use Carbon\Carbon;
 use DateTime;
 use Yii;
+use function PHPUnit\Framework\lessThanOrEqual;
 
 /**
  * This is the model class for table "ricovero".
@@ -103,14 +104,25 @@ class Ricovero extends \yii\db\ActiveRecord
 
     public function getNumGiorni()
     {
+        $out = ['giorni' => 0, 'mesi' => 0];
         if (!$this->da || !$this->a) return null;
         $da = Carbon::createFromFormat('Y-m-d', $this->da);
         $a = Carbon::createFromFormat('Y-m-d', $this->a);
-        return $a->diffInDays($da) + 1;
+        // id $da and $a are in different months
+        if ($da->month !== $a->month) {
+            $out['giorni'] = $da->daysInMonth - $da->day + 1;
+            $out['mesi'] = $a->diffInMonths($da);
+            $out['giorni'] += $a->day;
+        } else {
+            $out['giorni'] = $a->diffInDays($da) + 1;
+        }
+        return $out;
     }
 
     public function getImportoRicovero()
     {
-        return $this->getNumGiorni() * (($this->istanza->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
+        $valoreMese = $this->istanza->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
+        $ricovero = $this->getNumGiorni();
+        return ($ricovero['giorni'] * ($valoreMese / 30)) + ($ricovero['mesi'] * $valoreMese);
     }
 }
