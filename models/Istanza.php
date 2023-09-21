@@ -275,8 +275,9 @@ class Istanza extends \yii\db\ActiveRecord
         return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT', 'data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
     }
 
-    public function haRicoveriInCorso() {
-        return Ricovero::find()->where(['contabilizzare' => 1,'id_istanza' => $this->id])->andWhere(['IS', 'a', null])->count() > 0;
+    public function haRicoveriInCorso()
+    {
+        return Ricovero::find()->where(['contabilizzare' => 1, 'id_istanza' => $this->id])->andWhere(['IS', 'a', null])->count() > 0;
     }
 
     public function getNominativoDisabile()
@@ -321,7 +322,7 @@ class Istanza extends \yii\db\ActiveRecord
                 }
             }
         }
-        return $totale >0 ? $totale : 0;
+        return $totale > 0 ? $totale : 0;
     }
 
     public function getDifferenzaUltimoImportoArray()
@@ -329,18 +330,19 @@ class Istanza extends \yii\db\ActiveRecord
         $op = $this->isInAlert();
         $lastMovimento = $this->getLastMovimentoBancario();
         if (!$this->attivo)
-            return ['alert' => $op != null, 'presenteScorsoMese' => true, 'importo' =>  0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE'];
+            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE'];
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0);
-        if ($prossimoImporto < 0.0)
-            return ['alert' => $op != null,'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> (importo '.$prossimoImporto.')'];
+        if ($prossimoImporto <= 0.0)
+            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'];
         if ($lastMovimento)
-            return ['alert' => $op != null,'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza , 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "")];
+            return ['alert' => $op != null, 'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "")];
         else
-            return ['alert' => $op != null,'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza , 'op' => $op ?? "AGGIUNGERE"];
+            return ['alert' => $op != null, 'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? "AGGIUNGERE"];
     }
 
-    public function isInAlert() {
+    public function isInAlert()
+    {
         $out = null;
         if (!$this->attivo || $this->chiuso)
             $out .= "NON ATTIVO - ";
@@ -352,6 +354,6 @@ class Istanza extends \yii\db\ActiveRecord
             $out .= "RINUNCIA - ";
         if ($this->haRicoveriInCorso())
             $out .= "ATTUALMENTE RICOVERATO -";
-        return $out ? substr($out,0,strlen($out) -3) : null;
+        return $out ? substr($out, 0, strlen($out) - 3) : null;
     }
 }

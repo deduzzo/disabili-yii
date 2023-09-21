@@ -117,11 +117,13 @@ class Anagrafica extends \yii\db\ActiveRecord
         return $this->hasMany(Residenza::class, ['id_anagrafica' => 'id']);
     }
 
-    public function getEta()
+    public function getEta($dataDecesso= null)
     {
         if (!$this->data_nascita)
             return null;
-        return Carbon::parse($this->data_nascita)->age;
+        $referenceDate = $dataDecesso ? Carbon::parse($dataDecesso) : Carbon::now();
+
+        return Carbon::parse($this->data_nascita)->diffInYears($referenceDate);
     }
 
     public function isMinorenne() {
