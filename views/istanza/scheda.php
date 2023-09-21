@@ -49,7 +49,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="patto-di-cura" name="patto-di-cura" <?= $istanza->patto_di_cura ? "checked" : "" ?> onchange="pattoDiCuraCheck()">
+                            <input class="form-check-input" type="checkbox" role="switch" id="patto-di-cura"
+                                   name="patto-di-cura" <?= $istanza->patto_di_cura ? "checked" : "" ?>
+                                   onchange="pattoDiCuraCheck()">
                             <label class="form-check-label" for="patto-di-cura">Patto di cura</label>
                         </div>
                     </div>
@@ -72,7 +74,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-3">
                         <label for="data-chiusura">Data chiusura:</label>
                         <input type="date" class="form-control" name="data-chiusura" id="data-chiusura"
-                               value="<?= $istanza->data_chiusura ?>" disabled="<?= $istanza->data_chiusura === null ? "true" : "false"?>" >
+                               value="<?= $istanza->data_chiusura ?>"
+                               disabled="<?= $istanza->data_chiusura === null ? "true" : "false" ?>">
                     </div>
                     <div class="divider">
                         <div class="divider-text">Dati Istanza</div>
@@ -85,17 +88,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         <input type="radio" class="btn-check" name="stato" id="stato-nonattivo" autocomplete="off"
                                value="non-attivo" <?= !$istanza->attivo ? 'checked' : "" ?> onclick="attivoCheck()">
                         <label class="btn btn-outline-warning" for="stato-nonattivo">NON ATTIVO</label>
-                        <p style="margin-top: 20px; padding: 10px; text-align: justify">Solo le istanze con stato "Attivo" verranno considerate nel
-                            pagamento mensile.  Un istanza non può essere attiva se manca il patto di cura o è chiusa.</p>
+                        <p style="margin-top: 20px; padding: 10px; text-align: justify">Solo le istanze con stato
+                            "Attivo" verranno considerate nel
+                            pagamento mensile. Un istanza non può essere attiva se manca il patto di cura o è
+                            chiusa.</p>
                     </div>
                     <div class="col-md-6">
                         <input type="radio" class="btn-check" name="aperto-chiuso" id="stato-aperto" autocomplete="off"
                             <?= !$istanza->chiuso ? 'checked' : "" ?> value="aperto" onclick="attivoCheck()">
                         <label class="btn btn-outline-success" for="stato-aperto">Aperto</label>
-                        <input type="radio"  class="btn-check" name="aperto-chiuso" id="stato-chiuso" autocomplete="off"
-                               value="chiuso"  <?= $istanza->chiuso ? 'checked' : "" ?> onclick="attivoCheck()">
+                        <input type="radio" class="btn-check" name="aperto-chiuso" id="stato-chiuso" autocomplete="off"
+                               value="chiuso" <?= $istanza->chiuso ? 'checked' : "" ?> onclick="attivoCheck()">
                         <label class="btn btn-outline-danger" for="stato-chiuso">CHIUSO</label>
-                        <p style="margin-top: 20px; text-align: justify; padding: 10px;"><b>Chiudere SOLO le istanze che sono state completamente liquidate
+                        <p style="margin-top: 20px; text-align: justify; padding: 10px;"><b>Chiudere SOLO le istanze che
+                                sono state completamente liquidate
                                 e
                                 che
                                 non
@@ -122,7 +128,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="custom-control custom-checkbox" style="margin-top: 20px">
                             <input type="checkbox" class="form-check-input form-check-primary form-check-glow"
                                    name="liquidazione-decesso-completata"
-                                   id="liquidazione-decesso-completata" <?= $istanza->liquidazione_decesso_completata ? 'checked' : "" ?> onchange="decedutoCheck()" disabled="<?= $istanza->data_decesso === null ?>">
+                                   id="liquidazione-decesso-completata" <?= $istanza->liquidazione_decesso_completata ? 'checked' : "" ?>
+                                   onchange="decedutoCheck()" disabled="<?= $istanza->data_decesso === null ?>">
                             <label class="form-check-label" for="liquidazione-decesso-completata">Deceduto
                                 liquidato</label>
                         </div>
@@ -130,7 +137,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-4">
                         <label for="data-liquidazione">Data liquidazione decesso</label>
                         <input type="date" class="form-control" name="data-liquidazione" id="data-liquidazione"
-                               value="<?= $istanza->data_liquidazione_decesso ?>" disabled="<?= $istanza->liquidazione_decesso_completata !== null ?>">
+                               value="<?= $istanza->data_liquidazione_decesso ?>"
+                               disabled="<?= $istanza->liquidazione_decesso_completata !== null ?>">
                     </div>
                 </div>
             </div>
@@ -153,14 +161,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="card">
     <div class="card-header">
-        <!--begin::Card title-->
-        <!--        <h5 class="card-title">
-            <?php /*= $this->title */ ?>
-        </h5>-->
-        <!--begin::Card title-->
-        <!--            <div class="card-toolbar">
-                <?php /*= Html::a(Yii::t('app', 'Aggiungi'), ['create'], ['class' => 'btn btn-success fa fa-plus']) */ ?>
-            </div>-->
+        <?php if ($istanza->isInAlert()): ?>
+            <span class="badge bg-danger">ALERT!</span>
+            <span class="badge bg-warning"><?= $istanza->isInAlert() ?></span>
+        <?php endif; ?>
     </div>
     <div class="card-body" id="card-content">
         <div class="row p-1">
@@ -352,7 +356,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     originali</a>
                             </div>
                             <div class="col-md-2">
-                                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modifica-istanza" onclick="check()">Modifica
+                                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modifica-istanza"
+                                   onclick="check()">Modifica
                                     Istanza</a>
                             </div>
                             <div class="col-md-8"></div>
@@ -406,9 +411,10 @@ $this->params['breadcrumbs'][] = $this->title;
         console.log("patto di cura")
         document.getElementById("data-patto-cura").disabled = !document.getElementById("patto-di-cura").checked;
         if (document.getElementById("data-patto-cura").disabled)
-        document.getElementById("stato-nonattivo").checked = document.getElementById("data-patto-cura").disabled;
+            document.getElementById("stato-nonattivo").checked = document.getElementById("data-patto-cura").disabled;
         attivoCheck();
     }
+
     function check() {
         attivoCheck();
         pattoDiCuraCheck();

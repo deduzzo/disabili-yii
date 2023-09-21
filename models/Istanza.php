@@ -276,7 +276,7 @@ class Istanza extends \yii\db\ActiveRecord
     }
 
     public function haRicoveriInCorso() {
-        return Ricovero::find()->where(['contabilizzare' => 1])->andWhere(['IS', 'a', null])->count() > 0;
+        return Ricovero::find()->where(['contabilizzare' => 1,'id_istanza' => $this->id])->andWhere(['IS', 'a', null])->count() > 0;
     }
 
     public function getNominativoDisabile()
