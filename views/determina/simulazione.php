@@ -124,10 +124,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'tableOptions' => [
                 'class' => 'table table-striped dataTable-table',
                 'id' => 'table1',
+                'style' => 'font-size: 14px;'
             ],
             'columns' => [
                 'id',
-                'cf',
                 'cognome',
                 'nome',
                 'distretto',
