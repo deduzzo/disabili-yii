@@ -41,7 +41,7 @@ class DeterminaController extends \yii\web\Controller
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
             if (!$differenza['alert'] && in_array(strval($istanza->id), $allIdPagatiMeseScorso)) {
-                if ($soloProblematici === null || ($soloProblematici == "on" && $differenza['op'] !== "")) {
+                if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istanzeArray[] = [
                         'id' => $istanza->id,
                         'cf' => $istanza->anagraficaDisabile->codice_fiscale,
