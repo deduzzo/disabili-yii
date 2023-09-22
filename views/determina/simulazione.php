@@ -20,11 +20,7 @@ use yii\widgets\Pjax;
 
 $this->title = 'Simulazione determina';
 $this->params['breadcrumbs'][] = $this->title;
-?>
-
-<?php Pjax::begin(['id' => 'simulazione-determina']) ?>
-<?php $formatter = \Yii::$app->formatter;
-$distretto = Yii::$app->request->get()['distretto'] ?? null;
+$formatter = \Yii::$app->formatter;
 ?>
 
 
@@ -37,7 +33,7 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
                 </div>
                 <div class="col-6 col-sm-12 col-md-4">
                     <div class="list-group" role="tablist">
-                        <?php foreach ($distretti as $di): ?>
+                        <?php foreach ($distretti === [] ? ArrayHelper::getColumn($distretti, 'id') : $distretti as $di): ?>
                             <a class="list-group-item list-group-item-action d-flex justify-content-between"
                                id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
                                href="#<?= "dettagli_" . $di->id ?>" role="tab">
@@ -144,6 +140,10 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
                        for="solo-problematici">Mostra solo istanze con variazioni</label>
+                <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
+                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
+                <label class="form-check-label text-danger bold"
+                       for="solo-problematici">Mostra solo istanze con variazioni</label>
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary">Filtra</button>
@@ -242,5 +242,3 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
         ?>
     </div>
 </div>
-<?php Pjax::end() ?>
-
