@@ -37,7 +37,7 @@ echo GridView::widget([
             'value' => function ($model) {
                 return $model->annullato ?
                     '<span class="badge bg-warning">ANNULLATO</span>' :
-                    ($model->chiuso ? '<span class="badge bg-secondary">CHIUSO</span>' : ('<span class="badge bg-info">Attivo</span>' . ($model->rateizzato == 1 ? ('<br />mancano ' . $model->getRateMancanti() . ' rate') : ''))
+                    ($model->chiuso ? '<span class="badge bg-secondary">CHIUSO</span>' : ('<span class="badge bg-info">Attivo</span>' . ($model->rateizzato == 1 ? ('<br /><span class="badge bg-success">RATEIZZATO<br />mancano ' . $model->getRateMancanti() . ' rate</span>') : ''))
                     );
             },
             'format' => 'raw',
