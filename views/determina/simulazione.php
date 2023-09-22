@@ -28,57 +28,59 @@ $formatter = \Yii::$app->formatter;
 <div class="card">
     <div class="card-header">
         <div class="card-toolbar">
-            <div class="row">
-                <div class="divider">
-                    <div class="divider-text">Dettagli per distretto</div>
-                </div>
-                <div class="col-6 col-sm-12 col-md-4">
-                    <div class="list-group" role="tablist">
-                        <?php foreach ($distretti as $di): ?>
-                            <a class="list-group-item list-group-item-action d-flex justify-content-between"
-                               id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
-                               href="#<?= "dettagli_" . $di->id ?>" role="tab">
-                                <?= $di->nome ?>
-                                <div>
+            <?php if ($soloErrori == "off" && $soloProblematici = "off"): ?>
+                <div class="row">
+                    <div class="divider">
+                        <div class="divider-text">Dettagli per distretto</div>
+                    </div>
+                    <div class="col-6 col-sm-12 col-md-4">
+                        <div class="list-group" role="tablist">
+                            <?php foreach ($distretti as $di): ?>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between"
+                                   id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
+                                   href="#<?= "dettagli_" . $di->id ?>" role="tab">
+                                    <?= $di->nome ?>
+                                    <div>
                                     <span class="badge bg-warning badge-pill badge-round ms-2"><?= Html::encode("<25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
                                     <span class="badge bg-primary badge-pill badge-round ms-2"><?= Html::encode(">25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . ')</span>' ?>
                                     <span class="badge bg-success badge-pill badge-round ms-2"><?= "TOT (" . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
-                                </div>
-                            </a>
+                                    </div>
+                                </a>
 
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 col-sm-12 col-md-8 mt-1">
-                    <div class="tab-content text-justify" id="nav-tabContent">
-                        <?php foreach ($distretti as $di2): ?>
-                            <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" style="text-align:center"
-                                 role="tabpanel"
-                                 aria-labelledby="<?= "dettagli_" . $di2->id . "_list" ?>">
-                                <?php
-                                echo "<div class='row'><div class='col-md-12'><h2>Dettaglio distretto di " . $di2->nome.'</h2></div>';
-                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
+                    <div class="col-6 col-sm-12 col-md-8 mt-1">
+                        <div class="tab-content text-justify" id="nav-tabContent">
+                            <?php foreach ($distretti as $di2): ?>
+                                <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" style="text-align:center"
+                                     role="tabpanel"
+                                     aria-labelledby="<?= "dettagli_" . $di2->id . "_list" ?>">
+                                    <?php
+                                    echo "<div class='row'><div class='col-md-12'><h2>Dettaglio distretto di " . $di2->nome . '</h2></div>';
+                                    echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
 
-                                echo '<button type="button" class="btn btn-success">
+                                    echo '<button type="button" class="btn btn-success">
                                         ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K] . '</span>
                                     </button></div>';
-                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+                                    echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
-                                echo '<button type="button" class="btn btn-primary">
+                                    echo '<button type="button" class="btn btn-primary">
                                         ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] . '</span>
                                     </button></div>';
 
-                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
-                                echo '<button type="button" class="btn btn-secondary">
+                                    echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
+                                    echo '<button type="button" class="btn btn-secondary">
                                         ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K] + $stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . ($stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K]) . '</span>
                                     </button></div></div>';
 
-                                ?>
-                            </div>
-                        <?php endforeach; ?>
+                                    ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card-body">
@@ -140,9 +142,9 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Mostra solo istanze con variazioni</label><br />
+                       for="solo-problematici">Mostra solo istanze con variazioni</label><br/>
                 <input class="form-check-input" type="checkbox" role="switch" name="soloErrori"
-                       id="soloErrori" <?= $soloProblematici == "on" ? "checked" : "" ?>>
+                       id="soloErrori" <?= $soloErrori == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
                        for="soloErrori">Mostra solo istanze con Errori (ALERT)</label>
             </div>
