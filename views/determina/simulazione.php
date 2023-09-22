@@ -44,17 +44,14 @@ $formatter = \Yii::$app->formatter;
                         <p style="text-align:center">Clicca sul distretto per vedere i dettagli</p>
                         <div class="list-group" role="tablist">
                             <?php foreach ($distretti as $di): ?>
-                                <a class="list-group-item list-group-item-action d-flex justify-content-between"
-                                   id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
-                                   href="#<?= "dettagli_" . $di->id ?>" role="tab">
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list" href="#<?= "dettagli_" . $di->id ?>" role="tab">
                                     <?= $di->nome ?>
-                                    <div style="min-width:150px">
-                                    <span class="badge bg-success badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
-                                    <span class="badge bg-warning badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
-                                    <span class="badge bg-secondary badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
+                                    <div class="badge-container" style="display: flex; flex-direction: column; align-items: flex-end;">
+                                        <span class="badge bg-success badge-pill badge-round" style="margin-bottom: 5px;"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
+                                        <span class="badge bg-warning badge-pill badge-round" style="margin-bottom: 5px;"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
+                                        <span class="badge bg-secondary badge-pill badge-round" style="margin-bottom: 5px;"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
                                     </div>
                                 </a>
-
                             <?php endforeach; ?>
                         </div>
                     </div>
