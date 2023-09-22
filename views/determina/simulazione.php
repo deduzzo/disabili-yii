@@ -151,15 +151,15 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Mostra solo istanze con Errori (ALERT)</label><br/>
+                       for="solo-problematici">Solo ist. con Errori (ALERT)</label><br/>
                 <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
                        id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="soloVariazioni">Mostra solo istanze con Variazioni</label><br/>
+                       for="soloVariazioni">Solo ist. con Variazioni</label><br/>
                 <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
                        id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="soloRecuperi">Mostra solo istanze con Recuperi in corso</label>
+                       for="soloRecuperi">Solo ist. con Recuperi in corso</label>
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary">Filtra</button>
