@@ -18,7 +18,7 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : [3]; //: Distretto::getAllIds();
+        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : []; //: Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
         $soloErrori = isset($this->request->post()['soloErrori']) ? $this->request->post()['soloErrori'] : 'off';
