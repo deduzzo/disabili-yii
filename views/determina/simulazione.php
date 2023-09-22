@@ -149,7 +149,7 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
                        id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="soloVariazioni">Mostra solo istanze con Variazioni</label>
+                       for="soloVariazioni">Mostra solo istanze con Variazioni</label><br/>
                 <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
                        id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
@@ -256,28 +256,27 @@ $formatter = \Yii::$app->formatter;
         'position' => \yii\web\View::POS_READY
     ]); ?>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
+        $(document).ready(function () {
             const soloProblematici = document.getElementById('soloProblematici');
             const soloErrori = document.getElementById('soloErrori');
             const soloRecuperi = document.getElementById('soloRecuperi');
 
-            soloProblematici.addEventListener('change', function() {
-                if(soloProblematici.checked) {
+            soloProblematici.addEventListener('change', function () {
+                if (soloProblematici.checked) {
                     soloErrori.checked = false;
                     soloRecuperi.checked = false;
                 }
             });
 
-            soloErrori.addEventListener('change', function() {
-                if(soloErrori.checked) {
+            soloErrori.addEventListener('change', function () {
+                if (soloErrori.checked) {
                     soloProblematici.checked = false;
                     soloRecuperi.checked = false;
                 }
             });
 
-            soloRecuperi.addEventListener('change', function() {
-                if(soloRecuperi.checked) {
+            soloRecuperi.addEventListener('change', function () {
+                if (soloRecuperi.checked) {
                     soloProblematici.checked = false;
                     soloErrori.checked = false;
                 }

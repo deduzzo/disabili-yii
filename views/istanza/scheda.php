@@ -428,6 +428,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ]); ?>
 <script>
 
+
 </script>
 <?php JSRegister::end(); ?>
 
