@@ -35,7 +35,13 @@ $formatter = \Yii::$app->formatter;
                     <div class="divider">
                         <div class="divider-text">Dettagli per distretto</div>
                     </div>
-                    <div class="col-6 col-sm-12 col-md-4">
+                    <div class="col-6 col-sm-12 col-md-4" style="margin-bottom: 5px">
+                        <div style="text-align:center"><h6>LEGGENDA</h6>
+                            <span class="badge bg-success badge-pill badge-round ms-2">Minore 25k €</span>
+                            <span class="badge bg-warning badge-pill badge-round ms-2">Maggiore 25k €</span>
+                            <span class="badge bg-secondary badge-pill badge-round ms-2">Totali</span>
+                        </div>
+                        <p style="text-align:center">Clicca sul distretto per vedere i dettagli</p>
                         <div class="list-group" role="tablist">
                             <?php foreach ($distretti as $di): ?>
                                 <a class="list-group-item list-group-item-action d-flex justify-content-between"
@@ -43,9 +49,9 @@ $formatter = \Yii::$app->formatter;
                                    href="#<?= "dettagli_" . $di->id ?>" role="tab">
                                     <?= $di->nome ?>
                                     <div>
-                                    <span class="badge bg-warning badge-pill badge-round ms-2"><?= Html::encode("<25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
-                                    <span class="badge bg-primary badge-pill badge-round ms-2"><?= Html::encode(">25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . ')</span>' ?>
-                                    <span class="badge bg-success badge-pill badge-round ms-2"><?= "TOT (" . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
+                                    <span class="badge bg-success badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
+                                    <span class="badge bg-warning badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
+                                    <span class="badge bg-secondary badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
                                     </div>
                                 </a>
 
@@ -65,9 +71,9 @@ $formatter = \Yii::$app->formatter;
                                     echo '<button type="button" class="btn btn-success">
                                         ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K] . '</span>
                                     </button></div>';
-                                    echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+                                    echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-warning"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
-                                    echo '<button type="button" class="btn btn-primary">
+                                    echo '<button type="button" class="btn btn-warning">
                                         ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] . '</span>
                                     </button></div>';
 
@@ -113,9 +119,9 @@ $formatter = \Yii::$app->formatter;
                 echo '<button type="button" class="btn btn-success">
                                 ' . $formatter->asCurrency($importiPerTipo[IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MINORE_25K] . '</span>
                             </button></div>';
-                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-warning"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
-                echo '<button type="button" class="btn btn-primary">
+                echo '<button type="button" class="btn btn-warning">
                                 ' . $formatter->asCurrency($importiPerTipo[IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MAGGIORE_25K] . '</span>
                             </button></div>';
                 echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
