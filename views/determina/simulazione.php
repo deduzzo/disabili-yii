@@ -14,7 +14,7 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var string $soloRecuperi */
-/** @var string $soloVariazioni
+/** @var string $soloVariazioni */
 /** @var string $soloProblematici */
 /** @var array $distretti */
 /** @var array $stats */
@@ -30,7 +30,7 @@ $formatter = \Yii::$app->formatter;
 <div class="card">
     <div class="card-header">
         <div class="card-toolbar">
-            <?php if ($soloErrori === "off" && $soloProblematici === "off"): ?>
+            <?php if ($soloVariazioni === "off" && $soloProblematici === "off" && $soloRecuperi === "off"): ?>
                 <div class="row">
                     <div class="divider">
                         <div class="divider-text">Dettagli per distretto</div>
@@ -89,7 +89,7 @@ $formatter = \Yii::$app->formatter;
         <!-- add select box for distretto -->
 
         <div class="row">
-            <?php if ($soloErrori === "off" && $soloProblematici === "off"): ?>
+            <?php if ($soloVariazioni === "off" && $soloProblematici === "off" && $soloRecuperi === "off"): ?>
                 <div class="divider">
                     <div class="divider-text">Totali globali di <?= count($distretti) ?>
                         distrett<?= count($distretti) === 1 ? "o" : "i" ?></div>
