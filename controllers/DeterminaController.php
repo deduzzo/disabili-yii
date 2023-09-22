@@ -18,7 +18,7 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : []; //: Distretto::getAllIds();
+        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : Distretto::find()->all();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
         $soloErrori = isset($this->request->post()['soloErrori']) ? $this->request->post()['soloErrori'] : 'off';
@@ -32,11 +32,11 @@ class DeterminaController extends \yii\web\Controller
         $importiTotali = [];
         $numeriTotali = [];
         $alert = [];
-            foreach (Distretto::find()->all() as $item) {
-                $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-                $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-                $alert[$item->id] = [];
-            }
+        foreach (Distretto::find()->all() as $item) {
+            $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            $alert[$item->id] = [];
+        }
         foreach (Distretto::find()->all() as $dist) {
             $statistiche[$dist->id] = 0;
         }
@@ -82,12 +82,8 @@ class DeterminaController extends \yii\web\Controller
             $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
         $nonPagati = [];
-        if (count($distretti) > 0) {
-            foreach ($distretti as $disPag) {
-                $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
-            }
-        } else
-            $nonPagati = $allIdPagatiMeseScorso;
+        foreach ($distretti as $disPag)
+            $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
