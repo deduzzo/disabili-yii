@@ -61,4 +61,13 @@ class Distretto extends \yii\db\ActiveRecord
     {
         return new DistrettoQuery(get_called_class());
     }
+
+    public static function getAllIds()
+    {
+        $distretti = Distretto::find()->all();
+        $ids = [];
+        foreach ($distretti as $distretto)
+            $ids[] = $distretto->id;
+        return $ids;
+    }
 }

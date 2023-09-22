@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Distretto;
+use app\models\enums\IseeType;
 use kartik\select2\Select2;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
@@ -12,7 +13,8 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var string $soloProblematici */
-/** @var array $statistiche */
+/** @var array $distretti */
+/** @var array $stats */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 
@@ -30,24 +32,51 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
     <div class="card-header">
         <div class="card-toolbar">
             <div class="row">
-                <div class="col-4 col-sm-12 col-md-4">
+                <div class="divider">
+                    <div class="divider-text">Dettagli per distretto</div>
+                </div>
+                <div class="col-6 col-sm-12 col-md-4">
                     <div class="list-group" role="tablist">
-                        <?php foreach (Distretto::find()->all() as $di): ?>
+                        <?php foreach ($distretti as $di): ?>
                             <a class="list-group-item list-group-item-action d-flex justify-content-between"
                                id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
                                href="#<?= "dettagli_" . $di->id ?>" role="tab">
                                 <?= $di->nome ?>
-                                <span class="badge bg-warning badge-pill badge-round ms-1"><?= $statistiche[$di->id] ?></span>
+                                <div>
+                                    <span class="badge bg-warning badge-pill badge-round ms-2"><?= Html::encode("<25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
+                                    <span class="badge bg-primary badge-pill badge-round ms-2"><?= Html::encode(">25k€") . ' (' . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . ')</span>' ?>
+                                    <span class="badge bg-success badge-pill badge-round ms-2"><?= "TOT (" . $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . ')</span>' ?>
+                                </div>
                             </a>
+
                         <?php endforeach; ?>
                     </div>
                 </div>
-                <div class="col-8 col-sm-12 col-md-8 mt-1">
+                <div class="col-6 col-sm-12 col-md-8 mt-1">
                     <div class="tab-content text-justify" id="nav-tabContent">
-                        <?php foreach (Distretto::find()->all() as $di2): ?>
-                            <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" role="tabpanel"
+                        <?php foreach ($distretti as $di2): ?>
+                            <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" style="text-align:center"
+                                 role="tabpanel"
                                  aria-labelledby="<?= "dettagli_" . $di2->id . "_list" ?>">
-                                <?= $di2->nome ?>
+                                <?php
+                                echo "<div class='row'><div class='col-md-12'><h2>Dettaglio distretto di " . $di2->nome.'</h2></div>';
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
+
+                                echo '<button type="button" class="btn btn-success">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K] . '</span>
+                                    </button></div>';
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+
+                                echo '<button type="button" class="btn btn-primary">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] . '</span>
+                                    </button></div>';
+
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
+                                echo '<button type="button" class="btn btn-secondary">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K] + $stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . ($stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K]) . '</span>
+                                    </button></div></div>';
+
+                                ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -57,17 +86,51 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
     </div>
     <div class="card-body">
         <!-- add select box for distretto -->
-        <?= Html::beginForm(['determina/'], 'post', ['data-pjax' => '', 'class' => 'form-inline']) ?>
 
         <div class="row">
+            <div class="divider">
+                <div class="divider-text">Totali globali di <?= count($distretti) ?>
+                    distrett<?= count($distretti) === 1 ? "o" : "i" ?></div>
+            </div>
+            <?php
+            $out = "";
+            $totaleImporti = 0;
+            $numeriTotali = 0;
+            $importiPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            $numeriPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            foreach ($stats['importiTotali'] as $distretto => $numeri) {
+                $totaleImporti += $numeri[IseeType::MAGGIORE_25K] + $numeri[IseeType::MINORE_25K];
+                $numeriTotali += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
+                $importiPerTipo[IseeType::MAGGIORE_25K] += $numeri[IseeType::MAGGIORE_25K];
+                $importiPerTipo[IseeType::MINORE_25K] += $numeri[IseeType::MINORE_25K];
+                $numeriPerTipo[IseeType::MAGGIORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K];
+                $numeriPerTipo[IseeType::MINORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
+            }
+            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
+
+            echo '<button type="button" class="btn btn-success">
+                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MINORE_25K] . '</span>
+                            </button></div>';
+            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+
+            echo '<button type="button" class="btn btn-primary">
+                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MAGGIORE_25K] . '</span>
+                            </button></div>';
+            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
+            echo '<button type="button" class="btn btn-secondary">
+                                ' . $formatter->asCurrency($totaleImporti) . ' € <span class="badge bg-transparent">' . $numeriTotali . '</span>
+                            </button></div>';
+            ?>
+
             <div class="divider">
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-6">
+                <?= Html::beginForm(['determina'], 'post', ['data-pjax' => '', 'class' => 'form-inline']) ?>
                 <?= Select2::widget([
-                        'name' => 'distretti',
+                    'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
-                    'value' => $distretti,
+                    'value' => ArrayHelper::getColumn($distretti, 'id'),
                     'options' => ['placeholder' => 'Seleziona un distretto ...'],
                     'pluginOptions' => [
                         'allowClear' => true,

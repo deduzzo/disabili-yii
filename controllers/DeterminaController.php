@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Distretto;
+use app\models\enums\IseeType;
+use app\models\Isee;
 use app\models\Istanza;
 use app\models\SimulazioneDeterminaSearch;
 use Yii;
@@ -15,7 +17,8 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->post()['distretti']) ? $this->request->post()['distretti'] : [];
+        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : [3]; //: Distretto::getAllIds();
+        $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
@@ -24,14 +27,21 @@ class DeterminaController extends \yii\web\Controller
         $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
         $pagamentiPrecedentiPerDistretti = [];
         $pagamentiAttualiPerDistretti = [];
-        $statistiche = [];
+        $importiTotali = [];
+        $numeriTotali = [];
+        $alert = [];
+            foreach (Distretto::find()->all() as $item) {
+                $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+                $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+                $alert[$item->id] = [];
+            }
         foreach (Distretto::find()->all() as $dist) {
             $statistiche[$dist->id] = 0;
         }
         foreach ($allPagamentiPrecedenti as $pagamento) {
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
-        if (count($distretti) >0)
+        if (count($distretti) > 0)
             $allIstanzeAttive->andWhere(['id_distretto' => $distretti]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
@@ -42,7 +52,7 @@ class DeterminaController extends \yii\web\Controller
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
             if (!$differenza['alert'] && in_array(strval($istanza->id), $allIdPagatiMeseScorso)) {
                 if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
-                    $istanzeArray[] = [
+                    $istVal = [
                         'id' => $istanza->id,
                         'cf' => $istanza->anagraficaDisabile->codice_fiscale,
                         'cognome' => $istanza->anagraficaDisabile->cognome,
@@ -56,25 +66,30 @@ class DeterminaController extends \yii\web\Controller
                         'opArray' => $differenza,
                         'operazione' => $differenza['op'],
                     ];
-                    $statistiche[$istanza->distretto->id] += 1;
+                    if ($differenza['alert'])
+                        $alert[$istanza->distretto->id] = $istVal;
+                    else {
+                        $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
+                        $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+                    }
+                    $istanzeArray[] = $istVal;
                 }
             }
-                $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
-                $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
+            $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
+            $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
             $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
         $nonPagati = [];
-        if (count($distretti) >0) {
+        if (count($distretti) > 0) {
             foreach ($distretti as $disPag) {
-                $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag]);
+                $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
             }
-        }
-        else
+        } else
             $nonPagati = $allIdPagatiMeseScorso;
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            $istanzeArray[] = [
+            $istVal[] = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
                 'cognome' => $istanza->anagraficaDisabile->cognome,
@@ -88,6 +103,12 @@ class DeterminaController extends \yii\web\Controller
                 'opArray' => $differenza,
                 'operazione' => $differenza['op'],
             ];
+            if ($differenza['alert'])
+                $alert[$istanza->distretto->id][] = $istVal;
+            else {
+                $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
+                $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+            }
         }
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
 
@@ -96,8 +117,12 @@ class DeterminaController extends \yii\web\Controller
             'searchModel' => $searchModel,
             'allIdPagati' => $allIdPagatiMeseScorso,
             'soloProblematici' => $soloProblematici,
-            'statistiche' => $statistiche,
-            'distretti' => $distretti]);
+            'distretti' => $distretti,
+            'stats' => [
+                'importiTotali' => $importiTotali,
+                'numeriTotali' => $numeriTotali,
+                'alert' => $alert]
+        ]);
     }
 
 }
