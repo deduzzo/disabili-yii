@@ -68,7 +68,7 @@ class DeterminaController extends \yii\web\Controller
                         'importoPrecedente' => $differenza['importoPrecedente'],
                         'importo' => $istanza->getProssimoImporto(),
                         'opArray' => $differenza,
-                        'operazione' => $differenza['op'],
+                        'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
                     ];
                     if ($differenza['alert'] === true)
                         $alert[$istanza->distretto->id] = $istVal;
@@ -106,7 +106,7 @@ class DeterminaController extends \yii\web\Controller
                 'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => $istanza->getProssimoImporto(),
                 'opArray' => $differenza,
-                'operazione' => $differenza['op'],
+                'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
             ];
             if ($differenza['alert'] === true)
                 $alert[$istanza->distretto->id][] = $istVal;
