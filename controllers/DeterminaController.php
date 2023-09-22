@@ -129,7 +129,7 @@ class DeterminaController extends \yii\web\Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,
             $soloRecuperi === "on" ? $recuperiTotali :
          ($soloVariazioni === "on" ? $differenzeTotali :
-             ($soloProblematici ? $alertGlobal : $istanzeArray) ));
+             ($soloProblematici === "on" ? $alertGlobal : $istanzeArray) ));
 
         return $this->render('simulazione', [
             'dataProvider' => $dataProvider,

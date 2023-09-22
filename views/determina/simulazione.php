@@ -258,18 +258,18 @@ $formatter = \Yii::$app->formatter;
     <script>
         $(document).ready(function () {
             const soloProblematici = document.getElementById('soloProblematici');
-            const soloErrori = document.getElementById('soloErrori');
+            const soloVariazioni = document.getElementById('soloVariazioni');
             const soloRecuperi = document.getElementById('soloRecuperi');
 
             soloProblematici.addEventListener('change', function () {
                 if (soloProblematici.checked) {
-                    soloErrori.checked = false;
+                    soloVariazioni.checked = false;
                     soloRecuperi.checked = false;
                 }
             });
 
-            soloErrori.addEventListener('change', function () {
-                if (soloErrori.checked) {
+            soloVariazioni.addEventListener('change', function () {
+                if (soloVariazioni.checked) {
                     soloProblematici.checked = false;
                     soloRecuperi.checked = false;
                 }
@@ -278,7 +278,7 @@ $formatter = \Yii::$app->formatter;
             soloRecuperi.addEventListener('change', function () {
                 if (soloRecuperi.checked) {
                     soloProblematici.checked = false;
-                    soloErrori.checked = false;
+                    soloVariazioni.checked = false;
                 }
             });
 
