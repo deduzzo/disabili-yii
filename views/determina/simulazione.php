@@ -126,7 +126,7 @@ $distretto = Yii::$app->request->get()['distretto'] ?? null;
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-6">
-                <?= Html::beginForm(['determina'], 'post', ['data-pjax' => '', 'class' => 'form-inline']) ?>
+                <?= Html::beginForm(['/determina']) ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
