@@ -48,7 +48,7 @@ $formatter = \Yii::$app->formatter;
                                    id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
                                    href="#<?= "dettagli_" . $di->id ?>" role="tab">
                                     <?= $di->nome ?>
-                                    <div>
+                                    <div style="min-width:150px">
                                     <span class="badge bg-success badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
                                     <span class="badge bg-warning badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
                                     <span class="badge bg-secondary badge-pill badge-round ms-2"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
