@@ -69,12 +69,12 @@ $formatter = \Yii::$app->formatter;
                                     echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
 
                                     echo '<button type="button" class="btn btn-success">
-                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K] . '</span>
+                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MINORE_25K]) . '<span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MINORE_25K] . '</span>
                                     </button></div>';
                                     echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-warning"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
                                     echo '<button type="button" class="btn btn-warning">
-                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] . '</span>
+                                        ' . $formatter->asCurrency($stats['importiTotali'][$di2->id][IseeType::MAGGIORE_25K]) . '<span class="badge bg-transparent">' . $stats['numeriTotali'][$di2->id][IseeType::MAGGIORE_25K] . '</span>
                                     </button></div>';
 
                                     echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
@@ -117,16 +117,16 @@ $formatter = \Yii::$app->formatter;
                 echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
 
                 echo '<button type="button" class="btn btn-success">
-                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MINORE_25K] . '</span>
+                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MINORE_25K]) . '<span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MINORE_25K] . '</span>
                             </button></div>';
                 echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-warning"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
                 echo '<button type="button" class="btn btn-warning">
-                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MAGGIORE_25K] . '</span>
+                                ' . $formatter->asCurrency($importiPerTipo[IseeType::MAGGIORE_25K]) . '<span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MAGGIORE_25K] . '</span>
                             </button></div>';
                 echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
                 echo '<button type="button" class="btn btn-secondary">
-                                ' . $formatter->asCurrency($totaleImporti) . ' € <span class="badge bg-transparent">' . $numeriTotali . '</span>
+                                ' . $formatter->asCurrency($totaleImporti) . '<span class="badge bg-transparent">' . $numeriTotali . '</span>
                             </button></div>';
                 ?>
             <?php endif; ?>
