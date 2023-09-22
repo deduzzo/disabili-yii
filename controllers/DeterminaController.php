@@ -21,7 +21,8 @@ class DeterminaController extends \yii\web\Controller
         $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
-        $soloErrori = isset($this->request->post()['soloErrori']) ? $this->request->post()['soloErrori'] : 'off';
+        $soloVariazioni = isset($this->request->post()['soloVariazioni']) ? $this->request->post()['soloVariazioni'] : 'off';
+        $soloRecuperi = isset($this->request->post()['soloRecuperi']) ? $this->request->post()['soloRecuperi'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
@@ -31,20 +32,21 @@ class DeterminaController extends \yii\web\Controller
         $pagamentiAttualiPerDistretti = [];
         $importiTotali = [];
         $numeriTotali = [];
+        $recuperiPerDistretto = [];
+        $recuperiTotali = [];
+        $differenzePerDistretto = [];
+        $differenzeTotali = [];
         $alert = [];
         foreach (Distretto::find()->all() as $item) {
             $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
             $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            $recuperiPerDistretto[$item->id] = [];
             $alert[$item->id] = [];
-        }
-        foreach (Distretto::find()->all() as $dist) {
-            $statistiche[$dist->id] = 0;
         }
         foreach ($allPagamentiPrecedenti as $pagamento) {
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
-        if (count($distretti) > 0)
-            $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
+        $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
@@ -68,11 +70,15 @@ class DeterminaController extends \yii\web\Controller
                         'opArray' => $differenza,
                         'operazione' => $differenza['op'],
                     ];
-                    if ($differenza['alert'])
+                    if ($differenza['alert'] === true)
                         $alert[$istanza->distretto->id] = $istVal;
                     else {
                         $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                         $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+                        if ($differenza['recupero'] === true)
+                            $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
+                        if ($differenza['op'] !== "")
+                            $differenzePerDistretto[$istanza->distretto->id][] = $istVal;
                     }
                     $istanzeArray[] = $istVal;
                 }
@@ -82,12 +88,13 @@ class DeterminaController extends \yii\web\Controller
             $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
         $nonPagati = [];
-        foreach ($distretti as $disPag)
+        foreach ($distretti as $disPag) {
             $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
+        }
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            $istVal[] = [
+            $istVal = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
                 'cognome' => $istanza->anagraficaDisabile->cognome,
@@ -101,27 +108,42 @@ class DeterminaController extends \yii\web\Controller
                 'opArray' => $differenza,
                 'operazione' => $differenza['op'],
             ];
-            if ($differenza['alert'])
+            if ($differenza['alert'] === true)
                 $alert[$istanza->distretto->id][] = $istVal;
             else {
                 $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                 $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+                if ($differenza['recupero'] === true)
+                    $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
+                if ($differenza['op'] !== "")
+                    $differenzePerDistretto[$istanza->distretto->id][] = $istVal;
             }
-            //$istanzeArray[] = $istVal;
+            $istanzeArray[] = $istVal;
         }
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
+        $alertGlobal = [];
+        foreach ($distretti as $disPag) {
+            $alertGlobal = array_merge($alertGlobal, $alert[$disPag->id]);
+            $recuperiTotali = array_merge($recuperiTotali, $recuperiPerDistretto[$disPag->id]);
+            $differenzeTotali = array_merge($differenzeTotali, $differenzePerDistretto[$disPag->id]);
+        }
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,
+            $soloRecuperi === "on" ? $recuperiTotali :
+         ($soloVariazioni === "on" ? $differenzeTotali :
+             ($soloProblematici ? $alertGlobal : $istanzeArray) ));
 
         return $this->render('simulazione', [
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
             'allIdPagati' => $allIdPagatiMeseScorso,
             'soloProblematici' => $soloProblematici,
-            'soloErrori' => $soloErrori,
+            'soloVariazioni' => $soloVariazioni,
+            'soloRecuperi' => $soloRecuperi,
             'distretti' => $distretti,
             'stats' => [
                 'importiTotali' => $importiTotali,
                 'numeriTotali' => $numeriTotali,
-                'alert' => $alert]
+                'alert' => $alert,
+            ]
         ]);
     }
 

@@ -3,6 +3,7 @@
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use kartik\select2\Select2;
+use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -12,8 +13,9 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var string $soloRecuperi */
+/** @var string $soloVariazioni
 /** @var string $soloProblematici */
-/** @var string $soloErrori */
 /** @var array $distretti */
 /** @var array $stats */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
@@ -28,7 +30,7 @@ $formatter = \Yii::$app->formatter;
 <div class="card">
     <div class="card-header">
         <div class="card-toolbar">
-            <?php if ($soloErrori == "off" && $soloProblematici = "off"): ?>
+            <?php if ($soloErrori === "off" && $soloProblematici === "off"): ?>
                 <div class="row">
                     <div class="divider">
                         <div class="divider-text">Dettagli per distretto</div>
@@ -87,40 +89,41 @@ $formatter = \Yii::$app->formatter;
         <!-- add select box for distretto -->
 
         <div class="row">
-            <div class="divider">
-                <div class="divider-text">Totali globali di <?= count($distretti) ?>
-                    distrett<?= count($distretti) === 1 ? "o" : "i" ?></div>
-            </div>
-            <?php
-            $out = "";
-            $totaleImporti = 0;
-            $numeriTotali = 0;
-            $importiPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-            $numeriPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-            foreach ($stats['importiTotali'] as $distretto => $numeri) {
-                $totaleImporti += $numeri[IseeType::MAGGIORE_25K] + $numeri[IseeType::MINORE_25K];
-                $numeriTotali += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
-                $importiPerTipo[IseeType::MAGGIORE_25K] += $numeri[IseeType::MAGGIORE_25K];
-                $importiPerTipo[IseeType::MINORE_25K] += $numeri[IseeType::MINORE_25K];
-                $numeriPerTipo[IseeType::MAGGIORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K];
-                $numeriPerTipo[IseeType::MINORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
-            }
-            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
+            <?php if ($soloErrori === "off" && $soloProblematici === "off"): ?>
+                <div class="divider">
+                    <div class="divider-text">Totali globali di <?= count($distretti) ?>
+                        distrett<?= count($distretti) === 1 ? "o" : "i" ?></div>
+                </div>
+                <?php
+                $out = "";
+                $totaleImporti = 0;
+                $numeriTotali = 0;
+                $importiPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+                $numeriPerTipo = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+                foreach ($stats['importiTotali'] as $distretto => $numeri) {
+                    $totaleImporti += $numeri[IseeType::MAGGIORE_25K] + $numeri[IseeType::MINORE_25K];
+                    $numeriTotali += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
+                    $importiPerTipo[IseeType::MAGGIORE_25K] += $numeri[IseeType::MAGGIORE_25K];
+                    $importiPerTipo[IseeType::MINORE_25K] += $numeri[IseeType::MINORE_25K];
+                    $numeriPerTipo[IseeType::MAGGIORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MAGGIORE_25K];
+                    $numeriPerTipo[IseeType::MINORE_25K] += $stats['numeriTotali'][$distretto][IseeType::MINORE_25K];
+                }
+                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
 
-            echo '<button type="button" class="btn btn-success">
+                echo '<button type="button" class="btn btn-success">
                                 ' . $formatter->asCurrency($importiPerTipo[IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MINORE_25K] . '</span>
                             </button></div>';
-            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-primary"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
 
-            echo '<button type="button" class="btn btn-primary">
+                echo '<button type="button" class="btn btn-primary">
                                 ' . $formatter->asCurrency($importiPerTipo[IseeType::MAGGIORE_25K]) . ' € <span class="badge bg-transparent">' . $numeriPerTipo[IseeType::MAGGIORE_25K] . '</span>
                             </button></div>';
-            echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
-            echo '<button type="button" class="btn btn-secondary">
+                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
+                echo '<button type="button" class="btn btn-secondary">
                                 ' . $formatter->asCurrency($totaleImporti) . ' € <span class="badge bg-transparent">' . $numeriTotali . '</span>
                             </button></div>';
-            ?>
-
+                ?>
+            <?php endif; ?>
             <div class="divider">
                 <div class="divider-text">Filtri</div>
             </div>
@@ -142,11 +145,15 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Mostra solo istanze con variazioni</label><br/>
-                <input class="form-check-input" type="checkbox" role="switch" name="soloErrori"
-                       id="soloErrori" <?= $soloErrori == "on" ? "checked" : "" ?>>
+                       for="solo-problematici">Mostra solo istanze con Errori (ALERT)</label><br/>
+                <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
+                       id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="soloErrori">Mostra solo istanze con Errori (ALERT)</label>
+                       for="soloVariazioni">Mostra solo istanze con Variazioni</label>
+                <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
+                       id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
+                <label class="form-check-label text-danger bold"
+                       for="soloRecuperi">Mostra solo istanze con Recuperi in corso</label>
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary">Filtra</button>
@@ -244,4 +251,39 @@ $formatter = \Yii::$app->formatter;
         ]);
         ?>
     </div>
+    <?php JSRegister::begin([
+        'key' => 'manage',
+        'position' => \yii\web\View::POS_READY
+    ]); ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const soloProblematici = document.getElementById('soloProblematici');
+            const soloErrori = document.getElementById('soloErrori');
+            const soloRecuperi = document.getElementById('soloRecuperi');
+
+            soloProblematici.addEventListener('change', function() {
+                if(soloProblematici.checked) {
+                    soloErrori.checked = false;
+                    soloRecuperi.checked = false;
+                }
+            });
+
+            soloErrori.addEventListener('change', function() {
+                if(soloErrori.checked) {
+                    soloProblematici.checked = false;
+                    soloRecuperi.checked = false;
+                }
+            });
+
+            soloRecuperi.addEventListener('change', function() {
+                if(soloRecuperi.checked) {
+                    soloProblematici.checked = false;
+                    soloErrori.checked = false;
+                }
+            });
+
+        });
+    </script>
+    <?php JSRegister::end(); ?>
 </div>
