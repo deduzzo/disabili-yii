@@ -18,11 +18,11 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : Distretto::getAllIds();
+        $distretti = isset($this->request->get()['distrettiPost']) ? $this->request->get()['distrettiPost'] : Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
-        $soloVariazioni = isset($this->request->post()['soloVariazioni']) ? $this->request->post()['soloVariazioni'] : 'off';
-        $soloRecuperi = isset($this->request->post()['soloRecuperi']) ? $this->request->post()['soloRecuperi'] : 'off';
+        $soloProblematici = isset($this->request->get()['soloProblematici']) ? $this->request->get()['soloProblematici'] : 'off';
+        $soloVariazioni = isset($this->request->get()['soloVariazioni']) ? $this->request->get()['soloVariazioni'] : 'off';
+        $soloRecuperi = isset($this->request->get()['soloRecuperi']) ? $this->request->get()['soloRecuperi'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();

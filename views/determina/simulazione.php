@@ -134,7 +134,7 @@ $formatter = \Yii::$app->formatter;
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-6">
-                <?= Html::beginForm(['/determina']) ?>
+                <?= Html::beginForm(['/determina'],'get') ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
@@ -173,14 +173,8 @@ $formatter = \Yii::$app->formatter;
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
-                "<div class='dataTable-top'>
-<!--                                <div class='dataTable-search'>
-                                    <input class='dataTable-input' placeholder='Search...' type='text'>
-                                </div>-->
-                           </div>
-                           " . Html::endForm() .
-                "<div class='table-container'>{items}</div>
+            'layout' => "<div class='dataTable-top'>
+                           </div><div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
                                   <div class='dataTable-info'>{summary}<br />TOTALE:</div>
                                   <nav class='dataTable-pagination'>
