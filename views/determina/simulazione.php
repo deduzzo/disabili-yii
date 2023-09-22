@@ -165,7 +165,7 @@ $formatter = \Yii::$app->formatter;
                 <button type="submit" class="btn btn-primary">Filtra</button>
             </div>
             <div class="divider">
-                <div class="divider-text"></div>
+                <div class="divider-text">Elenco</div>
             </div>
         </div>
         <?= Html::endForm() ?>
