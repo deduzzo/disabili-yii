@@ -9,6 +9,7 @@ use app\models\Istanza;
 use app\models\SimulazioneDeterminaSearch;
 use Yii;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 class DeterminaController extends \yii\web\Controller
 {
@@ -20,6 +21,7 @@ class DeterminaController extends \yii\web\Controller
         $distretti = isset($this->request->post()['distrettiPost']) ? $this->request->post()['distrettiPost'] : [3]; //: Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->post()['soloProblematici']) ? $this->request->post()['soloProblematici'] : 'off';
+        $soloErrori = isset($this->request->post()['soloErrori']) ? $this->request->post()['soloErrori'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
@@ -42,7 +44,7 @@ class DeterminaController extends \yii\web\Controller
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
         if (count($distretti) > 0)
-            $allIstanzeAttive->andWhere(['id_distretto' => $distretti]);
+            $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
@@ -109,6 +111,7 @@ class DeterminaController extends \yii\web\Controller
                 $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                 $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
             }
+            //$istanzeArray[] = $istVal;
         }
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
 
@@ -117,6 +120,7 @@ class DeterminaController extends \yii\web\Controller
             'searchModel' => $searchModel,
             'allIdPagati' => $allIdPagatiMeseScorso,
             'soloProblematici' => $soloProblematici,
+            'soloErrori' => $soloErrori,
             'distretti' => $distretti,
             'stats' => [
                 'importiTotali' => $importiTotali,

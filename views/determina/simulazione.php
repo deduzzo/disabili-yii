@@ -13,6 +13,7 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var string $soloProblematici */
+/** @var string $soloErrori */
 /** @var array $distretti */
 /** @var array $stats */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
@@ -143,7 +144,7 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloErrori"
                        id="soloErrori" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-soloErrori">Mostra solo istanze con Errori (ALERT)</label>
+                       for="soloErrori">Mostra solo istanze con Errori (ALERT)</label>
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary">Filtra</button>
