@@ -197,12 +197,12 @@ class Recupero extends \yii\db\ActiveRecord
     }
 
     public function getDescrizioneRecupero() {
-        return ($this->rateizzato ?
-                ((" <b>" . $this->num_rate . " rate (".$this->getRateSaldate()." saldate, ".$this->getRateMancanti()." residue)</b><br />") . ($this->getUltimaRataSeDiversa() ? $this->num_rate - 1 : $this->num_rate) . ($this->importo_rata ? ' da ' . Yii::$app->formatter->asCurrency($this->importo_rata) .
+            return ($this->rateizzato ?
+                ((" <b>" . $this->getRateMancanti() . " rate residue [".$this->getRateSaldate()." di ".$this->num_rate." saldate]</b><br />") . ($this->getUltimaRataSeDiversa() ? $this->num_rate - 1 : $this->num_rate) . ($this->importo_rata ? ' da ' . Yii::$app->formatter->asCurrency($this->importo_rata) .
                     ($this->getUltimaRataSeDiversa() ? ('<br />ultima: ' . Yii::$app->formatter->asCurrency($this->getUltimaRataSeDiversa())) : '')
                     : ' variabili'))
                 : '<b>Unica Soluzione</b>') . '<br />' .
             ($this->recuperoCollegato ? ('Collegato al recupero #' . $this->recuperoCollegato->id . '<br />') : '') .
-            ($this->getImportoSaldato() <> 0 ? 'Importo saldato: ' . Yii::$app->formatter->asCurrency($this->getImportoSaldato()) . '<br />' : '') . $this->note;
+            ($this->getImportoSaldato() <> 0 ? 'Importo saldato: ' . Yii::$app->formatter->asCurrency(abs($this->getImportoSaldato())) . '<br />' : '') ."Residuo: ".Yii::$app->formatter->asCurrency(abs($this->getImportoResiduo())). $this->note;
     }
 }
