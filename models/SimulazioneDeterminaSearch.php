@@ -49,7 +49,7 @@ class SimulazioneDeterminaSearch extends Model
         return new ArrayDataProvider([
             'allModels' => $filteredIstanzeArray,
             'pagination' => [
-                'pageSize' => 250,
+                'pageSize' => 100,
             ],
             'sort' => [
                 'attributes' => ['id', 'cf', 'cognome', 'nome', 'gruppo', 'distretto', 'isee', 'eta','importo','importoPrecedente','operazione'],
