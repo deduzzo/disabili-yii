@@ -34,7 +34,7 @@ $formatter = \Yii::$app->formatter;
                 </div>
                 <div class="col-6 col-sm-12 col-md-4">
                     <div class="list-group" role="tablist">
-                        <?php foreach ($distretti === [] ? ArrayHelper::getColumn($distretti, 'id') : $distretti as $di): ?>
+                        <?php foreach ($distretti === [] ? ArrayHelper::getColumn(Distretto::find()->all(), 'id') : $distretti as $di): ?>
                             <a class="list-group-item list-group-item-action d-flex justify-content-between"
                                id="<?= "dettagli_" . $di->id . "_list" ?>" data-bs-toggle="list"
                                href="#<?= "dettagli_" . $di->id ?>" role="tab">
