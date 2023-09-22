@@ -48,11 +48,7 @@ echo GridView::widget([
         [
             'label' => 'Descrizione',
             'value' => function ($model) {
-                return ($model->rateizzato ? ((" <b>TOTALE: " . $model->num_rate . " rate</b><br />") . ($model->getUltimaRataSeDiversa() ? $model->num_rate - 1 : $model->num_rate) . ($model->importo_rata ? ' da ' . Yii::$app->formatter->asCurrency($model->importo_rata) .
-                            ($model->getUltimaRataSeDiversa() ? ('<br />ultima: ' . Yii::$app->formatter->asCurrency($model->getUltimaRataSeDiversa())) : '')
-                            : ' variabili')) : '<b>Unica Soluzione</b>') . '<br />' .
-                    ($model->recuperoCollegato ? ('Collegato al recupero #' . $model->recuperoCollegato->id . '<br />') : '') .
-                    ($model->getImportoSaldato() <> 0 ? 'Importo saldato: ' . Yii::$app->formatter->asCurrency($model->getImportoSaldato()) . '<br />' : '') . $model->note;
+                return $model->getDescrizioneRecupero();
             },
             'format' => 'raw',
         ],
