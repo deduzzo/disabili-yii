@@ -139,11 +139,11 @@ $formatter = \Yii::$app->formatter;
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Mostra solo istanze con variazioni</label>
-                <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
-                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
+                       for="solo-problematici">Mostra solo istanze con variazioni</label><br />
+                <input class="form-check-input" type="checkbox" role="switch" name="soloErrori"
+                       id="soloErrori" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Mostra solo istanze con variazioni</label>
+                       for="solo-soloErrori">Mostra solo istanze con Errori (ALERT)</label>
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary">Filtra</button>
