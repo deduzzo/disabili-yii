@@ -5,6 +5,7 @@ namespace app\models;
 use app\models\enums\DatiTipologia;
 use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
+use Carbon\Carbon;
 use Yii;
 use yii\db\Query;
 
@@ -51,30 +52,6 @@ class Istanza extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'istanza';
-    }
-
-    public static function getTotaliAttivi(string $tipoDato, $distretto = null, $gruppo = null)
-    {
-        $query = Istanza::find()->
-        innerJoin('anagrafica a', 'istanza.id_anagrafica_disabile = a.id')->
-        where(['istanza.attivo' => true, 'istanza.chiuso' => false]);
-        switch ($tipoDato) {
-            case DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI:
-                break;
-            case DatiTipologia::LISTA_MINORI18:
-                $query->andWhere('a.data_nascita > DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
-                break;
-            case DatiTipologia::LISTA_MAGGIORI_18:
-                $query->andWhere('a.data_nascita <= DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
-                break;
-            case DatiTipologia::LISTA_NO_DATA_NASCITA:
-                $query->andWhere(['a.data_nascita' => null]);
-                break;
-            case DatiTipologia::LISTA_MAGGIORI_25K:
-                $query->innerJoin(['isee is','']);
-                break;
-        }
-        return $query->count();
     }
 
     /**
@@ -221,6 +198,49 @@ class Istanza extends \yii\db\ActiveRecord
         return Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
     }
 
+
+    public static function getTotaliAttivi(string $tipoDato, $distretto = null, $gruppo = null)
+    {
+        $query = Istanza::find()->
+        innerJoin('anagrafica a', 'istanza.id_anagrafica_disabile = a.id')->
+        where(['istanza.attivo' => true, 'istanza.chiuso' => false]);
+        switch ($tipoDato) {
+            case DatiTipologia::LISTA_TOTALI_ATTIVI_NON_CHIUSI:
+                break;
+            case DatiTipologia::LISTA_MINORI18:
+                $query->andWhere('a.data_nascita > DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
+                break;
+            case DatiTipologia::LISTA_MAGGIORI_18:
+                $query->andWhere('a.data_nascita <= DATE_SUB(CURDATE(), INTERVAL 18 YEAR)');
+                break;
+            case DatiTipologia::LISTA_NO_DATA_NASCITA:
+                $query->andWhere(['a.data_nascita' => null]);
+                break;
+            case DatiTipologia::LISTA_MAGGIORI_25K:
+                $query->innerJoin(['isee is', '']);
+                break;
+        }
+        return $query->count();
+    }
+
+    public function getTotaleAnnuo() {
+        $lastIsee = $this->getLastIseeType();
+        if ($lastIsee !== IseeType::NO_ISEE)
+        {
+            $meseUltimoPagamento = Carbon::createFromFormat('Y-m-d', Movimento::getDataUltimoPagamento())->month;
+            $totaleTeorico = $meseUltimoPagamento * ($lastIsee === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+            $totaleRecuperi = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["IS NOT", "id_recupero", null])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
+            $ricoveriAttivi = $this->getImportoRicoveriDaContabilizzare();
+            return $totaleTeorico - $totaleRecuperi - $ricoveriAttivi;
+        }
+        else return null;
+    }
+
+    public function getTotaleEffettivoAnnuo() {
+        return Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["is_movimento_bancario" => true])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
+    }
+
+
     public function getLastIseeType()
     {
         if ($this->anagraficaDisabile->isMinorenne())
@@ -319,13 +339,19 @@ class Istanza extends \yii\db\ActiveRecord
                         $totale -= $recupero->getProssimaRata();
                 }
             }
-            foreach ($this->ricoveros as $ricovero) {
-                if ($ricovero->contabilizzare) {
-                    $totale -= $ricovero->getImportoRicovero();
-                }
-            }
+            $totale -= $this->getImportoRicoveriDaContabilizzare();
         }
         return $totale > 0 ? $totale : 0;
+    }
+
+    public function getImportoRicoveriDaContabilizzare(){
+        $totale = 0;
+        foreach ($this->ricoveros as $ricovero) {
+            if ($ricovero->contabilizzare) {
+                $totale += $ricovero->getImportoRicovero();
+            }
+        }
+        return $totale;
     }
 
     public function getDifferenzaUltimoImportoArray()
@@ -333,15 +359,15 @@ class Istanza extends \yii\db\ActiveRecord
         $op = $this->isInAlert();
         $lastMovimento = $this->getLastMovimentoBancario();
         if (!$this->attivo)
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE','recupero' => $this->haRecuperiInCorso()];
+            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE', 'recupero' => $this->haRecuperiInCorso()];
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0);
         if ($prossimoImporto <= 0.0)
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> PROSSIMO IMPORTO 0','recupero' => $this->haRecuperiInCorso()];
+            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> PROSSIMO IMPORTO 0', 'recupero' => $this->haRecuperiInCorso()];
         if ($lastMovimento)
-            return ['alert' => $op != null, 'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : ""),'recupero' => $this->haRecuperiInCorso()];
+            return ['alert' => $op != null, 'presenteScorsoMese' => true, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : ""), 'recupero' => $this->haRecuperiInCorso()];
         else
-            return ['alert' => $op != null, 'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? "AGGIUNGERE",'recupero' => $this->haRecuperiInCorso()];
+            return ['alert' => $op != null, 'presenteScorsoMese' => false, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? "AGGIUNGERE", 'recupero' => $this->haRecuperiInCorso()];
     }
 
     public function isInAlert()

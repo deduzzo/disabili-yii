@@ -33,7 +33,8 @@
     "kartik-v/yii2-editors": "^1.0",
     "kartik-v/yii2-export": "dev-master",
     "ext-openssl": "*",
-    "kartik-v/yii2-widget-fileinput": "dev-master"
+    "kartik-v/yii2-widget-fileinput": "dev-master",
+    "yii2tech/spreadsheet": "^1.0"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

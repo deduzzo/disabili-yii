@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "movimento".
@@ -19,6 +20,7 @@ use Yii;
  * @property int|null $id_recupero
  * @property int|null $num_rata
  * @property bool $contabilizzare
+ * @property bool $escludi_contabilita
  * @property string|null $note
  * @property int|null $id_gruppo_pagamento
  * @property int|null $id_determina
@@ -37,6 +39,11 @@ class Movimento extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'movimento';
+    }
+
+    public static function getDataUltimoPagamento()
+    {
+        return (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->scalar();
     }
 
     /**

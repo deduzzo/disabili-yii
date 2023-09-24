@@ -128,9 +128,9 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
         [
             'attribute' => 'gruppoPagamentoDescrizione',
             'value' => function ($model) {
-                return $model->gruppoPagamento ? $model->gruppoPagamento->descrizione : '-';
+                return $model->gruppoPagamento ? $model->gruppoPagamento->descrizione : ($model->recupero ? ("Recupero #" . $model->recupero->id . ($model->num_rata ? (" Rata " .$model->num_rata) : " unica soluzione" )) : '-');
             },
-            'label' => 'Descrizione Gruppo Pagamento',
+            'label' => 'Descrizione Pagamento',
         ],
         [
             'attribute' => 'determina',

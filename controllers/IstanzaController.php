@@ -141,6 +141,7 @@ class IstanzaController extends Controller
     public function actionScheda($id)
     {
         $model = $this->findModel($id);
+        $totaleAnnuo = $model->getTotaleAnnuo();
         return $this->render('scheda', [
             'istanza' => $model,
         ]);
