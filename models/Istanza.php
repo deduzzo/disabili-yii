@@ -223,15 +223,15 @@ class Istanza extends \yii\db\ActiveRecord
         return $query->count();
     }
 
-    public function getTotaleAnnuo() {
+    public function getTotaleAnnuoDovutoCorretto() {
         $lastIsee = $this->getLastIseeType();
         if ($lastIsee !== IseeType::NO_ISEE)
         {
             $meseUltimoPagamento = Carbon::createFromFormat('Y-m-d', Movimento::getDataUltimoPagamento())->month;
             $totaleTeorico = $meseUltimoPagamento * ($lastIsee === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
-            $totaleRecuperi = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["IS NOT", "id_recupero", null])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
-            $ricoveriAttivi = $this->getImportoRicoveriDaContabilizzare();
-            return $totaleTeorico - $totaleRecuperi - $ricoveriAttivi;
+            //$totaleRecuperi = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["IS NOT", "id_recupero", null])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
+            //$ricoveriAttivi = $this->getImportoRicoveriDaContabilizzare();
+            return $totaleTeorico;
         }
         else return null;
     }
