@@ -53,14 +53,20 @@ echo GridView::widget([
             'label' => 'Recuperato?',
             'format' => 'raw',
             'value' => function ($model) {
-                return '<i class="bi bi-info-circle" style="margin-left: 5px" data-bs-toggle="tooltip" data-bs-html="true" data-bs-original-title="'.Html::encode(!$model->contabilizzare ?
+                return !$model->contabilizzare ?
                     ($model->recupero ?
                         ("<span class='badge bg-success'>".($model->determina ? ("Si, det. " . $model->determina->numero . " - ") : ""). "#". $model->id_recupero. " - ". ($model->recupero->chiuso ? "Recuperato" : (" Residuo:". Yii::$app->formatter->asCurrency($model->recupero->getImportoResiduo()))). "</span>") : "<span class='badge bg-warning'>IMPORT. PRECEDENTE</span>") :
-                    "<span class='badge bg-primary'>DA CONTABILIZZARE</span>" . '"></i>');
+                    "<span class='badge bg-primary'>DA CONTABILIZZARE</span>";
 
             }
         ],
-        'note'
+        [
+            'attribute' => 'note',
+            'format' => 'raw',
+            'value' => function ($model) {
+                return '<i class="bi bi-info-circle" style="margin-left: 5px" data-bs-toggle="tooltip" data-bs-html="true" data-bs-original-title="'.Html::encode($model->note).'"></i>';
+            }
+        ]
     ],
     'emptyText' => 'Nessun altro dato presente',
 
