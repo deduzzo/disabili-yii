@@ -20,6 +20,7 @@ echo GridView::widget([
     'filterModel' => $searchModel,
     'options' => ['class' => 'grid-view small'],
     'columns' => [
+        'id',
         [
             'format' => 'raw',
             'attribute' => 'da',
