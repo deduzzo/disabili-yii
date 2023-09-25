@@ -371,7 +371,7 @@ class Istanza extends \yii\db\ActiveRecord
             'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
             'differenza' => $differenza,
             'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
-                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO": "AGGIUNGERE E AGGIORNARE IMPORTO") : "AGGIUNGERE")),
+                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO": "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "AGGIUNGERE")),
             'recupero' => $this->haRecuperiInCorso()
         ];
     }
