@@ -375,6 +375,8 @@ class Istanza extends \yii\db\ActiveRecord
         $out = null;
         if (!$this->attivo || $this->chiuso)
             $out .= "NON ATTIVO - ";
+        if ($this->data_decesso)
+            $out .= "DECEDUTO - ";
         if (!$this->patto_di_cura)
             $out .= "MANCA PATTO - ";
         if ($this->getLastIseeType() == IseeType::NO_ISEE)
