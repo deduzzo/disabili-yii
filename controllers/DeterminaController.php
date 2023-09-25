@@ -21,7 +21,7 @@ class DeterminaController extends \yii\web\Controller
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->get()['distrettiPost']) ? $this->request->get()['distrettiPost'] : [9]; //Distretto::getAllIds();
+        $distretti = isset($this->request->get()['distrettiPost']) ? $this->request->get()['distrettiPost'] : Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $soloProblematici = isset($this->request->get()['soloProblematici']) ? $this->request->get()['soloProblematici'] : 'off';
         $soloVariazioni = isset($this->request->get()['soloVariazioni']) ? $this->request->get()['soloVariazioni'] : 'off';
@@ -57,7 +57,7 @@ class DeterminaController extends \yii\web\Controller
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if (!$differenza['alert'] && (in_array($istanza->id, $allIdPagatiMeseScorso) && $istanza->getProssimoImporto() > 0)) {
+            if (!$differenza['alert'] &&  $istanza->getProssimoImporto() > 0) {
                 if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istVal = [
                         'id' => $istanza->id,
