@@ -60,6 +60,7 @@ echo GridView::widget([
 
             }
         ],
+        'note'
     ],
     'emptyText' => 'Nessun altro dato presente',
 
