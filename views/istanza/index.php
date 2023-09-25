@@ -7,6 +7,7 @@ use app\models\Istanza;
 use kartik\export\ExportMenu;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
+use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
