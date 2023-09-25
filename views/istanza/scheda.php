@@ -342,7 +342,7 @@ $this->params['breadcrumbs'][] = $this->title;
                          $totaleDovuto = $istanza->getTotaleAnnuoDovutoCorretto();
                          $totaleEffettivo = $istanza->getTotaleEffettivoAnnuo();
                         ?>
-                        <h5 class="card-title">Movimenti<i class="bi bi-info-circle" style="margin-left: 5px" data-bs-toggle="tooltip" data-bs-html="true" data-bs-original-title="<?= "Totale dovuto dell'anno: <b>".Yii::$app->formatter->asCurrency($totaleDovuto) ."</b><br />Totale effettivo: <b>".Yii::$app->formatter->asCurrency($totaleEffettivo) ."</b><br />Differenza: <b>".Yii::$app->formatter->asCurrency($totaleDovuto - $totaleEffettivo)."</b>" ?>"></i></h5>
+                        <h5 class="card-title">Movimenti<i class="bi bi-info-circle" style="margin-left: 5px" data-bs-toggle="tooltip" data-bs-html="true" data-bs-original-title="<?= "Totale dovuto dell'anno: <b>".Yii::$app->formatter->asCurrency($totaleDovuto) ."</b><br />Totale effettivo: <b>".Yii::$app->formatter->asCurrency($totaleEffettivo) ."</b><br />Differenza: <b>".Yii::$app->formatter->asCurrency($totaleDovuto - $totaleEffettivo)."</b>" ?>"</i></h5>
                         <?=
                         $this->render('../movimento/_movimenti_view', [
                             'istanza' => $istanza,
