@@ -311,9 +311,12 @@ class Istanza extends \yii\db\ActiveRecord
             return $this->anagraficaDisabile->cognome_nome;
     }
 
-    public function getLastMovimentoBancario()
+    public function getLastMovimentoBancario($data = null)
     {
-        return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
+        if (!$data)
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
+        else
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->andWhere(['=', 'data', $data])->one();
     }
 
     public function cancellaMovimentiCollegati()
@@ -357,7 +360,7 @@ class Istanza extends \yii\db\ActiveRecord
     public function getDifferenzaUltimoImportoArray()
     {
         $op = $this->isInAlert();
-        $lastMovimento = $this->getLastMovimentoBancario();
+        $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
         if (!$this->attivo)
             return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE', 'recupero' => $this->haRecuperiInCorso()];
         $prossimoImporto = $this->getProssimoImporto();
