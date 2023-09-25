@@ -26,6 +26,7 @@ Icon::map($this);
         <?php $this->head() ?>
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
         <link rel="stylesheet" href="/style.css"/>
+        <?= Html::csrfMetaTags() ?>
     </head>
 
     <body>
