@@ -53,10 +53,10 @@ echo GridView::widget([
             'label' => 'Recuperato?',
             'format' => 'raw',
             'value' => function ($model) {
-                return !$model->contabilizzare ?
+                return '<i class="bi bi-info-circle" style="margin-left: 5px" data-bs-toggle="tooltip" data-bs-html="true" data-bs-original-title="'.Html::encode(!$model->contabilizzare ?
                     ($model->recupero ?
                         ("<span class='badge bg-success'>".($model->determina ? ("Si, det. " . $model->determina->numero . " - ") : ""). "#". $model->id_recupero. " - ". ($model->recupero->chiuso ? "Recuperato" : (" Residuo:". Yii::$app->formatter->asCurrency($model->recupero->getImportoResiduo()))). "</span>") : "<span class='badge bg-warning'>IMPORT. PRECEDENTE</span>") :
-                    "<span class='badge bg-primary'>DA CONTABILIZZARE</span>";
+                    "<span class='badge bg-primary'>DA CONTABILIZZARE</span>" . '"></i>');
 
             }
         ],
