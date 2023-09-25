@@ -361,6 +361,8 @@ class Istanza extends \yii\db\ActiveRecord
     {
         $op = $this->isInAlert();
         $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
+        if(!$lastMovimento)
+            $op = "AGGIUNGERE";
         if (!$this->attivo)
             return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE', 'recupero' => $this->haRecuperiInCorso()];
         $prossimoImporto = $this->getProssimoImporto();
