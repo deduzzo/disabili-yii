@@ -23,7 +23,7 @@ $themeMazer = MainAsset::register($this);
 				</a>
 			</div>
 			<div class="header-top-right">
-				<div class="dropdown">
+				<div class="dropdown" id="top-dd">
 					<a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 						<div class="avatar avatar-md2">
 							<img src="<?= "{$themeMazer->baseUrl}/images/avatar.png" ?>" alt="Avatar">

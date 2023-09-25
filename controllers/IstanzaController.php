@@ -40,6 +40,7 @@ class IstanzaController extends Controller
      */
     public function actionIndex()
     {
+        // disable main layout
         $searchModel = new IstanzaSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 

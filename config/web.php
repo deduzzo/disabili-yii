@@ -16,6 +16,11 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'layout' => 'mainy',
+    'modules' => [
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+        ]
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -32,9 +37,9 @@ $config = [
             // set 404 url
             'returnUrl' => ['/site/index'],
         ],
-        'errorHandler' => [
+/*        'errorHandler' => [
             'errorAction' => 'site/errore',
-        ],
+        ],*/
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@app/mail',

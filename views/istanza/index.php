@@ -4,9 +4,9 @@ use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
+use kartik\export\ExportMenu;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
-use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
@@ -41,6 +41,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 100;  // Assumo 100 come default
         ?>
+        <div id="asd">
+            <?php
+            echo ExportMenu::widget([
+                'dataProvider' => $dataProvider,
+
+                'columns' => ['id'],
+                'asDropdown' => false,
+            ])
+            ?>
+        </div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
@@ -91,12 +101,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     'filter' => Html::activeDropDownList($searchModel, 'attivo', ['1' => "ATTIVO", '0' => "NON ATTIVO"], ['class' => 'form-control', 'prompt' => 'Tutti']),
                     'content' => function ($model) {
                         return Html::tag('span', $model->attivo ? 'Attivo' : 'Non attivo', [
-                            'class' => $model->attivo ? 'badge bg-success' : 'badge bg-danger'
-                        ]).($model->chiuso ? Html::tag('span', 'Chiuso', [
-                            'class' => 'badge bg-danger'
-                        ]) : (!$model->attivo ? Html::tag('span', 'Aperto', [
-                            'class' => 'badge bg-success'
-                        ]): ""));
+                                'class' => $model->attivo ? 'badge bg-success' : 'badge bg-danger'
+                            ]) . ($model->chiuso ? Html::tag('span', 'Chiuso', [
+                                'class' => 'badge bg-danger'
+                            ]) : (!$model->attivo ? Html::tag('span', 'Aperto', [
+                                'class' => 'badge bg-success'
+                            ]) : ""));
                     },
                     'contentOptions' => ['style' => 'width:150px; text-align:center;'],
                 ],
