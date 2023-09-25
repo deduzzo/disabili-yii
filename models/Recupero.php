@@ -164,7 +164,7 @@ class Recupero extends \yii\db\ActiveRecord
         $out = null;
         if ($this->rateizzato && $this->num_rate > 0) {
             if (($this->num_rate * $this->importo_rata) % $this->importo!== 0) {
-                $out = abs( ($this->num_rate * $this->importo_rata) % $this->importo);
+                $out = abs($this->importo) -  abs(($this->num_rate -1)  * $this->importo_rata);
             }
         }
         return $out;
