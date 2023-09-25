@@ -240,8 +240,6 @@ echo GridView::widget([
     }
 
     function checkStatus() {
-        document.getElementById('numRate_hidden').value = document.getElementById('numRate').value;
-        document.getElementById('importoRata_hidden').value = document.getElementById('importoRata').value;
         if (document.getElementById('rateizzato').checked) {
             document.getElementById('numMesiPosticipo').disabled = false;
             document.getElementById('numRate').disabled = false;
@@ -292,6 +290,8 @@ echo GridView::widget([
             document.getElementById('btnSalvaRateizzazione').disabled = true;
 
         document.getElementById('riepilogoRateizzazione').innerHTML = riassunto
+        document.getElementById('numRate_hidden').value = document.getElementById('numRate').value;
+        document.getElementById('importoRata_hidden').value = document.getElementById('importoRata').value;
     }
 
 </script>
