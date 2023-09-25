@@ -55,7 +55,7 @@ echo GridView::widget([
             'value' => function ($model) {
                 return $model->contabilizzare ?
                     ($model->recupero ?
-                        ("<span class='badge bg-success'>".($model->determina ? ("Si, det. " . $model->determina->numero) : ""). " - #". $model->id_recupero. ($model->recupero->chiuso ? " Recuperato" : ("Residuo:". $model->recupero->getImportoResiduo)). "</span>") : "<span class='badge bg-warning'>DA RECUPERARE</span>") : "<span class='badge bg-primary'>IMPORT. PREC.</span>";
+                        ("<span class='badge bg-success'>".($model->determina ? ("Si, det. " . $model->determina->numero) : ""). " - #". $model->id_recupero. ($model->recupero->chiuso ? " Recuperato" : ("Residuo:". $model->recupero->getImportoResiduo())). "</span>") : "<span class='badge bg-warning'>DA RECUPERARE</span>") : "<span class='badge bg-primary'>IMPORT. PREC.</span>";
 
             }
         ],
