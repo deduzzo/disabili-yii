@@ -223,21 +223,21 @@ class Istanza extends \yii\db\ActiveRecord
         return $query->count();
     }
 
-    public function getTotaleAnnuoDovutoCorretto() {
+    public function getTotaleAnnuoDovutoCorretto()
+    {
         $lastIsee = $this->getLastIseeType();
-        if ($lastIsee !== IseeType::NO_ISEE)
-        {
+        if ($lastIsee !== IseeType::NO_ISEE) {
             $meseUltimoPagamento = Carbon::createFromFormat('Y-m-d', Movimento::getDataUltimoPagamento())->month;
             $totaleTeorico = $meseUltimoPagamento * ($lastIsee === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
             //$totaleRecuperi = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["IS NOT", "id_recupero", null])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
             //$ricoveriAttivi = $this->getImportoRicoveriDaContabilizzare();
             return $totaleTeorico;
-        }
-        else return null;
+        } else return null;
     }
 
-    public function getTotaleEffettivoAnnuo() {
-        return Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["is_movimento_bancario" => true])->andWhere(['>=','movimento.data',Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
+    public function getTotaleEffettivoAnnuo()
+    {
+        return Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(["is_movimento_bancario" => true])->andWhere(['>=', 'movimento.data', Carbon::now()->startOfYear()->format('Y-m-d')])->sum('importo');
     }
 
 
@@ -347,7 +347,8 @@ class Istanza extends \yii\db\ActiveRecord
         return $totale > 0 ? $totale : 0;
     }
 
-    public function getImportoRicoveriDaContabilizzare(){
+    public function getImportoRicoveriDaContabilizzare()
+    {
         $totale = 0;
         foreach ($this->ricoveros as $ricovero) {
             if ($ricovero->contabilizzare) {
@@ -361,16 +362,17 @@ class Istanza extends \yii\db\ActiveRecord
     {
         $op = $this->isInAlert();
         $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
-        if (!$this->attivo)
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'importo' => 0, 'differenza' => 0, 'op' => $op ?? 'ELIMINARE', 'recupero' => $this->haRecuperiInCorso()];
         $prossimoImporto = $this->getProssimoImporto();
-        $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0);
-        if ($prossimoImporto <= 0.0)
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => 0, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? 'ELIMINARE<br /> PROSSIMO IMPORTO 0', 'recupero' => $this->haRecuperiInCorso()];
-        if ($lastMovimento)
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : ""), 'recupero' => $this->haRecuperiInCorso()];
-        else
-            return ['alert' => $op != null, 'presenteScorsoMese' => $lastMovimento !== null, 'importo' => $prossimoImporto, 'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0), 'differenza' => $differenza, 'op' => $op ?? "AGGIUNGERE", 'recupero' => $this->haRecuperiInCorso()];
+        $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0.0);
+        return [
+            'alert' => $op != null,
+            'presenteScorsoMese' => $lastMovimento !== null,
+            'importo' => ($prossimoImporto <= 0.0 || !$this->attivo) ? 0.0 : $prossimoImporto,
+            'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
+            'differenza' => $differenza,
+            'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0' : ($differenza != 0.0 ? "AGGIORNARE IMPORTO" : "AGGIUNGERE")),
+            'recupero' => $this->haRecuperiInCorso()
+        ];
     }
 
     public function isInAlert()
