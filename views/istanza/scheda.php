@@ -170,7 +170,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row p-1">
             <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
                 <?php if (!$istanza->rinuncia): ?>
-                    <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null || !$istanza->attivo) ? "success" : "danger" ?> text-small"><?= $istanza->data_decesso ? ("DECEDUTO " . Yii::$app->formatter->asDate($istanza->data_decesso)) : ($istanza->attivo ? "IN VITA" : "NON ATTIVO") ?></span>
+                    <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null && $istanza->attivo) ? "success" : "danger" ?> text-small"><?= $istanza->data_decesso ? ("DECEDUTO " . Yii::$app->formatter->asDate($istanza->data_decesso)) : ($istanza->attivo ? "IN VITA" : "NON ATTIVO") ?></span>
                     <span class="badge rounded-pill bg-<?= ($istanza->data_decesso === null && $istanza->patto_di_cura && !$istanza->chiuso && $istanza->attivo) ? "success" : "danger" ?> text-small"><?=
                         $istanza->data_decesso !== null ? (($istanza->liquidazione_decesso_completata && $istanza->chiuso) ? "CHIUSO LIQUIDATO" : ($istanza->attivo ? "DECEDUTO ANCORA ATTIVO" : ($istanza->liquidazione_decesso_completata ? "LIQUIDATO NON ATTIVO <br />APERTO (CHIUDERE)" : ($istanza->attivo ? "ATTIVO DA LIQUIDARE" : "NON ATTIVO DA LIQUIDARE")))) : ($istanza->attivo ? "ATTIVO" : (!$istanza->patto_di_cura ? "" : ($istanza->rinuncia ? "RINUNCIA" : ($istanza->chiuso ? "CHIUSO" : "NON ATTIVO, ATTENZIONARE")))) ?></span>
                 <?php endif; ?>
