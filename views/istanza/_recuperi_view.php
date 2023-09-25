@@ -278,7 +278,7 @@ echo GridView::widget([
                                 (parseInt(document.getElementById('numRate').value) - 1)) :
                             document.getElementById('numRate').value)
                         + " rate da " + document.getElementById('importoRata').value + " €<br />") : "") +
-                ((!document.getElementById('calcolo_automatico').checked && ((parseFloat(document.getElementById('importo').value) % (parseInt(document.getElementById('numRate').value) * parseFloat(document.getElementById('importoRata').value)) !== 0))) ?
+                ((!document.getElementById('calcolo_automatico').checked && document.getElementById('rateizzato').checked && ((parseFloat(document.getElementById('importo').value) % (parseInt(document.getElementById('numRate').value) * parseFloat(document.getElementById('importoRata').value)) !== 0))) ?
                     ("+ ultima rata: " +
                         (Math.abs(parseFloat(document.getElementById('importo').value) - (parseFloat(document.getElementById('importoRata').value) * (parseInt(document.getElementById('numRate').value) - 1)))) + " €<br />")
                     : "") +
