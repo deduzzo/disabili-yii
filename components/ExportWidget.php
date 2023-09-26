@@ -39,11 +39,7 @@ class ExportWidget extends Widget
             ]);
             $exporter->render();
             // set bold header
-            $exporter->setHeaderStyle([
-                'font' => [
-                    'bold' => true,
-                ]
-            ]);
+
             $exporter->send('out.xlsx');
         }
         return Html::beginForm('', 'POST',['id' => "formExport"]).Html::hiddenInput('export', 'true').
