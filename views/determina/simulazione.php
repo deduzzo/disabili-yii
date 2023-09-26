@@ -169,7 +169,10 @@ $formatter = \Yii::$app->formatter;
             </div>
         </div>
         <?= Html::endForm() ?>
-        <div class="col-md-12"><?= ExportWidget::widget(['models' => $dataProvider->models]) ?></div>
+        <div class="col-md-12"><?= ExportWidget::widget([
+                'models' => $dataProvider->models,
+                'columns' => ['cf','cognome','nome','distretto'],
+            ]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
