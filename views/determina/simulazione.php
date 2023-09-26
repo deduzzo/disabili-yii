@@ -170,9 +170,9 @@ $formatter = \Yii::$app->formatter;
             </div>
         </div>
         <?= Html::endForm() ?>
-        <div class="col-md-12"><?= ExportWidget::widget([
+        <div class="col-md-12" style="text-align:right"><?= ExportWidget::widget([
                 'models' => $istanzeArray,
-                'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importo','operazione'],
+                'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importoPrecedente','importo','operazione'],
             ]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
