@@ -22,7 +22,7 @@ class ExportWidget extends Widget
         }
         if ($this->columns === null) {
             // retrive the columns from the model
-            $this->columns = $this->models[0]->attributes();
+            $this->columns = array_keys($this->models[0]);
         }
     }
 

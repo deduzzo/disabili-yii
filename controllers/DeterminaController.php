@@ -57,7 +57,7 @@ class DeterminaController extends \yii\web\Controller
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if (!$differenza['alert'] &&  $istanza->getProssimoImporto() > 0) {
+            if (!$differenza['alert'] && $istanza->getProssimoImporto() > 0) {
                 if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istVal = [
                         'id' => $istanza->id,
@@ -133,33 +133,20 @@ class DeterminaController extends \yii\web\Controller
             $soloRecuperi === "on" ? $recuperiTotali :
                 ($soloVariazioni === "on" ? $differenzeTotali :
                     ($soloProblematici === "on" ? $alertGlobal : $istanzeArray)));
-        if (!$export) {
-            return $this->render('simulazione', [
-                'dataProvider' => $dataProvider,
-                'searchModel' => $searchModel,
-                'allIdPagati' => $allIdPagatiMeseScorso,
-                'soloProblematici' => $soloProblematici,
-                'soloVariazioni' => $soloVariazioni,
-                'soloRecuperi' => $soloRecuperi,
-                'distretti' => $distretti,
-                'stats' => [
-                    'importiTotali' => $importiTotali,
-                    'numeriTotali' => $numeriTotali,
-                    'alert' => $alert,
-                ]
-            ]);
-        }
-        else {
-            $exporter = new Spreadsheet([
-                'dataProvider' => new ArrayDataProvider([
-                    'allModels' => $istanzeArray
-                ]),
-                'columns' => ['id','cf','cognome'],
-                //'headerColumnUnions' => $initArray['headerColumnUnions']
-            ]);
-            $exporter->render();
-            $exporter->send('out.xlsx');
-        }
+        return $this->render('simulazione', [
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'allIdPagati' => $allIdPagatiMeseScorso,
+            'soloProblematici' => $soloProblematici,
+            'soloVariazioni' => $soloVariazioni,
+            'soloRecuperi' => $soloRecuperi,
+            'distretti' => $distretti,
+            'stats' => [
+                'importiTotali' => $importiTotali,
+                'numeriTotali' => $numeriTotali,
+                'alert' => $alert,
+            ]
+        ]);
     }
 
 }
