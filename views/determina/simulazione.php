@@ -168,6 +168,7 @@ $formatter = \Yii::$app->formatter;
                 <div class="divider-text">Elenco</div>
             </div>
         </div>
+        <?= Html::endForm() ?>
         <div class="col-md-12"><?= ExportWidget::widget(['models' => $dataProvider->models]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
