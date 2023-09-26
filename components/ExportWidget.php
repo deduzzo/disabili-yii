@@ -41,7 +41,7 @@ class ExportWidget extends Widget
                 //'headerColumnUnions' => $initArray['headerColumnUnions']
             ]);
 
-            $exporter->applyCellStyle('A:A',
+            $exporter->applyCellStyle('A1:XFD1',
                 [
                     'font' => [
                         'name' => 'Arial',
