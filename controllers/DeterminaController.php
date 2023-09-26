@@ -105,7 +105,7 @@ class DeterminaController extends \yii\web\Controller
                 'distretto' => $istanza->distretto->nome,
                 'isee' => $istanza->getLastIseeType(),
                 'eta' => $istanza->anagraficaDisabile->getEta(),
-                'gruppo' => $istanza->gruppo->descrizione_gruppo,
+                'gruppo' => $istanza->gruppo->descrizione_gruppo_old. " [".$istanza->gruppo->descrizione_gruppo."]",
                 'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => $istanza->getProssimoImporto(),
                 'opArray' => $differenza,
@@ -134,6 +134,7 @@ class DeterminaController extends \yii\web\Controller
                 ($soloVariazioni === "on" ? $differenzeTotali :
                     ($soloProblematici === "on" ? $alertGlobal : $istanzeArray)));
         return $this->render('simulazione', [
+            'istanzeArray' => $istanzeArray,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
             'allIdPagati' => $allIdPagatiMeseScorso,

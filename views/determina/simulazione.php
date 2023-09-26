@@ -18,6 +18,7 @@ use yii\helpers\Url;
 /** @var string $soloProblematici */
 /** @var array $distretti */
 /** @var array $stats */
+/** @var array $istanzeArray */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 
@@ -170,7 +171,7 @@ $formatter = \Yii::$app->formatter;
         </div>
         <?= Html::endForm() ?>
         <div class="col-md-12"><?= ExportWidget::widget([
-                'models' => $dataProvider->models,
+                'models' => $istanzeArray,
                 'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importo','operazione'],
             ]) ?></div>
         <?= GridView::widget([
