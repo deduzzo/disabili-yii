@@ -42,23 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 100;  // Assumo 100 come default
         ?>
-        <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle me-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Primary
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
-                <a class="dropdown-item" href="#">Option 1</a>
-                <a class="dropdown-item" href="#">Option 2</a>
-                <a class="dropdown-item" href="#">Option 3</a>
-            </div>
-        </div>
-            <?php
-            echo ExportMenu::widget([
-                'dataProvider' => $dataProvider,
-                'asDropdown' => false,
-            ])
-            ?>
-
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
