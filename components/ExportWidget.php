@@ -40,7 +40,7 @@ class ExportWidget extends Widget
             $exporter->render();
             $exporter->send('out.xlsx');
         }
-        return Html::beginForm('', 'POST').Html::hiddenInput('export', 'true').
+        return Html::beginForm('', 'POST',['id' => "form-export"]).Html::hiddenInput('export', 'true').
             '<div class="btn-group dropdown me-1 mb-1">
                 <button type="button" class="btn btn-warning">Esporta</button>
                 <button type="button" class="btn btn-warning dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
@@ -48,7 +48,7 @@ class ExportWidget extends Widget
                 </button>
                 <div class="dropdown-menu">
                     <h6 class="dropdown-header">Seleziona il formato</h6>
-                    <a href="javascript:void(0);" class="dropdown-item active" onclick="event.preventDefault(); this.closest(\'form\').submit();">Pdf</a>
+                    <a href="javascript:void(0);" class="dropdown-item active" onclick="event.preventDefault(); document.getElementById("form-export").submit();">Pdf</a>
                 </div>
             </div>'. Html::endForm();
     }
