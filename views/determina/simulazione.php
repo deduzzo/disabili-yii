@@ -161,9 +161,6 @@ $formatter = \Yii::$app->formatter;
                 <label class="form-check-label text-danger bold"
                        for="soloRecuperi">Solo ist. con Recuperi in corso</label>
             </div>
-            <div class="col-md-3">
-                <?= ExportWidget::widget(['models' => $dataProvider->models]) ?>
-            </div>
             <div class="col-md-12" style="text-align:center">
                 <button type="submit" class="btn btn-primary">Filtra</button>
             </div>
@@ -171,7 +168,7 @@ $formatter = \Yii::$app->formatter;
                 <div class="divider-text">Elenco</div>
             </div>
         </div>
-        <?= Html::endForm() ?>
+        <div class="col-md-12"><?= ExportWidget::widget(['models' => $dataProvider->models]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
