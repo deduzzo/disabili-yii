@@ -57,7 +57,7 @@ class DeterminaController extends \yii\web\Controller
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
             $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if (!$differenza['alert'] && $istanza->getProssimoImporto() >= 0) {
+            if (!$differenza['alert'] && $istanza->getProssimoImporto() > 0) {
                 if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istVal = [
                         'id' => $istanza->id,
@@ -85,10 +85,10 @@ class DeterminaController extends \yii\web\Controller
                     }
                     $istanzeArray[] = $istVal;
                 }
+                $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
+                $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
+                $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
             }
-            $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
-            $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
-            $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
         }
         $nonPagati = [];
         foreach ($distretti as $disPag) {
