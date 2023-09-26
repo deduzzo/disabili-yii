@@ -3,6 +3,7 @@
 namespace app\components;
 
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Yii;
 use yii\base\InvalidConfigException;
