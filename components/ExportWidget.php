@@ -2,6 +2,8 @@
 
 namespace app\components;
 
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
@@ -37,9 +39,39 @@ class ExportWidget extends Widget
                 'columns' => $this->columns,
                 //'headerColumnUnions' => $initArray['headerColumnUnions']
             ]);
-            $exporter->render();
-            // set bold header
 
+            $exporter->applyCellStyle('A:A',
+                [
+                    'font' => [
+                        'name' => 'Arial',
+                        'bold' => true,
+                        'size' => 14,
+                    ],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'color' => [
+                            'rgb' => 'e2f0d9'
+                        ]
+                    ],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                        'wrapText' => true,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => [
+                                'rgb' => '000000'
+                            ]
+                        ]
+                    ],
+                ]
+            );
+
+
+
+            $exporter->render();
             $exporter->send('out.xlsx');
         }
         return Html::beginForm('', 'POST',['id' => "formExport"]).Html::hiddenInput('export', 'true').
