@@ -48,7 +48,7 @@ class ExportWidget extends Widget
                 </button>
                 <div class="dropdown-menu">
                     <h6 class="dropdown-header">Seleziona il formato</h6>
-                    <a href="javascript:void(0);" class="dropdown-item active" onclick="event.preventDefault(); document.getElementById('."form-export".').submit();">Pdf</a>
+                    <a href="javascript:void(0);" class="dropdown-item active" onclick="event.preventDefault(); document.getElementById('."'form-export'".').submit();">Pdf</a>
                 </div>
             </div>'. Html::endForm();
     }
