@@ -171,7 +171,7 @@ $formatter = \Yii::$app->formatter;
         <?= Html::endForm() ?>
         <div class="col-md-12"><?= ExportWidget::widget([
                 'models' => $dataProvider->models,
-                'columns' => ['cf','cognome','nome','distretto'],
+                'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importo','operazione'],
             ]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
