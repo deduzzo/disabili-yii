@@ -1,16 +1,16 @@
 <?php
 
+use app\components\ExportWidget;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
-use kartik\export\ExportMenu;
 use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\widgets\Pjax;
+
 
 /** @var yii\web\View $this */
 /** @var app\models\IstanzaSearch $searchModel */
@@ -24,7 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--    <div class="container-fluid">
         <?php /*echo $this->render('_search', ['model' => $searchModel]); */ ?>
     </div>-->
-<?php Pjax::begin(['id' => 'datatable-pjax']) ?>
 <?php $formatter = \Yii::$app->formatter; ?>
 
 <div class="card">
@@ -45,8 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
-                "<div class='dataTable-top'>
+            'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline'])."<div class='dataTable-top'>
                                 <div class='dataTable-dropdown'>
                                         <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
                                                 <option value='50' " . ($selectedPageSize == 50 ? 'selected' : '') . ">50</option>

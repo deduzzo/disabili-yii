@@ -1,5 +1,6 @@
 <?php
 
+use app\components\ExportWidget;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use kartik\export\ExportMenu;
@@ -147,7 +148,7 @@ $formatter = \Yii::$app->formatter;
                     ],
                 ]); ?>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                        id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
@@ -160,6 +161,9 @@ $formatter = \Yii::$app->formatter;
                        id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
                 <label class="form-check-label text-danger bold"
                        for="soloRecuperi">Solo ist. con Recuperi in corso</label>
+            </div>
+            <div class="col-md-3">
+                <?= ExportWidget::widget(['models' => $dataProvider->models]) ?>
             </div>
             <div class="col-md-12" style="text-align:center">
                 <button type="submit" class="btn btn-primary">Filtra</button>
