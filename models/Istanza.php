@@ -493,7 +493,7 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($this->getRicoveriDaContabilizzare() as $ricoveroDaCont) {
             $recupero = new Recupero();
             $recupero->id_istanza = $this->id;
-            $recupero->importo = $ricoveroDaCont->getImportoRicovero();
+            $recupero->importo = -$ricoveroDaCont->getImportoRicovero();
             $recupero->rateizzato = false;
             $recupero->save();
             if ($recupero->errors)
