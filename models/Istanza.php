@@ -555,6 +555,6 @@ class Istanza extends \yii\db\ActiveRecord
                     $errors = array_merge($recuperoNegNonRateizzato->errors,$errors);
             }
         }
-        echo (count($errors));
+        print_r($errors[0]);
     }
 }
