@@ -547,11 +547,10 @@ class Istanza extends \yii\db\ActiveRecord
                     $recuperoNegNonRateizzato->rateizzato = true;
                     $recuperoNegNonRateizzato->num_rate = 2;
                 }
-                $recuperoNegNonRateizzato->save();
-                if ($recuperoNegNonRateizzato->getImportoResiduo() === 0) {
+                if ($recuperoNegNonRateizzato->getImportoResiduo() == 0.0)
                     $recuperoNegNonRateizzato->chiuso = true;
-                    $recuperoNegNonRateizzato->save();
-                }
+
+                $recuperoNegNonRateizzato->save();
                 if ($recuperoNegNonRateizzato->errors)
                     $errors = array_merge($recuperoNegNonRateizzato->errors,$errors);
             }
