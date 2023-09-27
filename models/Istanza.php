@@ -547,7 +547,7 @@ class Istanza extends \yii\db\ActiveRecord
                     $recuperoNegNonRateizzato->rateizzato = true;
                     $recuperoNegNonRateizzato->num_rate = 2;
                 }
-                if ($recuperoNegNonRateizzato->getImportoResiduo() == 0.0)
+                else
                     $recuperoNegNonRateizzato->chiuso = true;
 
                 $recuperoNegNonRateizzato->save();
