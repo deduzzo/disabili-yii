@@ -31,7 +31,7 @@ class ExportWidget extends Widget
 
     public function run()
     {
-        if (Yii::$app->request->isPost && Yii::$app->request->post()['exportWDG'] == 'true')
+        if (Yii::$app->request->isPost && isset(Yii::$app->request->post()['exportWDG']) && Yii::$app->request->post()['exportWDG'] == 'true')
         {
             $exporter = new Spreadsheet([
                 'dataProvider' => new ArrayDataProvider([
