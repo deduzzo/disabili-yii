@@ -433,7 +433,7 @@ class Istanza extends \yii\db\ActiveRecord
     {
         $out = [];
         foreach ($this->ricoveros as $ricovero) {
-            if ($ricovero->contabilizzare)
+            if ($ricovero->contabilizzare && $ricovero->a !== null)
                 $out[] = $ricovero;
         }
         return $out;
@@ -457,7 +457,7 @@ class Istanza extends \yii\db\ActiveRecord
         $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         $movimento->save();
         if ($movimento->errors)
-            $errors[] = $movimento->errors;
+            $errors = array_merge($movimento->errors,$errors);
         foreach ($recuperiPositivi as $recuperPos) {
             $movimento = new Movimento();
             $movimento->id_conto = $contoValido->id;
@@ -474,7 +474,7 @@ class Istanza extends \yii\db\ActiveRecord
                     $recuperPos->chiuso = true;
                     $recuperPos->save();
                     if ($recuperPos->errors)
-                        $errors[] = $recuperPos->errors;
+                        $errors = array_merge($recuperPos->errors,$errors);
                 }
             } else {
                 $movimento->importo = $recuperPos->importo;
@@ -482,11 +482,11 @@ class Istanza extends \yii\db\ActiveRecord
                 $recuperPos->chiuso = true;
                 $recuperPos->save();
                 if ($recuperPos->errors)
-                    $errors[] = $recuperPos->errors;
+                    $errors = array_merge($recuperPos->errors,$errors);
             }
             $movimento->save();
             if ($movimento->errors)
-                $errors[] = $movimento->errors;
+                $errors = array_merge($movimento->errors,$errors);
         }
         $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         // priorità i recuperi negativi rateizzati
@@ -497,12 +497,12 @@ class Istanza extends \yii\db\ActiveRecord
             $recupero->rateizzato = false;
             $recupero->save();
             if ($recupero->errors)
-                $errors[] = $recupero->errors;
+                $errors = array_merge($recupero->errors,$errors);
             $ricoveroDaCont->id_recupero = $recupero->id;
             $ricoveroDaCont->contabilizzare = false;
             $ricoveroDaCont->save();
             if ($ricoveroDaCont->errors)
-                $errors[] = $ricoveroDaCont->errors;
+                $errors= array_merge($ricoveroDaCont->errors,$errors);
         }
         foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
             if ($importoSurplus > 0) {
@@ -523,10 +523,10 @@ class Istanza extends \yii\db\ActiveRecord
                 }
                 $recuperoNegRat->save();
                 if ($recuperoNegRat->errors)
-                    $errors[] = $recuperoNegRat->errors;
+                    $errors = array_merge($recuperoNegRat->errors,$errors);
                 $movimento->save();
                 if ($movimento->errors)
-                    $errors[] = $movimento->errors;
+                    $errors = array_merge($movimento->errors,$errors);
             }
         }
         foreach ($this->getRecuperiNegativiNonRateizzati() as $recuperoNegNonRateizzato) {
@@ -541,7 +541,7 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->importo = abs($recuperoNegNonRateizzato->getImportoResiduo()) < abs($importoSurplus) ? -abs($recuperoNegNonRateizzato->getImportoResiduo()) : -$importoSurplus;
                 $movimento->save();
                 if ($movimento->errors)
-                    $errors[] = $movimento->errors;
+                    $errors = array_merge($movimento->errors,$errors);
                 $importoSurplus -= abs($movimento->importo);
                 if ($movimento->importo == -$importoSurplus) {
                     $recuperoNegNonRateizzato->rateizzato = true;
@@ -552,7 +552,7 @@ class Istanza extends \yii\db\ActiveRecord
 
                 $recuperoNegNonRateizzato->save();
                 if ($recuperoNegNonRateizzato->errors)
-                    $errors[] = $recuperoNegNonRateizzato->errors;
+                    $errors = array_merge($recuperoNegNonRateizzato->errors,$errors);
             }
         }
         print_r($errors);

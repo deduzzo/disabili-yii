@@ -17,7 +17,7 @@ use function PHPUnit\Framework\lessThanOrEqual;
  * @property string|null $a
  * @property string|null $cod_struttura
  * @property string|null $descr_struttura
- * @property int|null $contabilizzare
+ * @property bool $contabilizzare
  * @property string|null $note
  * @property int|null $id_istanza
  * @property int|null $id_determina
@@ -44,7 +44,9 @@ class Ricovero extends \yii\db\ActiveRecord
     {
         return [
             [['da', 'a'], 'safe'],
-            [['contabilizzare', 'id_istanza', 'id_determina', 'id_recupero'], 'integer'],
+            [[ 'id_istanza', 'id_determina', 'id_recupero'], 'integer'],
+            [['contabilizzare'], 'boolean'],
+            [['contabilizzare'], 'required'],
             [['note'], 'string'],
             [['cod_struttura', 'descr_struttura'], 'string', 'max' => 100],
             [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
