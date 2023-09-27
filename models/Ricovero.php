@@ -46,7 +46,6 @@ class Ricovero extends \yii\db\ActiveRecord
             [['da', 'a'], 'safe'],
             [[ 'id_istanza', 'id_determina', 'id_recupero'], 'integer'],
             [['contabilizzare'], 'boolean'],
-            [['contabilizzare'], 'required'],
             [['note'], 'string'],
             [['cod_struttura', 'descr_struttura'], 'string', 'max' => 100],
             [['id_determina'], 'exist', 'skipOnError' => true, 'targetClass' => Determina::class, 'targetAttribute' => ['id_determina' => 'id']],
