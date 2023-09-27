@@ -232,10 +232,19 @@ $formatter = \Yii::$app->formatter;
             </div>
         </div>
         <?= Html::endForm() ?>
-        <div class="col-md-12"><?= ExportWidget::widget([
+        <div class="col-md-8"><?= ExportWidget::widget([
                 'models' => $istanzeArray,
                 'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importo','operazione'],
             ]) ?></div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#concludi-determina">
+                Finalizza determina
+            </button>
+        </div>
+        <div class="divider">
+            <div class="divider-text">Elenco</div>
+        </div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
