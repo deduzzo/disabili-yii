@@ -189,15 +189,16 @@ class Recupero extends \yii\db\ActiveRecord
     }
 
     public function getImportoResiduo() {
-        $val = abs($this->importo) - abs($this->getImportoSaldato());
-            return $val;
+        return abs($this->importo) - abs($this->getImportoSaldato());
     }
 
     public function getProssimaRata() {
         if ($this->chiuso || $this->annullato)
             return 0;
         if ($this->rateizzato && $this->num_rate > 0) {
-            if (abs($this->getImportoResiduo()) < $this->importo_rata)
+            if ($this->importo_rata === null || $this->importo_rata === 0)
+                return $this->getImportoResiduo();
+            else if (abs($this->getImportoResiduo()) < $this->importo_rata)
                 return $this->getultimaRataSeDiversa();
             else
                 return $this->importo_rata;

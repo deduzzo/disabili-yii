@@ -418,12 +418,23 @@ class Istanza extends \yii\db\ActiveRecord
         }
         return $out;
     }
+
     public function getRecuperiNegativiNonRateizzati()
     {
         $out = [];
         foreach ($this->getRecuperi(Recupero::NEGATIVO) as $recupero) {
             if (!$recupero->rateizzato)
                 $out[] = $recupero;
+        }
+        return $out;
+    }
+
+    public function getRicoveriDaContabilizzare()
+    {
+        $out = [];
+        foreach ($this->ricoveros as $ricovero) {
+            if ($ricovero->contabilizzare)
+                $out[] = $ricovero;
         }
         return $out;
     }
@@ -479,6 +490,20 @@ class Istanza extends \yii\db\ActiveRecord
         }
         $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         // priorità i recuperi negativi rateizzati
+        foreach ($this->getRicoveriDaContabilizzare() as $ricoveroDaCont) {
+            $recupero = new Recupero();
+            $recupero->id_istanza = $this->id;
+            $recupero->importo = $ricoveroDaCont->getImportoRicovero();
+            $recupero->rateizzato = false;
+            $recupero->save();
+            if ($recupero->errors)
+                $errors[] = $recupero->errors;
+            $ricoveroDaCont->id_recupero = $recupero->id;
+            $ricoveroDaCont->contabilizzare = false;
+            $ricoveroDaCont->save();
+            if ($ricoveroDaCont->errors)
+                $errors[] = $ricoveroDaCont->errors;
+        }
         foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
             if ($importoSurplus > 0) {
                 $movimento = new Movimento();
@@ -488,7 +513,7 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->is_movimento_bancario = false;
                 $movimento->data = Carbon::now()->format('Y-m-d');
                 $movimento->id_determina = $idDetermina;
-                $movimento->importo =  abs($recuperoNegRat->importo_rata) < abs($importoSurplus) ? -$recuperoNegRat->importo_rata : -$importoSurplus;
+                $movimento->importo = abs($recuperoNegRat->getProssimaRata()) < abs($importoSurplus) ? -abs($recuperoNegRat->getProssimaRata()) : -$importoSurplus;
                 $movimento->num_rata = $recuperoNegRat->getNumeroProssimaRata();
                 $importoSurplus -= abs($movimento->importo);
                 if ($movimento->importo == -$importoSurplus)
@@ -513,17 +538,21 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->is_movimento_bancario = false;
                 $movimento->data = Carbon::now()->format('Y-m-d');
                 $movimento->id_determina = $idDetermina;
-                $movimento->importo =  abs($recuperoNegNonRateizzato->importo) < abs($importoSurplus) ? -$recuperoNegNonRateizzato->importo : -$importoSurplus;
-                $movimento->num_rata = $recuperoNegNonRateizzato->getNumeroProssimaRata();
-                $importoSurplus -= abs($movimento->importo);
-                if ($movimento->importo == -$importoSurplus)
-                    $recuperoNegNonRateizzato->chiuso = true;
-                $recuperoNegNonRateizzato->save();
-                if ($recuperoNegNonRateizzato->errors)
-                    $errors[] = $recuperoNegNonRateizzato->errors;
+                $movimento->importo = abs($recuperoNegNonRateizzato->getImportoResiduo()) < abs($importoSurplus) ? -abs($recuperoNegNonRateizzato->getImportoResiduo()) : -$importoSurplus;
                 $movimento->save();
                 if ($movimento->errors)
                     $errors[] = $movimento->errors;
+                $importoSurplus -= abs($movimento->importo);
+                if ($movimento->importo == -$importoSurplus) {
+                    $recuperoNegNonRateizzato->rateizzato = true;
+                    $recuperoNegNonRateizzato->num_rate = 2;
+                }
+                if ($recuperoNegNonRateizzato->getImportoResiduo() === 0)
+                    $recuperoNegNonRateizzato->chiuso = true;
+
+                $recuperoNegNonRateizzato->save();
+                if ($recuperoNegNonRateizzato->errors)
+                    $errors[] = $recuperoNegNonRateizzato->errors;
             }
         }
 
