@@ -490,7 +490,8 @@ class Istanza extends \yii\db\ActiveRecord
         }
         $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         // priorità i recuperi negativi rateizzati
-        foreach ($this->getRicoveriDaContabilizzare() as $ricoveroDaCont) {
+        $ricoveri = $this->getRicoveriDaContabilizzare();
+        foreach ($ricoveri as $ricoveroDaCont) {
             $recupero = new Recupero();
             $recupero->id_istanza = $this->id;
             $recupero->importo = -$ricoveroDaCont->getImportoRicovero();
@@ -504,6 +505,9 @@ class Istanza extends \yii\db\ActiveRecord
             if ($ricoveroDaCont->errors)
                 $errors= array_merge($ricoveroDaCont->errors,$errors);
         }
+        if (count($ricoveri) >0)
+            $this->refresh();
+
         foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
             if ($importoSurplus > 0) {
                 $movimento = new Movimento();
