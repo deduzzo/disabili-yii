@@ -27,6 +27,65 @@ $this->params['breadcrumbs'][] = $this->title;
 $formatter = \Yii::$app->formatter;
 ?>
 
+<div class="modal fade text-left" id="concludi-determina" tabindex="-1" aria-labelledby="label-modifica"
+     style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title white" id="label-modifica">
+                    Finalizza Determina
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <?= Html::beginForm(['/determina/finalizza'], 'post', ['id' => 'finalizza-determina', 'class' => 'form-horizontal']) ?>
+                <div class="divider">
+                    <div class="divider-text">Dati Determina</div>
+                </div>
+                <div class="row">
+                    <!-- attributes: numero determina, data determina, data inizio, data fine -->
+                    <div class="col-md-6">
+                        <label for="numero_determina">Numero Determina</label>
+                        <input class="form-control" type="text" name="numero_determina" id="numero_determina"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="data_determina">Data Determina</label>
+                        <input class="form-control" type="date" name="data_determina" id="data_determina"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="data_inizio">Data Inizio Pagamento</label>
+                        <input class="form-control" type="date" name="data_inizio" id="data_inizio"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="data_fine">Data Fine Pagamento</label>
+                        <input class="form-control" type="date" name="data_fine" id="data_fine"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Annulla</span>
+                </button>
+
+                <button type="submit" class="btn btn-warning ms-1">
+                    <i class="bx bx-check d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Finalizza determina</span>
+                </button>
+                <?= Html::endForm() ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="card">
     <div class="card-header">
@@ -50,9 +109,12 @@ $formatter = \Yii::$app->formatter;
                                    href="#<?= "dettagli_" . $di->id ?>" role="tab">
                                     <?= $di->nome ?>
                                     <div style="">
-                                    <span class="badge bg-success badge-pill badge-round ms-2" style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
-                                    <span class="badge bg-warning badge-pill badge-round ms-2" style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
-                                    <span class="badge bg-secondary badge-pill badge-round ms-2" style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
+                                    <span class="badge bg-success badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
+                                    <span class="badge bg-warning badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] . '</span>' ?>
+                                    <span class="badge bg-secondary badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][$di->id][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][$di->id][IseeType::MINORE_25K] . '</span>' ?>
                                     </div>
                                 </a>
 
@@ -135,7 +197,7 @@ $formatter = \Yii::$app->formatter;
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-6">
-                <?= Html::beginForm(['/determina'],'get') ?>
+                <?= Html::beginForm(['/determina'], 'get') ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
@@ -166,14 +228,23 @@ $formatter = \Yii::$app->formatter;
                 <button type="submit" class="btn btn-primary">Filtra</button>
             </div>
             <div class="divider">
+                <div class="divider-text">Operazioni</div>
+            </div>
+            <?= Html::endForm() ?>
+            <div class="col-md-8"><?= ExportWidget::widget([
+                    'models' => $istanzeArray,
+                    'columns' => ['cf', 'cognome', 'nome', 'distretto', 'isee', 'gruppo', 'importo', 'operazione'],
+                ]) ?></div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#concludi-determina">
+                    Finalizza determina
+                </button>
+            </div>
+            <div class="divider">
                 <div class="divider-text">Elenco</div>
             </div>
         </div>
-        <?= Html::endForm() ?>
-        <div class="col-md-12"><?= ExportWidget::widget([
-                'models' => $istanzeArray,
-                'columns' => ['cf','cognome','nome','distretto','isee','gruppo','importo','operazione'],
-            ]) ?></div>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,

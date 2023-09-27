@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Isee;
@@ -16,16 +17,17 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null)
     {
         // unlimited memory_limit
         ini_set('memory_limit', '-1');
         $searchModel = new SimulazioneDeterminaSearch();
-        $distretti = isset($this->request->get()['distrettiPost']) ? $this->request->get()['distrettiPost'] :Distretto::getAllIds();
+        $getVars = $idDeterminaFinalizzare !== null ? $this->request->get() : [];
+        $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        $soloProblematici = isset($this->request->get()['soloProblematici']) ? $this->request->get()['soloProblematici'] : 'off';
-        $soloVariazioni = isset($this->request->get()['soloVariazioni']) ? $this->request->get()['soloVariazioni'] : 'off';
-        $soloRecuperi = isset($this->request->get()['soloRecuperi']) ? $this->request->get()['soloRecuperi'] : 'off';
+        $soloProblematici = isset($getVars['soloProblematici']) ? $getVars['soloProblematici'] : 'off';
+        $soloVariazioni = isset($getVars['soloVariazioni']) ? $getVars['soloVariazioni'] : 'off';
+        $soloRecuperi = isset($getVars['soloRecuperi']) ? $getVars['soloRecuperi'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = Movimento::getDataUltimoPagamento();
@@ -67,7 +69,7 @@ class DeterminaController extends \yii\web\Controller
                         'distretto' => $istanza->distretto->nome,
                         'isee' => $istanza->getLastIseeType(),
                         'eta' => $istanza->anagraficaDisabile->getEta(),
-                        'gruppo' => $istanza->gruppo->descrizione_gruppo_old. " [".$istanza->gruppo->descrizione_gruppo."]",
+                        'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
                         'importoPrecedente' => $differenza['importoPrecedente'],
                         'importo' => $istanza->getProssimoImporto(),
                         'opArray' => $differenza,
@@ -76,6 +78,8 @@ class DeterminaController extends \yii\web\Controller
                     if ($differenza['alert'] === true)
                         $alert[$istanza->distretto->id] = $istVal;
                     else {
+                        if ($idDeterminaFinalizzare !== null)
+                            $istanza->finalizzaMensilita();
                         $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                         $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
                         if ($differenza['recupero'] === true)
@@ -105,7 +109,7 @@ class DeterminaController extends \yii\web\Controller
                 'distretto' => $istanza->distretto->nome,
                 'isee' => $istanza->getLastIseeType(),
                 'eta' => $istanza->anagraficaDisabile->getEta(),
-                'gruppo' => $istanza->gruppo->descrizione_gruppo_old. " [".$istanza->gruppo->descrizione_gruppo."]",
+                'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
                 'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => $istanza->getProssimoImporto(),
                 'opArray' => $differenza,
@@ -148,6 +152,18 @@ class DeterminaController extends \yii\web\Controller
                 'alert' => $alert,
             ]
         ]);
+    }
+
+    public function actionFinalizza() {
+        $vars = $this->request->post();
+        if (isset($vars['numero_determina'])) {
+            $determina = new Determina();
+            $determina->numero = $vars['numero_determina'];
+            $determina->data = $vars['data_determina'];
+            $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'];
+            $determina->save();
+            $this->actionIndex(false,$determina->id);
+        }
     }
 
 }

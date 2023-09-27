@@ -33,6 +33,9 @@ use yii\db\Expression;
  */
 class Recupero extends \yii\db\ActiveRecord
 {
+
+    const NEGATIVO = "NEGATIVO";
+    const POSITIVO = "POSITIVO";
     /**
      * {@inheritdoc}
      */
@@ -151,6 +154,13 @@ class Recupero extends \yii\db\ActiveRecord
             return $this->num_rate - count($this->movimentos);
         else
             return 0;
+    }
+
+    public function getNumeroProssimaRata() {
+        if ($this->rateizzato === true && $this->num_rate > 0)
+            return count($this->movimentos) + 1;
+        else
+            return null;
     }
 
     public function getRateSaldate() {
