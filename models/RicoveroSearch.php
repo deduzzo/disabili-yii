@@ -46,7 +46,7 @@ class RicoveroSearch extends Ricovero
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['da' => SORT_DESC]],
+            'sort'=> ['defaultOrder' => [['da' => SORT_DESC],['contabilizzare'=>SORT_DESC,'da'=>SORT_ASC]]],
         ]);
 
         $this->load($params);
@@ -72,7 +72,6 @@ class RicoveroSearch extends Ricovero
             ->andFilterWhere(['like', 'descr_struttura', $this->descr_struttura])
             ->andFilterWhere(['like', 'note', $this->note]);
 
-        $query->orderBy(['contabilizzare'=>SORT_DESC,'da'=>SORT_ASC]);
 
         return $dataProvider;
     }
