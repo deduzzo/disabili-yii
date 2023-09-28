@@ -91,6 +91,7 @@ class UploadForm extends Model
         $rowIndex = 0;
         $nonTrovati = [];
         $errors = [];
+        $alert = [];
         $gruppiPagamento = GruppoPagamento::find([])->all();
         $gruppiPagamentoMap = [];
         $istanze = null;
@@ -180,6 +181,8 @@ class UploadForm extends Model
                                         $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors]);
                                 }
                                 $movimento->contabilizzare = 0;
+                                if (!$istanza->attivo)
+                                    $alert[] = ["Istanza" . $istanza->id . " codice fiscale pagata ma non attiva"];
                                 $movimento->save();
                                 if ($movimento->errors)
                                     $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
@@ -199,7 +202,7 @@ class UploadForm extends Model
         // put in var $date the date in format yyyy-mm-dd_hh-mm-ss
         $date = date('Y-m-d_H-i-s');
         $fp = fopen('../import/pagamenti/con_iban/res_'.$date.'.json', 'w');
-        fwrite($fp, json_encode(["nonTrovati" => $nonTrovati, "errors" => $errors]));
+        fwrite($fp, json_encode(["nonTrovati" => $nonTrovati, "errors" => $errors, "alert" => $alert]));
         fclose($fp);
         // send download of file fp
         Yii::$app->response->sendFile('../import/pagamenti/con_iban/res_'.$date.'.json');
