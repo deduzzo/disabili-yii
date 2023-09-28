@@ -109,7 +109,7 @@ class UploadForm extends Model
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[PagamentiConIban::IMPORTO]] !== "") {
-                    $consideraSoloAttivi = true;
+                    $consideraSoloAttivi = false;
                     if ($lastCf !== strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))) {
                         $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
                         if ($consideraSoloAttivi)
