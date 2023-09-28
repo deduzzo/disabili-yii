@@ -75,6 +75,9 @@ class UploadForm extends Model
                     break;
             }
         }
+        if ($this->errors)
+            // show with setFlash the errors array
+            Yii::$app->session->setFlash('error', json_encode($this->errors));
         return $stats;
     }
 
