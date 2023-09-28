@@ -129,9 +129,9 @@ class DeterminaController extends \yii\web\Controller
         }
         $alertGlobal = [];
         foreach ($distretti as $disPag) {
-            $alertGlobal = array_merge($alertGlobal, $alert[$disPag->id]);
-            $recuperiTotali = array_merge($recuperiTotali, $recuperiPerDistretto[$disPag->id]);
-            $differenzeTotali = array_merge($differenzeTotali, $differenzePerDistretto[$disPag->id]);
+            $alertGlobal = array_merge($alertGlobal, $alert[$disPag->id] ?? []);
+            $recuperiTotali = array_merge($recuperiTotali, $recuperiPerDistretto[$disPag->id] ?? []);
+            $differenzeTotali = array_merge($differenzeTotali, $differenzePerDistretto[$disPag->id] ?? []);
         }
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,
             $soloRecuperi === "on" ? $recuperiTotali :
