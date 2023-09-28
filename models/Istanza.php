@@ -439,6 +439,22 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
+    public function verificaContabilitaMese($mese, $anno)
+    {
+        $inizioMese = Carbon::createFromDate($anno, $mese, 1)->format('Y-m-d');
+        $fineMese = Carbon::create($inizioMese)->endOfMonth()->format('Y-m-d');
+        $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
+        $logico = 0;
+        $reale = 0;
+        foreach ($movimentiIstanzaMese as $movimento) {
+            if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita)
+                $reale += $movimento->importo;
+            else
+                $logico += $movimento->importo;
+        }
+        return $reale - $logico;
+    }
+
     public function finalizzaMensilita($idDetermina)
     {
         $errors = [];
@@ -457,7 +473,7 @@ class Istanza extends \yii\db\ActiveRecord
         $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         $movimento->save();
         if ($movimento->errors)
-            $errors = array_merge($movimento->errors,$errors);
+            $errors = array_merge($movimento->errors, $errors);
         foreach ($recuperiPositivi as $recuperPos) {
             $movimento = new Movimento();
             $movimento->id_conto = $contoValido->id;
@@ -474,7 +490,7 @@ class Istanza extends \yii\db\ActiveRecord
                     $recuperPos->chiuso = true;
                     $recuperPos->save();
                     if ($recuperPos->errors)
-                        $errors = array_merge($recuperPos->errors,$errors);
+                        $errors = array_merge($recuperPos->errors, $errors);
                 }
             } else {
                 $movimento->importo = $recuperPos->importo;
@@ -482,11 +498,11 @@ class Istanza extends \yii\db\ActiveRecord
                 $recuperPos->chiuso = true;
                 $recuperPos->save();
                 if ($recuperPos->errors)
-                    $errors = array_merge($recuperPos->errors,$errors);
+                    $errors = array_merge($recuperPos->errors, $errors);
             }
             $movimento->save();
             if ($movimento->errors)
-                $errors = array_merge($movimento->errors,$errors);
+                $errors = array_merge($movimento->errors, $errors);
         }
         $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         // priorità i recuperi negativi rateizzati
@@ -498,14 +514,14 @@ class Istanza extends \yii\db\ActiveRecord
             $recupero->rateizzato = false;
             $recupero->save();
             if ($recupero->errors)
-                $errors = array_merge($recupero->errors,$errors);
+                $errors = array_merge($recupero->errors, $errors);
             $ricoveroDaCont->id_recupero = $recupero->id;
             $ricoveroDaCont->contabilizzare = false;
             $ricoveroDaCont->save();
             if ($ricoveroDaCont->errors)
-                $errors= array_merge($ricoveroDaCont->errors,$errors);
+                $errors = array_merge($ricoveroDaCont->errors, $errors);
         }
-        if (count($ricoveri) >0)
+        if (count($ricoveri) > 0)
             $this->refresh();
 
         foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
@@ -527,10 +543,10 @@ class Istanza extends \yii\db\ActiveRecord
                 }
                 $recuperoNegRat->save();
                 if ($recuperoNegRat->errors)
-                    $errors = array_merge($recuperoNegRat->errors,$errors);
+                    $errors = array_merge($recuperoNegRat->errors, $errors);
                 $movimento->save();
                 if ($movimento->errors)
-                    $errors = array_merge($movimento->errors,$errors);
+                    $errors = array_merge($movimento->errors, $errors);
             }
         }
         foreach ($this->getRecuperiNegativiNonRateizzati() as $recuperoNegNonRateizzato) {
@@ -545,20 +561,19 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->importo = abs($recuperoNegNonRateizzato->getImportoResiduo()) < abs($importoSurplus) ? -abs($recuperoNegNonRateizzato->getImportoResiduo()) : -$importoSurplus;
                 $movimento->save();
                 if ($movimento->errors)
-                    $errors = array_merge($movimento->errors,$errors);
+                    $errors = array_merge($movimento->errors, $errors);
                 $importoSurplus -= abs($movimento->importo);
                 if ($movimento->importo == -$importoSurplus) {
                     $recuperoNegNonRateizzato->rateizzato = true;
                     $recuperoNegNonRateizzato->num_rate = 2;
-                }
-                else
+                } else
                     $recuperoNegNonRateizzato->chiuso = true;
 
                 $recuperoNegNonRateizzato->save();
                 if ($recuperoNegNonRateizzato->errors)
-                    $errors = array_merge($recuperoNegNonRateizzato->errors,$errors);
+                    $errors = array_merge($recuperoNegNonRateizzato->errors, $errors);
             }
         }
-        if (count($errors) >0) print_r($errors);
+        if (count($errors) > 0) print_r($errors);
     }
 }

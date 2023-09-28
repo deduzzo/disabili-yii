@@ -9,6 +9,7 @@ use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
 use app\models\SimulazioneDeterminaSearch;
+use Carbon\Carbon;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\db\Query;
@@ -164,6 +165,24 @@ class DeterminaController extends \yii\web\Controller
             $determina->save();
             $this->actionIndex(false,$determina->id);
         }
+    }
+
+    public function actionPagamenti() {
+        $result = "";
+        $ultimoPagamento = Movimento::getDataUltimoPagamento();
+
+        $istanzePagate = (new Query())->select('i.id')->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
+        foreach ($istanzePagate as $istanza) {
+            $istanza = Istanza::findOne($istanza['id']);
+            $tempResult = $istanza->verificaContabilitaMese(Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month, Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year);
+            if ($tempResult !== 0.0)
+                $result .= $istanza->id . ": " . $tempResult . "<br />";
+        }
+        return $this->render('pagamenti', [
+            "mese" =>Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
+            "anno" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year,
+            "result" => $result,
+        ]);
     }
 
 }

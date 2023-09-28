@@ -78,7 +78,10 @@ JS) ?>
 							<a href="/istanza">Istanze</a>
 						</li>
                         <li class="submenu-item">
-                            <a href="/determina">Simulazione Pagamenti</a>
+                            <a href="/determina">Simulazione Determina</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/determina/pagamenti">Pagamenti</a>
                         </li>
 <!--						<li class="submenu-item">
 							<a href="?layout=mainx">Horizontal Menu</a>

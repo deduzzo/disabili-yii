@@ -54,7 +54,7 @@ class Movimento extends \yii\db\ActiveRecord
         return [
             [['importo'], 'required'],
             [['importo'], 'number'],
-            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare'], 'boolean'],
+            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare','escludi_contabilita'], 'boolean'],
             [['data', 'periodo_da', 'periodo_a'], 'safe'],
             [['data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'id_gruppo_pagamento', 'id_determina', 'id_conto'], 'integer'],
             [['note'], 'string'],
