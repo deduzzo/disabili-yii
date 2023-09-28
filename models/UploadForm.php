@@ -163,6 +163,7 @@ class UploadForm extends Model
                                 $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
                                 $movimento->data = $movimento->periodo_a;
                                 $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
+                                $movimento->escludi_contabilita = true;
                                 $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
                                 if ($movimento->id_gruppo_pagamento === null) {
                                     $gruppoPagamento = new GruppoPagamento();
