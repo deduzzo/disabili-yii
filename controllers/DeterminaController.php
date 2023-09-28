@@ -155,7 +155,8 @@ class DeterminaController extends \yii\web\Controller
         ]);
     }
 
-    public function actionFinalizza() {
+    public function actionFinalizza()
+    {
         $vars = $this->request->post();
         if (isset($vars['numero_determina'])) {
             $determina = new Determina();
@@ -163,23 +164,26 @@ class DeterminaController extends \yii\web\Controller
             $determina->data = $vars['data_determina'];
             $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'];
             $determina->save();
-            $this->actionIndex(false,$determina->id);
+            $this->actionIndex(false, $determina->id);
         }
     }
 
-    public function actionPagamenti() {
+    public function actionPagamenti()
+    {
         $result = "";
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
-
-        $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
-        foreach ($istanzePagate as $istanza) {
-            $istanza = Istanza::findOne($istanza['id']);
-            $tempResult = $istanza->verificaContabilitaMese(Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month, Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year);
-            if ($tempResult !== 0.0)
-                $result .= $istanza->id . ": " . $tempResult . "<br />";
+        $vars = $this->request->get();
+        if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
+            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
+            foreach ($istanzePagate as $istanza) {
+                $istanza = Istanza::findOne($istanza['id']);
+                $tempResult = $istanza->verificaContabilitaMese(Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month, Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year);
+                if ($tempResult !== 0.0)
+                    $result .= $istanza->id . ": " . $tempResult . "<br />";
+            }
         }
         return $this->render('pagamenti', [
-            "mese" =>Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
+            "mese" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
             "anno" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year,
             "result" => $result,
         ]);
