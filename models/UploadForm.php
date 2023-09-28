@@ -181,8 +181,8 @@ class UploadForm extends Model
                                         $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors]);
                                 }
                                 $movimento->contabilizzare = 0;
-                                if (!$istanza->attivo)
-                                    $alert[] = ["Istanza" . $istanza->id . " codice fiscale pagata ma non attiva"];
+                                if ($istanza->data_decesso !== null || $istanza->attivo === false)
+                                    $alert[] = ["Istanza" . $istanza->id . " codice fiscale pagata ma non è attiva o il disabile è deceduto"];
                                 $movimento->save();
                                 if ($movimento->errors)
                                     $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
