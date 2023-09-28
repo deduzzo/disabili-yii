@@ -439,7 +439,7 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
-    public function finalizzaMensilita($idDetermina = 3)
+    public function finalizzaMensilita($idDetermina)
     {
         $errors = [];
         $contoValido = $this->getContoValido();

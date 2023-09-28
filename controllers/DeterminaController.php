@@ -79,7 +79,7 @@ class DeterminaController extends \yii\web\Controller
                         $alert[$istanza->distretto->id] = $istVal;
                     else {
                         if ($idDeterminaFinalizzare !== null)
-                            $istanza->finalizzaMensilita();
+                            $istanza->finalizzaMensilita($idDeterminaFinalizzare);
                         $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                         $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
                         if ($differenza['recupero'] === true)
