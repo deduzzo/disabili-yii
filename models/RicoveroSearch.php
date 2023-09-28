@@ -46,7 +46,7 @@ class RicoveroSearch extends Ricovero
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['da' => SORT_ASC]],
+            'sort'=> ['defaultOrder' => ['da' => SORT_DESC]],
         ]);
 
         $this->load($params);
