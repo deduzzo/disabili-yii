@@ -48,10 +48,8 @@ class RicoveroSearch extends Ricovero
             'query' => $query,
             'sort' => [
                 'defaultOrder' => [
-                    [
-                        'da' => SORT_DESC,
-                        'contabilizzare' => SORT_DESC
-                    ]
+                    'da' => SORT_DESC,
+                    'contabilizzare' => SORT_DESC
                 ]
             ],
         ]);
