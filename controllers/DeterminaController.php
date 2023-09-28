@@ -171,7 +171,7 @@ class DeterminaController extends \yii\web\Controller
         $result = "";
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
 
-        $istanzePagate = (new Query())->select('i.id')->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
+        $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
         foreach ($istanzePagate as $istanza) {
             $istanza = Istanza::findOne($istanza['id']);
             $tempResult = $istanza->verificaContabilitaMese(Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month, Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year);
