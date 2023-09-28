@@ -166,8 +166,8 @@ class UploadForm extends Model
                                 $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
                                 if ($movimento->id_gruppo_pagamento === null) {
                                     $gruppoPagamento = new GruppoPagamento();
-                                    $gruppoPagamento->descrizione = "# ". $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]];
-                                    $gruppoPagamento->progressivo = $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]];
+                                    $gruppoPagamento->descrizione = "# ". $newRow[$header[PagamentiConIban::ID_ELENCO]];
+                                    $gruppoPagamento->progressivo = $newRow[$header[PagamentiConIban::ID_ELENCO]];
                                     $gruppoPagamento->save();
                                     $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
                                     $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
