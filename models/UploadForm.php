@@ -81,7 +81,7 @@ class UploadForm extends Model
         return $stats;
     }
 
-    private function importaFileConElenchi($path, $soloQuestiId = [], $update = false, $skip = true)
+    private function importaFileConElenchi($path, $soloQuestiId = [])
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -152,44 +152,39 @@ class UploadForm extends Model
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
                         $movimentoExists = Movimento::find()->where(['id_conto' => $conto->id, 'periodo_da' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]), 'periodo_a' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]])])->one();
+                        if ($movimentoExists)
+                            $alert[] = ["Istanza #" . $istanza->id . " pagata ma ha già un pagamento, verificare"];
                         $movimento = null;
-                        if (!$movimentoExists || ($movimentoExists && !$skip)) {
-                            if ($movimentoExists && $update)
-                                $movimento = $movimentoExists;
-                            else if (!$movimentoExists || !$skip) {
-                                $movimento = new Movimento();
-                                $movimento->id_conto = $conto->id;
-                                $movimento->is_movimento_bancario = true;
-                                $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
-                                $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
-                                $movimento->data = $movimento->periodo_a;
-                                $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
-                                $movimento->escludi_contabilita = true;
-                                $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
-                                if ($movimento->id_gruppo_pagamento === null) {
-                                    $gruppoPagamento = new GruppoPagamento();
-                                    $gruppoPagamento->descrizione = "# " . $newRow[$header[PagamentiConIban::ID_ELENCO]];
-                                    $gruppoPagamento->progressivo = $newRow[$header[PagamentiConIban::ID_ELENCO]];
-                                    $gruppoPagamento->save();
-                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
-                                    if ($gruppoPagamento->errors)
-                                        $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
-                                }
-                                if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
-                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
-                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->save();
-                                    if ($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors)
-                                        $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors]);
-                                }
-                                $movimento->contabilizzare = 0;
-                                if ($istanza->data_decesso !== null || $istanza->attivo === false)
-                                    $alert[] = ["Istanza #" . $istanza->id . " pagata ma non è attiva o il disabile è deceduto"];
-                                $movimento->save();
-                                if ($movimento->errors)
-                                    $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
-                            }
+                        $movimento = new Movimento();
+                        $movimento->id_conto = $conto->id;
+                        $movimento->is_movimento_bancario = true;
+                        $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
+                        $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                        $movimento->data = $movimento->periodo_a;
+                        $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
+                        $movimento->escludi_contabilita = true;
+                        $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
+                        if ($movimento->id_gruppo_pagamento === null) {
+                            $gruppoPagamento = new GruppoPagamento();
+                            $gruppoPagamento->descrizione = "# " . $newRow[$header[PagamentiConIban::ID_ELENCO]];
+                            $gruppoPagamento->progressivo = $newRow[$header[PagamentiConIban::ID_ELENCO]];
+                            $gruppoPagamento->save();
+                            $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
+                            if ($gruppoPagamento->errors)
+                                $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
                         }
-                    } else {
+                        if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
+                            $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                            $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->save();
+                            if ($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors)
+                                $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->errors]);
+                        }
+                        $movimento->contabilizzare = 0;
+                        if ($istanza->data_decesso !== null || $istanza->attivo === false)
+                            $alert[] = ["Istanza #" . $istanza->id . " pagata ma non è attiva o il disabile è deceduto"];
+                        $movimento->save();
+                        if ($movimento->errors)
+                            $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
                         if (($istanze && count($soloQuestiId) > 0 && count($istanze) !== 1) || count($soloQuestiId) === 0)
                             if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
                                 $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
