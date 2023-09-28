@@ -101,7 +101,10 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
                         $out .= '<span class="badge bg-success">RECUPERO'.($model->recupero->rateizzato ? (' ['.$model->num_rata . " di " . $model->recupero->num_rate.']') : '').'</span>';
                 }
                 else {
-                    $out.= '<span class="badge bg-primary">BANCARIO</span>';
+                    if (!$model->escludi_contabilita)
+                        $out.= '<span class="badge bg-primary">BANCARIO</span>';
+                    else
+                        $out.= '<span class="badge bg-info">BANCARIO UFFICIALE</span>';
                 }
                 return $out;
             },
