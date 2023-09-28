@@ -161,6 +161,14 @@ class UploadForm extends Model
                                 $movimento->data = $movimento->periodo_a;
                                 $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
                                 $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
+                                if ($movimento->id_gruppo_pagamento === null) {
+                                    $gruppoPagamento = new GruppoPagamento();
+                                    $gruppoPagamento->descrizione = "# ". $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]];
+                                    $gruppoPagamento->progressivo = $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]];
+                                    $gruppoPagamento->save();
+                                    $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
+                                    $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
+                                }
                                 if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
                                     $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
                                     $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->save();
@@ -184,13 +192,13 @@ class UploadForm extends Model
             }
         }
         $reader->close();
-        // save $nonTrovati as Json File
-        $fp = fopen('../import/pagamenti/con_iban/non_trovati.json', 'w');
-        $fp2 = fopen('../import/pagamenti/con_iban/errori.json', 'w');
-        fwrite($fp, json_encode($nonTrovati));
-        fwrite($fp2, json_encode($errors));
+        // put in var $date the date in format yyyy-mm-dd_hh-mm-ss
+        $fp = fopen('../import/pagamenti/con_iban/res_'.$date.'.json', 'w');
+        fwrite($fp, json_encode(["nonTrovati" => $nonTrovati, "errors" => $errors]));
         fclose($fp);
-        return $nonTrovati;
+        // send download of file fp
+        Yii::$app->response->sendFile('../import/pagamenti/con_iban/res_'.$date.'.json');
+        return ["nonTrovati" => $nonTrovati, "errors" => $errors];
     }
 
 

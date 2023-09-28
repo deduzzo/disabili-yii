@@ -141,16 +141,17 @@ class SiteController extends Controller
             }
             if ($importaFileParisi)
                 $this->importaFileParisi('../import/parisi/out2.xlsx', true);
-            $this->importaPagamenti($importaElenchi, $importaPagamenti);
+            else if ($importaPagamenti)
+                $this->importaPagamenti($importaElenchi, $importaPagamenti);
         }
     }
 
-/*    public function actionRicoveri() {
-        $ricovero = new Ricovero();
-        $ricovero->da = "2024-01-01";
-        $ricovero->a = "2024-02-10";
-        print_r($ricovero->getNumGiorni());
-    }*/
+    /*    public function actionRicoveri() {
+            $ricovero = new Ricovero();
+            $ricovero->da = "2024-01-01";
+            $ricovero->a = "2024-02-10";
+            print_r($ricovero->getNumGiorni());
+        }*/
 
     public function actionAggiornaIsee()
     {
