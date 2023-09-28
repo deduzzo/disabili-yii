@@ -81,7 +81,7 @@ class UploadForm extends Model
         return $stats;
     }
 
-    private function importaFileConElenchi($path, $soloQuestiId = [])
+    private function importaFileConElenchi($path)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -110,22 +110,20 @@ class UploadForm extends Model
                     foreach ($newRow as $idx => $cell)
                         $header[$cell] = $idx;
                 } else if ($newRow[$header[PagamentiConIban::IMPORTO]] !== "") {
-                    $consideraSoloAttivi = true;
                     if ($lastCf !== strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))) {
                         $istanze = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))]);
-                        if ($consideraSoloAttivi)
-                            $istanze = $istanze->andWhere(['istanza.chiuso' => false]);
+                        $istanze = $istanze->andWhere(['istanza.chiuso' => false]);
                         $istanze = $istanze->all();
-
                     }
-                    if ($istanze && count($soloQuestiId) > 0) {
+                    if ($istanze) {
                         if (count($istanze) === 1) {
                             $istanza = $istanze[0];
                             $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
-                            if (!in_array($istanza->id, $soloQuestiId))
-                                $istanze = null;
+                        } else if (count($istanza) === 0) {
+                            if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
+                                $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
                         } else
-                            $error = true;
+                            $errors[] = ['errore' => 'Trovate più istanze con lo stesso codice fiscale ' . strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))];
                     }
                     if ($istanze && count($istanze) === 1) {
                         $istanza = $istanze[0];
@@ -185,11 +183,7 @@ class UploadForm extends Model
                         $movimento->save();
                         if ($movimento->errors)
                             $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
-                        if (($istanze && count($soloQuestiId) > 0 && count($istanze) !== 1) || count($soloQuestiId) === 0)
-                            if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
-                                $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
                     }
-
                 }
                 $rowIndex++;
             }
