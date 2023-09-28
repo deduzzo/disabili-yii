@@ -196,6 +196,7 @@ class UploadForm extends Model
         }
         $reader->close();
         // put in var $date the date in format yyyy-mm-dd_hh-mm-ss
+        $date = date('Y-m-d_H-i-s');
         $fp = fopen('../import/pagamenti/con_iban/res_'.$date.'.json', 'w');
         fwrite($fp, json_encode(["nonTrovati" => $nonTrovati, "errors" => $errors]));
         fclose($fp);
