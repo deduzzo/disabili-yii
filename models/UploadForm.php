@@ -38,9 +38,9 @@ class UploadForm extends Model
         if ($this->validate()) {
             if (isset($this->files[0])) {
                 $file = $this->files[0];
-                $nome_file_originale =  $file->baseName . '.' . $file->extension;
-                $nome_file_temp = bin2hex(openssl_random_pseudo_bytes(30)). '.' . $file->extension;
-                $file->saveAs($path. '/' . $nome_file_temp);
+                $nome_file_originale = $file->baseName . '.' . $file->extension;
+                $nome_file_temp = bin2hex(openssl_random_pseudo_bytes(30)) . '.' . $file->extension;
+                $file->saveAs($path . '/' . $nome_file_temp);
             }
             return true;
         } else {
@@ -56,14 +56,14 @@ class UploadForm extends Model
         $stats = null;
         if ($this->validate()) {
             foreach ($this->files as $index => $file) {
-                $nome_file_originale =  $file->baseName . '.' . $file->extension;
-                $nome_file_temp = bin2hex(openssl_random_pseudo_bytes(30)). '.' . $file->extension;
+                $nome_file_originale = $file->baseName . '.' . $file->extension;
+                $nome_file_temp = bin2hex(openssl_random_pseudo_bytes(30)) . '.' . $file->extension;
                 // verify if folder $path exists
                 if (!file_exists($path)) {
                     mkdir($path, 0777, true);
                 }
-                $file->saveAs($path. '/' . $nome_file_temp);
-                $okFiles[] = $path. '/' . $nome_file_temp;
+                $file->saveAs($path . '/' . $nome_file_temp);
+                $okFiles[] = $path . '/' . $nome_file_temp;
             }
             switch ($this->tipo) {
                 case TipologiaDatiCategoria::RICOVERI:
@@ -81,7 +81,7 @@ class UploadForm extends Model
         return $stats;
     }
 
-    private function importaFileConElenchi($path, $soloQuestiId = [],$update = false, $skip = true)
+    private function importaFileConElenchi($path, $soloQuestiId = [], $update = false, $skip = true)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -168,11 +168,12 @@ class UploadForm extends Model
                                 $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
                                 if ($movimento->id_gruppo_pagamento === null) {
                                     $gruppoPagamento = new GruppoPagamento();
-                                    $gruppoPagamento->descrizione = "# ". $newRow[$header[PagamentiConIban::ID_ELENCO]];
+                                    $gruppoPagamento->descrizione = "# " . $newRow[$header[PagamentiConIban::ID_ELENCO]];
                                     $gruppoPagamento->progressivo = $newRow[$header[PagamentiConIban::ID_ELENCO]];
                                     $gruppoPagamento->save();
                                     $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
-                                    $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
+                                    if ($gruppoPagamento->errors)
+                                        $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
                                 }
                                 if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
                                     $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
@@ -182,7 +183,7 @@ class UploadForm extends Model
                                 }
                                 $movimento->contabilizzare = 0;
                                 if ($istanza->data_decesso !== null || $istanza->attivo === false)
-                                    $alert[] = ["Istanza" . $istanza->id . " codice fiscale pagata ma non è attiva o il disabile è deceduto"];
+                                    $alert[] = ["Istanza #" . $istanza->id . " pagata ma non è attiva o il disabile è deceduto"];
                                 $movimento->save();
                                 if ($movimento->errors)
                                     $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
@@ -201,15 +202,13 @@ class UploadForm extends Model
         $reader->close();
         // put in var $date the date in format yyyy-mm-dd_hh-mm-ss
         $date = date('Y-m-d_H-i-s');
-        $fp = fopen('../import/pagamenti/con_iban/res_'.$date.'.json', 'w');
+        $fp = fopen('../import/pagamenti/con_iban/res_' . $date . '.json', 'w');
         fwrite($fp, json_encode(["nonTrovati" => $nonTrovati, "errors" => $errors, "alert" => $alert]));
         fclose($fp);
         // send download of file fp
-        Yii::$app->response->sendFile('../import/pagamenti/con_iban/res_'.$date.'.json');
+        Yii::$app->response->sendFile('../import/pagamenti/con_iban/res_' . $date . '.json');
         return ["nonTrovati" => $nonTrovati, "errors" => $errors];
     }
-
-
 
 
     private function importaRicoveri($files, $clearAll = false)
@@ -218,7 +217,7 @@ class UploadForm extends Model
         set_time_limit(0);
         $nonTrovati = [];
         $errors = [];
-        $stats =["aggiunti" => 0, "aggiornati" => 0];
+        $stats = ["aggiunti" => 0, "aggiornati" => 0];
         if ($clearAll)
             Ricovero::deleteAll();
         // for each files with extension ".xlsx" in folder: $path
@@ -298,7 +297,7 @@ class UploadForm extends Model
         $fp = fopen($folder . 'esito-importazione_' . $date . '.json', 'w');
         fwrite($fp, json_encode(['nonTrovati' => $nonTrovati, 'errors' => $errors]));
         fclose($fp);
-        Yii::$app->session->setFlash('success', "Importazione completata. Ricoveri aggiunti: ".$stats["aggiunti"].", aggiornati: ".$stats["aggiornati"]. " errori: ".count($errors));
-        return ['nonTrovati' => $nonTrovati, 'errors' => $errors,'statsfilename' => 'esito-importazione_' . $date . '.json'];
+        Yii::$app->session->setFlash('success', "Importazione completata. Ricoveri aggiunti: " . $stats["aggiunti"] . ", aggiornati: " . $stats["aggiornati"] . " errori: " . count($errors));
+        return ['nonTrovati' => $nonTrovati, 'errors' => $errors, 'statsfilename' => 'esito-importazione_' . $date . '.json'];
     }
 }
