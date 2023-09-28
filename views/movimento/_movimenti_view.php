@@ -102,7 +102,7 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
                 }
                 else {
                     if (!$model->escludi_contabilita)
-                        $out.= '<span class="badge bg-primary">BANCARIO</span>';
+                        $out.= '<span class="badge bg-primary">ACCREDITO CONTABILE</span>';
                     else
                         $out.= '<span class="badge bg-info">BANCARIO UFFICIALE</span>';
                 }
