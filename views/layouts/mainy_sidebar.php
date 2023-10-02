@@ -83,9 +83,10 @@ JS) ?>
                         <li class="submenu-item">
                             <a href="/determina/pagamenti">Pagamenti</a>
                         </li>
-<!--						<li class="submenu-item">
-							<a href="?layout=mainx">Horizontal Menu</a>
-						</li>
+                        <li class="submenu-item">
+                            <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php">Ticket</a>
+                        </li>
+<!--
 
 						<li class="submenu-item">
 							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/login']) */?>">LogIn</a>
