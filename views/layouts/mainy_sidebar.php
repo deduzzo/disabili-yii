@@ -84,7 +84,7 @@ JS) ?>
                             <a href="/determina/pagamenti">Pagamenti</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php">Ticket</a>
+                            <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php" target="_blank">Ticket</a>
                         </li>
 <!--
 
