@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\batch\ImportDatirealiJob;
+
 use app\helpers\Utils;
 use app\models\Anagrafica;
 use app\models\AnagraficaAltricampi;
@@ -11,32 +11,23 @@ use app\models\ContoCessionario;
 use app\models\DeterminaGruppoPagamento;
 use app\models\Distretto;
 use app\models\enums\FileParisi;
-use app\models\enums\FileRicoveri;
 use app\models\enums\ImportoBase;
-use app\models\enums\ImportTipologiaProcessi;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
-use app\models\enums\QueueContext;
 use app\models\Gruppo;
 use app\models\GruppoPagamento;
-use app\models\ImportProcessi;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
-use app\models\Quinquenni;
 use app\models\Recupero;
 use app\models\Ricovero;
-use app\models\SettingsModel;
 use app\models\UploadForm;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use PHP_IBAN\IBAN;
 use Yii;
-use yii\data\ActiveDataProvider;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
-use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use yii\web\UploadedFile;

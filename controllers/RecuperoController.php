@@ -1,8 +1,6 @@
 <?php
 
 namespace app\controllers;
-
-use app\helpers\Utils;
 use app\models\Movimento;
 use app\models\Recupero;
 use app\models\RecuperoSearch;
@@ -10,8 +8,6 @@ use Carbon\Carbon;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\web\Response;
 
 /**
  * RecuperoController implements the CRUD actions for Recupero model.
@@ -68,6 +64,24 @@ class RecuperoController extends Controller
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    public function actionAggiornaNota() {
+        $errors = [];
+        if ($this->request->isPost) {
+            $data = $this->request->post();
+            $recupero = $this->findModel($data['id_recupero']);
+            if ($recupero) {
+                $recupero->note = $data['testo-nota'];
+                $recupero->save();
+                $errors = array_merge($errors, $recupero->errors);
+            }
+            if (count($errors) === 0)
+                Yii::$app->session->setFlash('success', 'Nota aggiornata correttamente');
+            else
+                Yii::$app->session->setFlash('error', 'Errore durante l\'aggiornamento della nota');
+            return $this->redirect(['/istanza/scheda', 'id' => $recupero->id_istanza]);
+        }
     }
 
     public function actionCreateByIstanza($id)

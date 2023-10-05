@@ -36,6 +36,7 @@ class Recupero extends \yii\db\ActiveRecord
 
     const NEGATIVO = "NEGATIVO";
     const POSITIVO = "POSITIVO";
+
     /**
      * {@inheritdoc}
      */
@@ -156,31 +157,35 @@ class Recupero extends \yii\db\ActiveRecord
             return 0;
     }
 
-    public function getNumeroProssimaRata() {
+    public function getNumeroProssimaRata()
+    {
         if ($this->rateizzato === true && $this->num_rate > 0)
             return count($this->movimentos) + 1;
         else
             return null;
     }
 
-    public function getRateSaldate() {
+    public function getRateSaldate()
+    {
         if ($this->rateizzato === true && $this->num_rate > 0)
             return count($this->movimentos);
         else
             return 0;
     }
 
-    public function getUltimaRataSeDiversa() {
+    public function getUltimaRataSeDiversa()
+    {
         $out = null;
         if ($this->rateizzato && $this->num_rate > 0) {
-            if (($this->num_rate * $this->importo_rata) % $this->importo!== 0) {
-                $out = abs($this->importo) -  abs(($this->num_rate -1)  * $this->importo_rata);
+            if (($this->num_rate * $this->importo_rata) % $this->importo !== 0) {
+                $out = abs($this->importo) - abs(($this->num_rate - 1) * $this->importo_rata);
             }
         }
         return $out;
     }
 
-    public function getImportoSaldato() {
+    public function getImportoSaldato()
+    {
         $out = 0;
         foreach ($this->movimentos as $movimento) {
             $out += $movimento->importo;
@@ -188,11 +193,13 @@ class Recupero extends \yii\db\ActiveRecord
         return $out;
     }
 
-    public function getImportoResiduo() {
+    public function getImportoResiduo()
+    {
         return abs($this->importo) - abs($this->getImportoSaldato());
     }
 
-    public function getProssimaRata() {
+    public function getProssimaRata()
+    {
         if ($this->chiuso || $this->annullato)
             return 0;
         if ($this->rateizzato && $this->num_rate > 0) {
@@ -202,18 +209,18 @@ class Recupero extends \yii\db\ActiveRecord
                 return $this->getultimaRataSeDiversa();
             else
                 return $this->importo_rata;
-        }
-        else
+        } else
             return $this->getImportoResiduo();
     }
 
-    public function getDescrizioneRecupero() {
-            return ($this->rateizzato ?
-                ((" <b>[".$this->getRateSaldate()." di ".$this->num_rate." rate saldate]</b><br />") . ($this->getUltimaRataSeDiversa() ? $this->num_rate - 1 : $this->num_rate) . ($this->importo_rata ? ' da ' . Yii::$app->formatter->asCurrency($this->importo_rata) .
-                    ($this->getUltimaRataSeDiversa() ? (' + 1 da ' . Yii::$app->formatter->asCurrency($this->getUltimaRataSeDiversa())) : '')
-                    : ' variabili'))
+    public function getDescrizioneRecupero($mostraNote = true)
+    {
+        return ($this->rateizzato ?
+                ((" <b>[" . $this->getRateSaldate() . " di " . $this->num_rate . " rate saldate]</b><br />") . ($this->getUltimaRataSeDiversa() ? $this->num_rate - 1 : $this->num_rate) . ($this->importo_rata ? ' da ' . Yii::$app->formatter->asCurrency($this->importo_rata) .
+                        ($this->getUltimaRataSeDiversa() ? (' + 1 da ' . Yii::$app->formatter->asCurrency($this->getUltimaRataSeDiversa())) : '')
+                        : ' variabili'))
                 : '<b>Unica Soluzione</b>') . '<br />' .
             ($this->recuperoCollegato ? ('Collegato al recupero #' . $this->recuperoCollegato->id . '<br />') : '') .
-            ($this->getImportoSaldato() <> 0 ? 'Saldato: ' . Yii::$app->formatter->asCurrency(abs($this->getImportoSaldato())) . '<br />' : '') ."Residuo: ".Yii::$app->formatter->asCurrency(abs($this->getImportoResiduo())). $this->note;
+            ($this->getImportoSaldato() <> 0 ? 'Saldato: ' . Yii::$app->formatter->asCurrency(abs($this->getImportoSaldato())) . '<br />' : '') . "Residuo: " . Yii::$app->formatter->asCurrency(abs($this->getImportoResiduo())) . ($mostraNote ? $this->note : "");
     }
 }
