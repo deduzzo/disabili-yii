@@ -1,13 +1,11 @@
 <?php
 
-use app\models\AnagraficaAltricampi;
 use kartik\editors\Summernote;
 use richardfan\widget\JSRegister;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-use yii\widgets\DetailView;
+
 
 /** @var yii\web\View $this */
 /** @var app\models\Istanza $istanza */
@@ -55,12 +53,13 @@ echo GridView::widget([
         ],
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{delete}{annulla}{editNote}',
+            'template' => '{editNote} {annulla} {delete}',
             'buttons' => [
                 'delete' => function ($url, $model) {
                     return Html::a('<i class="bi bi-trash"></i>', '#', [
                         'class' => 'btn btn-sm btn-danger',
                         'onclick' => "confirmDeleteRecupero({$model->id}); return false;",
+                        'style' => 'display: block',
                         'title' => 'Elimina recupero',
                     ]);
                 },
@@ -69,6 +68,7 @@ echo GridView::widget([
                         return Html::a('<i class="fas fa-undo"></i>', '#', [
                             'class' => 'btn btn-sm btn-warning',
                             'title' => 'Annulla recupero',
+                            'style' => 'display: block',
                             'data-bs-toggle' => 'modal',
                             'data-bs-target' => '#warning',
                             'onclick' => '$("#id_recupero").val(' . $model->id . ');',
@@ -77,14 +77,14 @@ echo GridView::widget([
                         return "";
                 },
                 'editNote' => function ($url, $model) {
-                    return Html::a('<i class="bi bi-journal-check"></i>', '#', [
+                    return Html::a('<i class="bi bi-card-text"></i>', '#', [
                         'class' => 'btn btn-sm btn-secondary',
-                        'style' => 'margin-right: 3px;', // Aggiunto margine a destra
+                        'style' => 'margin-right: 3px; display: block',
                         'title' => $model->note . "<b>Clicca per modificare la nota</b>",
                         'data-bs-toggle' => 'tooltip',
                         'data-bs-placement' => 'bottom',
                         'data-bs-html' => 'true',
-                        'onclick' => 'showNotaRecupero("' . $model->id . '","'.Html::encode($model->note).'");',
+                        'onclick' => 'showNotaRecupero("' . $model->id . '","' . Html::encode($model->note) . '");',
                     ]);
                 },
 
@@ -239,34 +239,35 @@ echo GridView::widget([
 
     <div class="modal fade" id="modifica-nota-recupero" data-bs-backdrop="static" data-bs-keyboard="false"
          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="min-width: 700px">
-            <?= Html::beginForm(['recupero/aggiorna-nota']); ?>
-            <div class="modal-header">
-                <h5 class="modal-title" id="titoloNotaRecupero"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <?= Html::hiddenInput('id_recupero', null, ['id' => 'id_recupero_nota']) ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= // using Summernote widget
-                        Summernote::widget([
-                            'name' => 'testo-nota',
-                            'value' => null,
-                            'id' => 'testo-nota',
-                        ]); ?>
+        <div class="modal-dialog">
+            <div class="modal-content" style="min-width: 700px">
+                <?= Html::beginForm(['recupero/aggiorna-nota']); ?>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titoloNotaRecupero"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <?= Html::hiddenInput('id_recupero', null, ['id' => 'id_recupero_nota']) ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?= // using Summernote widget
+                            Summernote::widget([
+                                'name' => 'testo-nota',
+                                'value' => null,
+                                'id' => 'testo-nota',
+                            ]); ?>
+                        </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="salvaNota">
+                            Salva nota
+                        </button>
+                    </div>
+                    <?= Html::endForm(); ?>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla
-                    </button>
-                    <button type="submit" class="btn btn-danger" id="salvaNota">
-                        Salva nota
-                    </button>
-                </div>
-                <?= Html::endForm(); ?>
             </div>
         </div>
     </div>
@@ -343,7 +344,7 @@ echo GridView::widget([
             document.getElementById('importoRata_hidden').value = document.getElementById('importoRata').value;
         }
 
-        function showNotaRecupero(idRecupero,testo) {
+        function showNotaRecupero(idRecupero, testo) {
             console.log('coia');
             document.getElementById('id_recupero_nota').value = idRecupero;
             document.getElementById('titoloNotaRecupero').innerHTML = "Nota recupero #" + idRecupero;
@@ -354,10 +355,10 @@ echo GridView::widget([
 
     </script>
 
-    <?php JSRegister::begin([
-        'key' => 'manage',
-        'position' => \yii\web\View::POS_READY
-    ]); ?>
+<?php JSRegister::begin([
+    'key' => 'manage',
+    'position' => \yii\web\View::POS_READY
+]); ?>
     <script>
         $(document).ready(function () {
             checkStatus();
