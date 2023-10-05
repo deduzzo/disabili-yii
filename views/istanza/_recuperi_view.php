@@ -55,7 +55,7 @@ echo GridView::widget([
         ],
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{delete} <span class="btn-spacing"></span> {annulla} <span class="btn-spacing"></span> {editNote}',
+            'template' => '{delete}{annulla}{editNote}',
             'buttons' => [
                 'delete' => function ($url, $model) {
                     return Html::a('<i class="bi bi-trash"></i>', '#', [
