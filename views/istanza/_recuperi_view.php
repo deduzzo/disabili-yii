@@ -80,7 +80,7 @@ echo GridView::widget([
                     return Html::a('<i class="bi bi-card-text"></i>', '#', [
                         'class' => 'btn btn-sm btn-secondary',
                         'style' => 'margin-right: 3px; display: block',
-                        'title' => $model->note . "<b>Clicca per modificare la nota</b>",
+                        'title' => $model->note . "<p>Clicca per modificare la nota</p>",
                         'data-bs-toggle' => 'tooltip',
                         'data-bs-placement' => 'bottom',
                         'data-bs-html' => 'true',
