@@ -55,7 +55,7 @@ echo GridView::widget([
         ],
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{delete}&nbsp{annulla}&nbsp{editNote}',
+            'template' => '{delete} <span class="btn-spacing"></span> {annulla} <span class="btn-spacing"></span> {editNote}',
             'buttons' => [
                 'delete' => function ($url, $model) {
                     return Html::a('<i class="bi bi-trash"></i>', '#', [
@@ -79,6 +79,7 @@ echo GridView::widget([
                 'editNote' => function ($url, $model) {
                     return Html::a('<i class="bi bi-journal-check"></i>', '#', [
                         'class' => 'btn btn-sm btn-secondary',
+                        'style' => 'margin-right: 3px;', // Aggiunto margine a destra
                         'title' => $model->note . "<b>Clicca per modificare la nota</b>",
                         'data-bs-toggle' => 'tooltip',
                         'data-bs-placement' => 'bottom',
@@ -86,6 +87,7 @@ echo GridView::widget([
                         'onclick' => 'showNotaRecupero("' . $model->id . '","'.Html::encode($model->note).'");',
                     ]);
                 },
+
             ],
         ],
     ],
