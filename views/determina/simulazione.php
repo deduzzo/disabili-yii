@@ -280,14 +280,7 @@ $formatter = \Yii::$app->formatter;
                 'cognome',
                 'nome',
                 'distretto',
-                [
-                    'label' => "ISEE",
-                    'format' => 'raw',
-                    'value' => function ($isee) {
-                        return $isee;
-                        //return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . $isee . '</span>';
-                    },
-                ],
+                'isee',
                 'eta',
                 'gruppo',
                 [
