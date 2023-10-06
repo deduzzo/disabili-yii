@@ -281,7 +281,6 @@ $formatter = \Yii::$app->formatter;
                 'nome',
                 'distretto',
                 [
-                    'attribute' => 'isee',
                     'label' => "ISEE",
                     'format' => 'raw',
                     'value' => function ($isee) {
