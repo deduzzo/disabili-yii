@@ -284,8 +284,7 @@ $formatter = \Yii::$app->formatter;
                     'filter' => Html::activeDropDownList($searchModel, 'isee', ['Maggiore' => IseeType::MAGGIORE_25K, 'Minore' => IseeType::MINORE_25K, "N/D" => IseeType::NO_ISEE], ['class' => 'form-control', 'prompt' => 'Tutti']),
                     'label' => "ISEE",
                     'format' => 'raw',
-                    'value' => function ($model) {
-                        $isee = $model->getLastIseeType();
+                    'value' => function ($isee) {
                         return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($model->getLastIseeType()) . '</span>';
                     },
                     // set column size max 100px and text center
