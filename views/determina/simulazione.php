@@ -54,7 +54,8 @@ $formatter = \Yii::$app->formatter;
                     <!-- attributes: numero determina, data determina, data inizio, data fine -->
                     <div class="col-md-6">
                         <label for="numero_determina">Numero Determina</label>
-                        <input class="form-control" type="text" maxlength="9" name="numero_determina" id="numero_determina"/>
+                        <input class="form-control" type="text" maxlength="9" name="numero_determina"
+                               id="numero_determina"/>
                     </div>
                     <div class="col-md-6">
                         <label for="data_determina">Data Determina</label>
@@ -284,7 +285,8 @@ $formatter = \Yii::$app->formatter;
                     'label' => "ISEE",
                     'format' => 'raw',
                     'value' => function ($isee) {
-                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . $isee . '</span>';
+                        return $isee;
+                        //return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . $isee . '</span>';
                     },
                 ],
                 'eta',
