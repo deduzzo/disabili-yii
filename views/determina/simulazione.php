@@ -234,7 +234,7 @@ $formatter = \Yii::$app->formatter;
             <?= Html::endForm() ?>
             <div class="col-md-8"><?= ExportWidget::widget([
                     'models' => $istanzeArray,
-                    'columns' => ['cf', 'cognome', 'nome', 'distretto', 'isee', 'gruppo', 'importo', 'operazione'],
+                    'columns' => ['cf', 'cognome', 'nome', 'eta', 'distretto', 'isee', 'gruppo', 'importo', 'operazione'],
                 ]) ?></div>
             <div class="col-md-4">
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal"
