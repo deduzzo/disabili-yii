@@ -285,7 +285,7 @@ $formatter = \Yii::$app->formatter;
                     'format' => 'raw',
                     'value' => function ($model) {
                         $isee = $model['isee'];
-                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . $isee . '</span>';
+                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
                     },
                 ],
                 'eta',
