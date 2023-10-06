@@ -279,7 +279,13 @@ $formatter = \Yii::$app->formatter;
                 'cognome',
                 'nome',
                 'distretto',
-                'isee',
+                [
+                    'attribute' => 'isee',
+                    'format' => 'raw',
+                    'value' => function ($isee) {
+                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($model->getLastIseeType()) . '</span>';
+                    },
+                ],
                 'eta',
                 'gruppo',
                 [
