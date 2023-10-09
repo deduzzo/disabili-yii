@@ -141,7 +141,8 @@ class IstanzaSearch extends Istanza
                 $conditionsForWord = [
                     'or',
                     ['like', 'anagrafica.nome', $word],
-                    ['like', 'anagrafica.cognome', $word]
+                    ['like', 'anagrafica.cognome', $word],
+                    ['like', 'anagrafica.cognome_nome', $word],
                 ];
                 $allConditions[] = $conditionsForWord;
             }
