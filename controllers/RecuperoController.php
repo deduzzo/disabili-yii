@@ -179,7 +179,7 @@ class RecuperoController extends Controller
                     default:
                         $errors[] = "Azione non valida";
                 }
-                if (count($recuperoNew->errors) === 0)
+                if (!$recuperoNew || count($recuperoNew->errors) === 0)
                 {
                     $recupero->chiuso = 1;
                     $recupero->annullato = 1;
