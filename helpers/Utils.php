@@ -33,7 +33,8 @@ class Utils
         } else return $date->format($destFormat);
     }
 
-    static function jsonToHtml($jsonString) {
+    static function jsonToHtml($jsonString)
+    {
         // Sostituisci le chiavi
         $jsonString = preg_replace('/"([^"]+)"\s*:/', '<span class="json-key">"$1"</span>:', $jsonString);
 
@@ -50,5 +51,10 @@ class Utils
         $jsonString = str_replace([',', "\n"], [',<br>', ''], $jsonString);
 
         return $jsonString;
+    }
+
+    static function is_assoc($var)
+    {
+        return is_array($var) && array_diff_key($var, array_keys(array_keys($var)));
     }
 }

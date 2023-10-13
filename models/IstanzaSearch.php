@@ -46,7 +46,7 @@ class IstanzaSearch extends Istanza
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $isExport = false)
     {
         $this->isee = $params['IstanzaSearch']['isee'] ?? null;
         $this->descrizione_gruppo = $params['IstanzaSearch']['descrizione_gruppo'] ?? null;
@@ -62,15 +62,20 @@ class IstanzaSearch extends Istanza
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => isset($params['pageSize']) ? $params['pageSize'] : 100, // Default to 10 if not set
-            ],
             'sort' => [
                 'defaultOrder' => [
                     'data_inserimento' => SORT_DESC,
                 ],
             ],
         ]);
+        if ($isExport) {
+            $dataProvider->pagination = false;
+        }
+        else
+            $dataProvider->pagination = [
+                'pageSize' => isset($params['pageSize']) ? $params['pageSize'] : 100,
+            ];
+
 
         $dataProvider->sort->attributes['descrizione_gruppo'] = [
             'asc' => ['gruppo.descrizione_gruppo' => SORT_ASC],

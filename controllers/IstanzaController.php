@@ -42,7 +42,7 @@ class IstanzaController extends Controller
     {
         // disable main layout
         $searchModel = new IstanzaSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search($this->request->queryParams,isset($this->request->post()['exportWDG']));
 
         return $this->render('index', [
             'searchModel' => $searchModel,

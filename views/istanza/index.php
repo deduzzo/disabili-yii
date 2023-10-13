@@ -41,10 +41,42 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 100;  // Assumo 100 come default
         ?>
-        <?= GridView::widget([
-            'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
-            'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline'])."<div class='dataTable-top'>
+        <div class="row">
+            <div class="col-md-3">
+                <?= ExportWidget::widget([
+                    'models' => $dataProvider->getModels(),
+                    'query' => [
+                        'sil' => 'Elenco codici fiscali per SIL',
+                        'istanze' => 'Elenco istanze'
+                    ],
+                    'columns' => [
+                        'sil' => ['anagraficaDisabile.codice_fiscale'],
+                        'istanze' => [
+                            'attivo',
+                            'cf',
+                            'anagraficaDisabile.nome',
+                            'anagraficaDisabile.cognome',
+                            'gruppo.descrizione_gruppo',
+                            'distretto.nome',
+                        ],
+                        'default' => [
+                            'attivo',
+                            'nome',
+                            'cognome',
+                            'gruppo.descrizione_gruppo',
+                            'distretto.nome',
+                        ],
+                    ],
+                ]) ?>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+        <?php if (!isset(Yii::$app->request->post()['exportWDG']) == 'false')
+            echo GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'layout' => Html::beginForm(['istanza/index'], 'get', ['data-pjax' => '', 'class' => 'form-inline']) . "<div class='dataTable-top'>
                                 <div class='dataTable-dropdown'>
                                         <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
                                                 <option value='50' " . ($selectedPageSize == 50 ? 'selected' : '') . ">50</option>
@@ -60,143 +92,143 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>-->
                            </div>
                            " . Html::endForm() .
-                "<div class='table-container'>{items}</div>
+                    "<div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
                                   <div class='dataTable-info'>{summary}</div>
                                   <nav class='dataTable-pagination'>
                                         {pager}
                                   </nav>
                             </div>",
-            'pager' => [
-                'class' => 'yii\bootstrap5\LinkPager',
-                'firstPageLabel' => 'PRIMA',
-                'lastPageLabel' => 'ULTIMA',
-                'nextPageLabel' => '>>',
-                'prevPageLabel' => '<<',
-                'linkOptions' => ['class' => 'page-link'],
-            ],
-            'options' => [
-                'tag' => 'div',
-                'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
-                'id' => 'datatable',
-            ],
-            'tableOptions' => [
-                'class' => 'table table-striped dataTable-table',
-                'id' => 'table1',
-            ],
-            'columns' => [
-                [
-                    'attribute' => 'attivo',
-                    'filter' => Html::activeDropDownList($searchModel, 'attivo', ['1' => "ATTIVO", '0' => "NON ATTIVO"], ['class' => 'form-control', 'prompt' => 'Tutti']),
-                    'content' => function ($model) {
-                        return Html::tag('span', $model->attivo ? 'Attivo' : 'Non attivo', [
-                                'class' => $model->attivo ? 'badge bg-success' : 'badge bg-danger'
-                            ]) . ($model->chiuso ? Html::tag('span', 'Chiuso', [
-                                'class' => 'badge bg-danger'
-                            ]) : (!$model->attivo ? Html::tag('span', 'Aperto', [
-                                'class' => 'badge bg-success'
-                            ]) : ""));
-                    },
-                    'contentOptions' => ['style' => 'width:150px; text-align:center;'],
+                'pager' => [
+                    'class' => 'yii\bootstrap5\LinkPager',
+                    'firstPageLabel' => 'PRIMA',
+                    'lastPageLabel' => 'ULTIMA',
+                    'nextPageLabel' => '>>',
+                    'prevPageLabel' => '<<',
+                    'linkOptions' => ['class' => 'page-link'],
                 ],
-                [
-                    'attribute' => 'cognomeNome',
-                    'label' => "Nominativo",
-                    'filter' => Html::activeTextInput($searchModel, 'cognomeNome', ['class' => 'form-control']),
-                    // set column size max 100px and text center
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:400px; text-align:center;'];
-                    },
-                    'value' => function ($model) {
-                        return $model->getNominativoDisabile();
-                    },
+                'options' => [
+                    'tag' => 'div',
+                    'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
+                    'id' => 'datatable',
                 ],
-                [
-                    'attribute' => 'gruppo.descrizione_gruppo',
-                    // filter, select2 with all names of table "gruppo"
-                    'filter' => Html::activeDropDownList($searchModel, 'id_gruppo', ArrayHelper::map(Gruppo::find()->orderBy('descrizione_gruppo')->all(), 'id', "descrizioneCompleta"), ['class' => 'form-control', 'prompt' => 'Tutti']),
-                    'label' => "Gruppo",
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        return '<div style="display: flex; align-items: center; justify-content: center;"><h5 style="margin-right: 10px;"><span class="badge bg-primary">' . $model->gruppo->descrizione_gruppo_old . '</span></h5><h6><span class="badge bg-primary">' . $model->gruppo->descrizione_gruppo . '</span></h6></div>';
-                    },
-                    // set column size max 100px and text center
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:150px; text-align:center;'];
-                    },
+                'tableOptions' => [
+                    'class' => 'table table-striped dataTable-table',
+                    'id' => 'table1',
                 ],
-                [
-                    'value' => 'distretto.nome',
-                    'attribute' => 'distretto',
-                    'filter' => Html::activeDropDownList($searchModel, 'id_distretto', ArrayHelper::map(Distretto::find()->orderBy('nome')->all(), 'id', "nome"), ['class' => 'form-control', 'prompt' => 'Tutti']),
-                    'label' => "Distretto",
-                    'format' => 'raw',
-                    // set column size max 100px and text center
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:150px; text-align:center;'];
-                    },
-                ],
-                [
-                    'attribute' => 'isee',
-                    'filter' => Html::activeDropDownList($searchModel, 'isee', ['Maggiore' => IseeType::MAGGIORE_25K, 'Minore' => IseeType::MINORE_25K, "N/D" => IseeType::NO_ISEE], ['class' => 'form-control', 'prompt' => 'Tutti']),
-                    'label' => "ISEE",
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        $isee = $model->getLastIseeType();
-                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($model->getLastIseeType()) . '</span>';
-                    },
-                    // set column size max 100px and text center
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:150px; text-align:center;'];
-                    },
-                ],
-                [
-                    'attribute' => 'cf',
-                    'value' => 'anagraficaDisabile.codice_fiscale',
-                    'label' => "CF",
-                    'filter' => Html::activeTextInput($searchModel, 'cf', ['class' => 'form-control', 'value' => $searchModel['cf']]),
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:200px; text-align:center;'];
-                    },
-                ],
-                // eta
-                [
-                    'attribute' => 'eta',
-                    'label' => "Età",
-                    'value' => function ($model) {
-                        return $model->anagraficaDisabile->getEta();
-                    },
-                    'contentOptions' => function ($model) {
-                        return ['style' => 'width:100px; text-align:center;'];
-                    },
-                ],
-                [
-                    'attribute' => 'recuperos',
-                    'label' => "Recupero?",
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        return $model->haRecuperiInCorso()
-                            ? '<span class="badge bg-warning text-dark h6">SI</span>'
-                            : '<span class="badge bg-success">NO</span>';
-                    }
-                ],
-                [
-                    'class' => ActionColumn::className(),
-                    'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
-                    'urlCreator' => function ($action, Istanza $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
-                    },
-                    'buttons' => [
-                        'scheda' => function ($url, $model) {
-                            return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
-                                'title' => Yii::t('yii', 'Vai alla scheda'),
-                                'class' => 'btn btn-icon btn-sm btn-primary',
-                            ]);
+                'columns' => [
+                    [
+                        'attribute' => 'attivo',
+                        'filter' => Html::activeDropDownList($searchModel, 'attivo', ['1' => "ATTIVO", '0' => "NON ATTIVO"], ['class' => 'form-control', 'prompt' => 'Tutti']),
+                        'content' => function ($model) {
+                            return Html::tag('span', $model->attivo ? 'Attivo' : 'Non attivo', [
+                                    'class' => $model->attivo ? 'badge bg-success' : 'badge bg-danger'
+                                ]) . ($model->chiuso ? Html::tag('span', 'Chiuso', [
+                                    'class' => 'badge bg-danger'
+                                ]) : (!$model->attivo ? Html::tag('span', 'Aperto', [
+                                    'class' => 'badge bg-success'
+                                ]) : ""));
                         },
-                    ]
+                        'contentOptions' => ['style' => 'width:150px; text-align:center;'],
+                    ],
+                    [
+                        'attribute' => 'cognomeNome',
+                        'label' => "Nominativo",
+                        'filter' => Html::activeTextInput($searchModel, 'cognomeNome', ['class' => 'form-control']),
+                        // set column size max 100px and text center
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:400px; text-align:center;'];
+                        },
+                        'value' => function ($model) {
+                            return $model->getNominativoDisabile();
+                        },
+                    ],
+                    [
+                        'attribute' => 'gruppo.descrizione_gruppo',
+                        // filter, select2 with all names of table "gruppo"
+                        'filter' => Html::activeDropDownList($searchModel, 'id_gruppo', ArrayHelper::map(Gruppo::find()->orderBy('descrizione_gruppo')->all(), 'id', "descrizioneCompleta"), ['class' => 'form-control', 'prompt' => 'Tutti']),
+                        'label' => "Gruppo",
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return '<div style="display: flex; align-items: center; justify-content: center;"><h5 style="margin-right: 10px;"><span class="badge bg-primary">' . $model->gruppo->descrizione_gruppo_old . '</span></h5><h6><span class="badge bg-primary">' . $model->gruppo->descrizione_gruppo . '</span></h6></div>';
+                        },
+                        // set column size max 100px and text center
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:150px; text-align:center;'];
+                        },
+                    ],
+                    [
+                        'value' => 'distretto.nome',
+                        'attribute' => 'distretto',
+                        'filter' => Html::activeDropDownList($searchModel, 'id_distretto', ArrayHelper::map(Distretto::find()->orderBy('nome')->all(), 'id', "nome"), ['class' => 'form-control', 'prompt' => 'Tutti']),
+                        'label' => "Distretto",
+                        'format' => 'raw',
+                        // set column size max 100px and text center
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:150px; text-align:center;'];
+                        },
+                    ],
+                    [
+                        'attribute' => 'isee',
+                        'filter' => Html::activeDropDownList($searchModel, 'isee', ['Maggiore' => IseeType::MAGGIORE_25K, 'Minore' => IseeType::MINORE_25K, "N/D" => IseeType::NO_ISEE], ['class' => 'form-control', 'prompt' => 'Tutti']),
+                        'label' => "ISEE",
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            $isee = $model->getLastIseeType();
+                            return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($model->getLastIseeType()) . '</span>';
+                        },
+                        // set column size max 100px and text center
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:150px; text-align:center;'];
+                        },
+                    ],
+                    [
+                        'attribute' => 'cf',
+                        'value' => 'anagraficaDisabile.codice_fiscale',
+                        'label' => "CF",
+                        'filter' => Html::activeTextInput($searchModel, 'cf', ['class' => 'form-control', 'value' => $searchModel['cf']]),
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:200px; text-align:center;'];
+                        },
+                    ],
+                    // eta
+                    [
+                        'attribute' => 'eta',
+                        'label' => "Età",
+                        'value' => function ($model) {
+                            return $model->anagraficaDisabile->getEta();
+                        },
+                        'contentOptions' => function ($model) {
+                            return ['style' => 'width:100px; text-align:center;'];
+                        },
+                    ],
+                    [
+                        'attribute' => 'recuperos',
+                        'label' => "Recupero?",
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return $model->haRecuperiInCorso()
+                                ? '<span class="badge bg-warning text-dark h6">SI</span>'
+                                : '<span class="badge bg-success">NO</span>';
+                        }
+                    ],
+                    [
+                        'class' => ActionColumn::className(),
+                        'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
+                        'urlCreator' => function ($action, Istanza $model, $key, $index, $column) {
+                            return Url::toRoute([$action, 'id' => $model->id]);
+                        },
+                        'buttons' => [
+                            'scheda' => function ($url, $model) {
+                                return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
+                                    'title' => Yii::t('yii', 'Vai alla scheda'),
+                                    'class' => 'btn btn-icon btn-sm btn-primary',
+                                ]);
+                            },
+                        ]
+                    ],
                 ],
-            ],
-        ]); ?>
+            ]); ?>
     </div>
 </div>
 
