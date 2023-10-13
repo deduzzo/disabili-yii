@@ -106,7 +106,6 @@ class ExportWidget extends Widget
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);" data-popper-placement="top-start">
                         <a class="dropdown-item" href="javascript:void(0);" onclick="event.preventDefault(); document.getElementById(' . "'formExport'" . ').submit();">Excel</a>
                     </div>
-                    </div>
                 </div>' .
             '</div>' .
             Html::endForm();
