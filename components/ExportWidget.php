@@ -100,7 +100,7 @@ class ExportWidget extends Widget
             ) .
             '<div class="col-auto">' .
             '<div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle me-1 show" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <button class="btn btn-secondary dropdown-toggle me-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                         Esporta
                                     </button>
                     <div class="dropdown-menu show" aria-labelledby="dropdownMenuButton" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);" data-popper-placement="top-start">
