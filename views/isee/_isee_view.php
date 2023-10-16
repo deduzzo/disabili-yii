@@ -24,7 +24,21 @@ if ($model->anagraficaDisabile->isMinorenne())
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'options' => ['class' => 'grid-view small'],
+    'layout' => "<div class='table-container'>{items}</div>
+                            <div class='dataTable-bottom'>
+                                  <nav class='dataTable-pagination'>
+                                        {pager}
+                                  </nav>
+                            </div>",
+    'options' => [
+        'tag' => 'div',
+        'class' => 'grid-view small dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
+        'id' => 'datatable',
+    ],
+    'tableOptions' => [
+        'class' => 'table table-striped dataTable-table',
+        'id' => 'table1',
+    ],
     'columns' => [
         'id',
         'data_presentazione:date',

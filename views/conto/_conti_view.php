@@ -14,31 +14,11 @@ use yii\widgets\Pjax;
 $searchModel = new ContoSearch();
 $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanza);
 
-Pjax::begin();
-
-
-$selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$app->request->queryParams['pageSize'] : 20;
-
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'layout' => Html::beginForm(['istanza/scheda','id' => Yii::$app->request->queryParams['id']], 'get', ['data-pjax' => '', 'class' => 'form-inline']) .
-                "<div class='dataTable-top'>
-                                <div class='dataTable-dropdown'>
-                                        <label>Mostra</label>&nbsp;
-                                        <select id='pageSize' name='pageSize' class='dataTable-selector form-select' onchange='this.form.submit()'>
-                                                <option value='10' ". ($selectedPageSize == 10 ? 'selected' : '').">10</option>
-                                                <option value='20' ".($selectedPageSize == 20 ? 'selected' : '').">20</option>
-                                                <option value='40' ". ($selectedPageSize == 40 ? 'selected' : '').">40</option>
-                                                <option value='100' ". ($selectedPageSize == 100 ? 'selected' : '').">100</option>
-                                                <option value='-1' ". ($selectedPageSize == -1 ? 'selected' : '').">Tutti</option>
-                                        </select>
-                                       
-                                 </div>
-                           </div>
-                           " . Html::endForm() . "<div class='table-container'>{items}</div>
+    'layout' => "<div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
-                                  <div class='dataTable-info'>{summary}</div>
                                   <nav class='dataTable-pagination'>
                                         {pager}
                                   </nav>
@@ -60,15 +40,56 @@ echo GridView::widget([
         'class' => 'table table-striped dataTable-table',
         'id' => 'table1',
     ],
-    'summary' => 'Mostro elementi da <b>{begin}</b> a <b>{end}</b> di <b>{totalCount}</b>',
     'columns' => [
         'id',
         'iban',
-        'attivo:boolean',
+        [
+            'label' => "Stato",
+            'value' => function ($model) {
+                return ($model->attivo && $model->validato )?
+                    '<span class="badge bg-success">ATTIVO</span>' : (!$model->validato ? '<span class="badge bg-warning">DA VALIDARE</span>' : '<span class="badge bg-danger">DISATTIVO</span>');
+            },
+            'format' => 'raw',
+        ],
         'note',
     ],
     'emptyText' => 'Nessun movimento presente',
 
 ]);
+?>
 
-Pjax::end();
+<div class="modal fade text-left" id="nuovo-conto" tabindex="-1" aria-labelledby="myModalLabel140" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title white" id="myModalLabel140">
+                    Nuovo Conto
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Annulla</span>
+                </button>
+
+                <button type="submit" class="btn btn-warning ms-1">
+                    <i class="bx bx-check d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Aggiungi conto</span>
+                </button>
+                <?= Html::endForm() ?>
+            </div>
+        </div>
+    </div>
+</div>

@@ -280,12 +280,12 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function haRecuperiInCorso()
     {
-        return Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => 0])->count() > 0;
+        return Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => false])->count() > 0;
     }
 
     public function getContoValido()
     {
-        return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => 1])->one();
+        return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
     }
 
     public static function getNumIstanzeAttive()
@@ -575,5 +575,11 @@ class Istanza extends \yii\db\ActiveRecord
             }
         }
         if (count($errors) > 0) print_r($errors);
+    }
+
+    public function contoInFaseDiValidazione()
+    {
+        $conti = Conto::find()->where(['id_istanza' => $this->id,'attivo' => false,'validato' => false])->all();
+        return count($conti) > 0;
     }
 }

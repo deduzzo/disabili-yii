@@ -3,18 +3,26 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "conto".
  *
  * @property int $id
- * @property string|null $iban
+ * @property string $iban
  * @property string|null $note
- * @property int $attivo
+ * @property bool $attivo
+ * @property bool $validato
+ * @property string|null $data_validazione
  * @property int|null $id_istanza
- * @property int|null $data_disattivazione
- * @property int|null $data_creazione
- * @property int|null $data_modifica
+ * @property string|null $data_disattivazione
+ * @property string|null $data_creazione
+ * @property string|null $data_modifica
+ * @property int|null $id_utente_creazione
+ * @property int|null $id_utente_modifica
  *
  * @property ContoCessionario[] $contoCessionarios
  * @property Istanza $istanza
@@ -36,14 +44,33 @@ class Conto extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['note'], 'string'],
-            [['attivo', 'id_istanza', 'data_disattivazione', 'data_creazione', 'data_modifica'], 'integer'],
-            [['iban'], 'string', 'max' => 40],
-            //[['iban'], 'match', 'pattern' => '/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/'],
             [['iban'], 'required'],
-            // iban and id_istanza unique
+            [['note'], 'string'],
+            [['attivo', 'validato'], 'boolean'],
+            [['data_validazione', 'data_disattivazione', 'data_creazione', 'data_modifica'], 'safe'],
+            [['id_istanza'], 'integer'],
+            [['iban'], 'string', 'max' => 40],
             [['iban', 'id_istanza'], 'unique', 'targetAttribute' => ['iban', 'id_istanza']],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['data_creazione', 'data_modifica'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['data_modifica'],
+                ],
+                'value' => new Expression("NOW()")
+            ],
+            [
+                'class' => BlameableBehavior::class,
+                'createdByAttribute' => 'id_utente_creazione',
+                'updatedByAttribute' => 'id_utente_modifica',
+            ],
         ];
     }
 

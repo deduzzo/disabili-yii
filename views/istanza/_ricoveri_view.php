@@ -18,7 +18,15 @@ $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'options' => ['class' => 'grid-view small'],
+    'options' => [
+        'tag' => 'div',
+        'class' => 'grid-view small dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
+        'id' => 'datatable',
+    ],
+    'tableOptions' => [
+        'class' => 'table table-striped dataTable-table',
+        'id' => 'table1',
+    ],
     'columns' => [
         'id',
         [

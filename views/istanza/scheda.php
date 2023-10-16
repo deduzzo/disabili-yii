@@ -297,8 +297,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="card-body">
                         <div class="row">
                             <!-- Titolo -->
-                            <div class="col-md-6 d-flex align-items-center">
-                                <h5 class="card-title mb-0">Conti</h5>
+                            <div class="row">
+                                <!-- Titolo -->
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <h5 class="card-title mb-0" style="margin-right:10px">Conti</h5>
+                                    <?= $istanza->contoInFaseDiValidazione() ? "<span class='badge bg-warning text-dark h6'>CAMBIO IBAN IN ATTESA DI VERIFICA</span>" : "" ?>
+                                </div>
+
+                                <!-- Pulsante -->
+                                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#nuovo-conto">
+                                        <i class="fas fa-solid fa-plus"></i> Conto
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
