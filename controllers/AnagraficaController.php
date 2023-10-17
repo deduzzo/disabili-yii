@@ -60,6 +60,12 @@ class AnagraficaController extends Controller
         ]);
     }
 
+    public function actionList() {
+        // return Anagrafica::getAnagraficheList(); as json
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return ['results' => Anagrafica::getAnagraficheList($this->request->get('search'))];
+    }
+
     /**
      * Creates a new Anagrafica model.
      * If creation is successful, the browser will be redirected to the 'view' page.

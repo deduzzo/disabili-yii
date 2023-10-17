@@ -4,6 +4,7 @@ namespace app\models;
 
 use Carbon\Carbon;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "anagrafica".
@@ -32,6 +33,13 @@ class Anagrafica extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'anagrafica';
+    }
+
+    public static function getAnagraficheList()
+    {
+       // return id, union cognome + nome, as map id => value
+        return ArrayHelper::map(Anagrafica::find()->select(['id', 'CONCAT(cognome, " ", nome, " - ", DATE_FORMAT(data_nascita, "%d/%m/%Y")) as cognome_nome'])->
+        where(['not', ['cognome' => null]])->andWhere(['not', ['nome' => null]])->orderBy('cognome_nome')->all(), 'id', 'cognome_nome');
     }
 
     /**

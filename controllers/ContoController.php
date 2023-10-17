@@ -131,4 +131,10 @@ class ContoController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    public function actionCheckIban() {
+        // return true if iban is valid in json format
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return Conto::checkIban($this->request->post('newIban'));
+    }
 }

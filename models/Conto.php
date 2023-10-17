@@ -120,4 +120,8 @@ class Conto extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Movimento::class, ['id_conto' => 'id']);
     }
+
+    public static function checkIban($iban) {
+        return verify_iban($iban);
+    }
 }

@@ -442,9 +442,12 @@ $this->params['breadcrumbs'][] = $this->title;
     'key' => 'manage',
     'position' => \yii\web\View::POS_READY
 ]); ?>
-<script>
+    <script>
+        var timer;  // Variabile per mantenere il riferimento al timeout
 
-
-</script>
+        $('#newIban').on('input', function() {
+            clearTimeout(timer);  // Cancella il timeout esistente
+            timer = setTimeout(checkIban, 3000);  // Imposta un nuovo timeout di 3 secondi
+        });
+    </script>
 <?php JSRegister::end(); ?>
-
