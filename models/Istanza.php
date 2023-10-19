@@ -365,6 +365,7 @@ class Istanza extends \yii\db\ActiveRecord
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0.0);
         $hacambioiban = $this->haCambioIbanInCorso();
+        $haOmonimi = $this->haOmonimi();
         return [
             'alert' => $op != null,
             'presenteScorsoMese' => $lastMovimento !== null,
@@ -587,5 +588,10 @@ class Istanza extends \yii\db\ActiveRecord
     private function haCambioIbanInCorso()
     {
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->count() > 0;
+    }
+
+    private function haOmonimi() {
+        // TODO
+
     }
 }
