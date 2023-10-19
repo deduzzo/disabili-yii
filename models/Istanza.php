@@ -364,6 +364,7 @@ class Istanza extends \yii\db\ActiveRecord
         $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0.0);
+        $hacambioiban = $this->haCambioIbanInCorso();
         return [
             'alert' => $op != null,
             'presenteScorsoMese' => $lastMovimento !== null,
@@ -371,7 +372,7 @@ class Istanza extends \yii\db\ActiveRecord
             'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
             'differenza' => $differenza,
             'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
-                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")),
+                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) . ($hacambioiban?"<br />VERIFICARE CAMBIO IBAN":""),
             'recupero' => $this->haRecuperiInCorso(),
             'color' => $op ? 'danger' : ($differenza != 0.0 ? 'warning' : 'success')
         ];
@@ -581,5 +582,10 @@ class Istanza extends \yii\db\ActiveRecord
     {
         $conti = Conto::find()->where(['id_istanza' => $this->id,'attivo' => false,'validato' => false])->all();
         return count($conti) > 0;
+    }
+
+    private function haCambioIbanInCorso()
+    {
+        return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->count() > 0;
     }
 }

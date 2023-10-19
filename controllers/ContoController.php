@@ -82,6 +82,26 @@ class ContoController extends Controller
         ]);
     }
 
+    public function actionCreaNuovo() {
+        if ($this->request->isPost) {
+            if ($this->request->post('idIstanza') && $this->request->post('newIban')) {
+                $model = new Conto();
+                $model->id_istanza = intval($this->request->post('idIstanza'));
+                $model->intestatario = $this->request->post('intestatario');
+                $model->iban = $this->request->post('newIban');
+                $model->attivo = 1;
+                $model->validato = $this->request->post('validato') == "true";
+                $model->note = $this->request->post('note');
+                $model->save();
+                if ($model->hasErrors())
+                    \Yii::$app->session->setFlash('error', 'Errore durante la creazione del conto');
+                else
+                    \Yii::$app->session->setFlash('success', 'Conto creato con successo');
+                return $this->redirect(['istanza/scheda', 'id' => $model->id_istanza]);
+            }
+        }
+    }
+
     /**
      * Updates an existing Conto model.
      * If update is successful, the browser will be redirected to the 'view' page.

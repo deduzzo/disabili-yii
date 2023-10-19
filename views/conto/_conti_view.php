@@ -62,38 +62,44 @@ echo GridView::widget([
 
 ?>
 
-    <div class="modal fade text-left" id="nuovo-conto" tabindex="-1" aria-labelledby="myModalLabel140"
-         style="display: none;"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title white" id="myModalLabel140">
-                        Nuovo Conto
-                    </h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                             class="feather feather-x">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
+<div class="modal fade text-left" id="nuovo-conto" tabindex="-1" aria-labelledby="myModalLabel140"
+     style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <?= Html::beginForm(['conto/crea-nuovo'], 'post', ['id' => 'formNuovoConto']) ?>
+        <?= Html::hiddenInput('idIstanza', $istanza->id) ?>
+        <?= Html::hiddenInput('validato', "false") ?>
+        <div class="modal-content" style="min-width: 500px">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title white" id="myModalLabel140">
+                    Nuovo Conto
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <!-- iban -->
+                <div class="mb-1">
+                    <?= Html::label('Iban', 'newiban', ['class' => 'form-label']) ?>
+                    <?= Html::textInput('newIban', '', ['class' => 'form-control', 'id' => 'newIban']) ?>
                 </div>
-                <div class="modal-body">
+                <!-- intestatario, kartik select2 with data all the anagrafica nome and cognome, filtering enabled -->
+                <div class="mb-1">
+                    <?= Html::label('Intestatario:', 'intestatario', ['class' => 'form-label']) ?>
 
-                    <!-- iban -->
                     <div class="mb-1">
-                        <?= Html::label('Iban', 'newiban', ['class' => 'form-label']) ?>
-                        <?= Html::textInput('newIban', '', ['class' => 'form-control', 'id' => 'newIban']) ?>
-                    </div>
-                    <!-- intestatario, kartik select2 with data all the anagrafica nome and cognome, filtering enabled -->
-                    <div class="mb-1">
-                        <?= Html::label('Intestatario:', 'intestatario', ['class' => 'form-label']) ?>
-
-                        <div class="mb-1">
+                        <?php $newVersion = false;
+                        if ($newVersion): ?>
                             <div class="d-flex align-items-center"> <!-- Contenitore Flexbox -->
-                                <div class="flex-grow-1"> <!-- Questo div farà in modo che Select2 cresca per riempire lo spazio disponibile -->
+                                <div class="flex-grow-1">
+                                    <!-- Questo div farà in modo che Select2 cresca per riempire lo spazio disponibile -->
                                     <?= Select2::widget([
                                         'name' => 'intestatario',
                                         'data' => Anagrafica::getAnagraficheList(),
@@ -116,6 +122,11 @@ echo GridView::widget([
                                     <span class="d-none d-sm-block">+</span>
                                 </button>
                             </div>
+                        <?php else: ?>
+                        <div class="flex-grow-1">
+                            <!-- input text of intestatario -->
+                            <?= Html::textInput('intestatario', '', ['class' => 'form-control', 'id' => 'intestatario']) ?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -140,7 +151,9 @@ echo GridView::widget([
                 </div>
             </div>
         </div>
+        <?= Html::endForm() ?>
     </div>
+</div>
 
 
     <script>

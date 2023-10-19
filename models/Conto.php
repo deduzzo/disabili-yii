@@ -13,6 +13,7 @@ use yii\db\Expression;
  *
  * @property int $id
  * @property string $iban
+ * @property string $intestatario
  * @property string|null $note
  * @property bool $attivo
  * @property bool $validato
@@ -45,7 +46,7 @@ class Conto extends \yii\db\ActiveRecord
     {
         return [
             [['iban'], 'required'],
-            [['note'], 'string'],
+            [['note','intestatario'], 'string'],
             [['attivo', 'validato'], 'boolean'],
             [['data_validazione', 'data_disattivazione', 'data_creazione', 'data_modifica'], 'safe'],
             [['id_istanza'], 'integer'],

@@ -71,6 +71,9 @@ class ContoSearch extends Conto
         $query->andFilterWhere(['like', 'iban', $this->iban])
             ->andFilterWhere(['like', 'note', $this->note]);
 
+        // order by data_creazione
+        $query->orderBy(['data_creazione' => SORT_DESC]);
+
         return $dataProvider;
     }
 }
