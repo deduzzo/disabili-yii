@@ -88,7 +88,7 @@ echo GridView::widget([
                 <!-- iban -->
                 <div class="mb-1">
                     <?= Html::label('Iban', 'newiban', ['class' => 'form-label']) ?>
-                    <?= Html::textInput('newIban', '', ['class' => 'form-control', 'id' => 'newIban']) ?>
+                    <?= Html::textInput('newIban', '', ['class' => 'form-control', 'id' => 'newIban', 'oninput' => 'this.value = this.value.toUpperCase();']) ?>
                 </div>
                 <!-- intestatario, kartik select2 with data all the anagrafica nome and cognome, filtering enabled -->
                 <div class="mb-1">
