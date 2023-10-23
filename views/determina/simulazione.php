@@ -234,7 +234,7 @@ $formatter = \Yii::$app->formatter;
             <?= Html::endForm() ?>
             <div class="col-md-8"><?= ExportWidget::widget([
                     'models' => $istanzeArray,
-                    'columns' => ['cf', 'cognome', 'nome', 'eta', 'distretto', 'isee', 'gruppo', 'importo', 'operazione'],
+                    'columns' => ['cognome', 'nome','cf', 'dataNascita', 'eta', 'distretto', 'isee', 'gruppo','importoPrecedente', 'importo', 'operazione'],
                 ]) ?></div>
             <div class="col-md-4">
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal"
@@ -288,6 +288,7 @@ $formatter = \Yii::$app->formatter;
                         return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
                     },
                 ],
+                'dataNascita',
                 'eta',
                 'gruppo',
                 [
