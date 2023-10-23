@@ -67,6 +67,7 @@ class DeterminaController extends \yii\web\Controller
                         'cf' => $istanza->anagraficaDisabile->codice_fiscale,
                         'cognome' => $istanza->anagraficaDisabile->cognome,
                         'nome' => $istanza->anagraficaDisabile->nome,
+                        'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
                         'distretto' => $istanza->distretto->nome,
                         'isee' => $istanza->getLastIseeType(),
                         'eta' => $istanza->anagraficaDisabile->getEta(),
