@@ -288,7 +288,7 @@ $formatter = \Yii::$app->formatter;
                         return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
                     },
                 ],
-                'dataNascita',
+                'dataNascita:date',
                 'eta',
                 'gruppo',
                 [
