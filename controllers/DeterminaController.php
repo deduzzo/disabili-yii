@@ -82,10 +82,9 @@ class DeterminaController extends \yii\web\Controller
                     else {
                         if ($idDeterminaFinalizzare !== null)
                             $istanza->finalizzaMensilita($idDeterminaFinalizzare);
-                        if ($istanza->getProssimoImporto() >0) {
+                        if ($istanza->getProssimoImporto() >0)
                             $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
-                            $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
-                        }
+                        $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
                         if ($differenza['recupero'] === true)
                             $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
                         if ($differenza['op'] !== "")
@@ -124,7 +123,8 @@ class DeterminaController extends \yii\web\Controller
                 $alert[$istanza->distretto->id][] = $istVal;
             else {
                 $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
-                $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+                if ($istanza->getProssimoImporto() >0)
+                    $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
                 if ($differenza['recupero'] === true)
                     $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
                 if ($differenza['op'] !== "")
