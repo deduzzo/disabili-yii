@@ -403,9 +403,9 @@ class Istanza extends \yii\db\ActiveRecord
             throw new \Exception("Tipologia non valida");
         $out = [];
         foreach ($this->recuperos as $recupero) {
-            if ($recupero->importo > 0 && $tipologia === Recupero::POSITIVO)
+            if ($recupero->importo > 0 && $tipologia === Recupero::POSITIVO && !$recupero->chiuso)
                 $out[] = $recupero;
-            else if ($recupero->importo < 0 && $tipologia === Recupero::NEGATIVO)
+            else if ($recupero->importo < 0 && $tipologia === Recupero::NEGATIVO && !$recupero->chiuso)
                 $out[] = $recupero;
         }
         return $out;
