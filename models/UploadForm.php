@@ -117,9 +117,8 @@ class UploadForm extends Model
                     }
                     if ($istanze) {
                         if (count($istanze) === 1) {
-                            $istanza = $istanze[0];
                             $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
-                        } else if (count($istanza) === 0) {
+                        } else if (count($istanze) === 0) {
                             if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
                                 $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
                         } else
