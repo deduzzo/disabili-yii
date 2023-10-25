@@ -115,14 +115,13 @@ class UploadForm extends Model
                         $istanze = $istanze->andWhere(['istanza.chiuso' => false]);
                         $istanze = $istanze->all();
                     }
-                    if (count($istanze) === 1) {
-                        $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
-                    } else if (count($istanze) === 0) {
+                    if (count($istanze) === 0) {
                         if (!array_key_exists(strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]])), $nonTrovati))
                             $nonTrovati[strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))] = $newRow;
-                    } else
+                    } else if (count($istanze) > 1)
                         $errors[] = ['errore' => 'Trovate più istanze con lo stesso codice fiscale ' . strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]))];
                     if ($istanze && count($istanze) === 1) {
+                        $lastCf = strtoupper(trim($newRow[$header[PagamentiConIban::CODICE_FISCALE]]));
                         $istanza = $istanze[0];
                         $ultimoConto = $istanza->getContoValido();
                         $iban = $newRow[$header[PagamentiConIban::IBAN1]] . $newRow[$header[PagamentiConIban::IBAN2]] . $newRow[$header[PagamentiConIban::IBAN3]] . $newRow[$header[PagamentiConIban::IBAN4]] . $newRow[$header[PagamentiConIban::IBAN5]] . $newRow[$header[PagamentiConIban::IBAN6]];
