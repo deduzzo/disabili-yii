@@ -2,6 +2,7 @@
 
 /**
  * @var \yii\web\View $this
+ * @var \app\models\UploadForm $files
  */
 
 use app\components\ExportWidget;
@@ -27,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             TipologiaDatiCategoria::MOVIMENTI_CON_IBAN => 'Pagamenti con IBAN',
             TipologiaDatiCategoria::MOVIMENTI_CON_ELENCHI => 'Pagamenti con Elenchi',
         ], ['prompt' => 'Selezionare il tipo di file da importare..']);
+        echo $form->field($files, 'simulazione')->checkbox();
         echo $form->field($files, 'files[]')->widget(FileInput::class, [
             'options' => [
                 'multiple' => true,

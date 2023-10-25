@@ -174,7 +174,7 @@ class DeterminaController extends \yii\web\Controller
 
     public function actionPagamenti()
     {
-        $result = "";
+        $result = null;
         $vars = $this->request->get();
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
         if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
@@ -187,12 +187,12 @@ class DeterminaController extends \yii\web\Controller
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult !== 0.0) {
-                    $result .= "<div><p>❌ Istanza #" . $istanza->id
+                    $result .= "<div><p style='display:inline-block;'>❌ Istanza #" . $istanza->id
                         . " nominativo: " . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
                         . " distretto: " . $istanza->distretto->nome
                         . ": "
-                        . '</p><span class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
+                        . '</p><span style="margin-left:20px" class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
                         . '">' . ($tempResult > 0 ? ("+".$tempResult) : $tempResult)
                         . '</span></div>';
                 }
@@ -201,7 +201,7 @@ class DeterminaController extends \yii\web\Controller
         return $this->render('pagamenti', [
             "mese" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
             "anno" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year,
-            "result" => $result === "" ? "🆗Tutto ok! ✔️" : $result,
+            "result" => $result !== null ? ($result === "" ? "🆗Tutto ok! ✔️" : $result) : "",
         ]);
     }
 
