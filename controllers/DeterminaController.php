@@ -175,21 +175,33 @@ class DeterminaController extends \yii\web\Controller
     public function actionPagamenti()
     {
         $result = "";
-        $ultimoPagamento = Movimento::getDataUltimoPagamento();
         $vars = $this->request->get();
+        $ultimoPagamento = Movimento::getDataUltimoPagamento();
         if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
-            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['data' => $ultimoPagamento])->all();
+            //$ultimoPagamento = Movimento::getDataUltimoPagamento();
+            $mesePagamento = Carbon::createFromFormat('Y-m-d',$vars['anno'].'-'.$vars['mese']."-01");
+            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id');
+            // and where m.data is between start and and of mesepagamento
+            $istanzePagate = $istanzePagate->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
             foreach ($istanzePagate as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
-                $tempResult = $istanza->verificaContabilitaMese(Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month, Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year);
-                if ($tempResult !== 0.0)
-                    $result .= $istanza->id . ": " . $tempResult . "<br />";
+                $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
+                if ($tempResult !== 0.0) {
+                    $result .= "❌ Istanza #" . $istanza->id
+                        . " nominativo: " . $istanza->anagraficaDisabile->cognome
+                        . " " . $istanza->anagraficaDisabile->nome
+                        . " distretto: " . $istanza->distretto->nome
+                        . ": "
+                        . '<span class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
+                        . '">' . ($tempResult > 0 ? ("+".$tempResult) : $tempResult)
+                        . '</span><br />';
+                }
             }
         }
         return $this->render('pagamenti', [
             "mese" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
             "anno" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year,
-            "result" => $result,
+            "result" => $result === "" ? "🆗Tutto ok! ✔️" : $result,
         ]);
     }
 
