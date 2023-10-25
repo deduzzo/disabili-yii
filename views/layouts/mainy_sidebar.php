@@ -81,7 +81,7 @@ JS) ?>
                             <a href="/determina">Simulazione Determina</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="/determina/simulazione">Verifica Pagamenti</a>
+                            <a href="/determina/pagamenti">Verifica Pagamenti</a>
                         </li>
                         <li class="submenu-item">
                             <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php" target="_blank">Ticket</a>

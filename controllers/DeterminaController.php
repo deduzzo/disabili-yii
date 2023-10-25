@@ -20,8 +20,8 @@ class DeterminaController extends \yii\web\Controller
 {
     public function actionIndex($export = false, $idDeterminaFinalizzare = null)
     {
-        // unlimited memory_limit
         ini_set('memory_limit', '-1');
+        set_time_limit(0);
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $idDeterminaFinalizzare === null ? $this->request->get() : [];
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
