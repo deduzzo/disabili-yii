@@ -187,14 +187,14 @@ class DeterminaController extends \yii\web\Controller
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult !== 0.0) {
-                    $result .= "❌ Istanza #" . $istanza->id
+                    $result .= "<div><p>❌ Istanza #" . $istanza->id
                         . " nominativo: " . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
                         . " distretto: " . $istanza->distretto->nome
                         . ": "
-                        . '<span class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
+                        . '</p><span class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
                         . '">' . ($tempResult > 0 ? ("+".$tempResult) : $tempResult)
-                        . '</span><br />';
+                        . '</span></div>';
                 }
             }
         }
