@@ -299,6 +299,7 @@ class DeterminaController extends \yii\web\Controller
         $vars = $this->request->get();
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
         if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
+            $result = "";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
             $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id');
