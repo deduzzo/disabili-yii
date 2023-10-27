@@ -25,6 +25,14 @@ use yii\helpers\Url;
 $this->title = 'Simulazione determina';
 $this->params['breadcrumbs'][] = $this->title;
 $formatter = \Yii::$app->formatter;
+
+if (!isset($soloVariazioni)) {
+    $soloVariazioni = "off";
+    $soloProblematici = "off";
+    $soloRecuperi = "off";
+    $soloVisualizzazione = true;
+} else
+    $soloVisualizzazione = false;
 ?>
 
 <div class="modal fade text-left" id="concludi-determina" tabindex="-1" aria-labelledby="label-modifica"
@@ -93,6 +101,55 @@ $formatter = \Yii::$app->formatter;
         <div class="card-toolbar">
             <?php if ($soloVariazioni === "off" && $soloProblematici === "off" && $soloRecuperi === "off"): ?>
                 <div class="row">
+                    <?php if ($soloVisualizzazione): ?>
+                        <div class="divider">
+                            <div class="divider-text">Mese e anno da visualizzare</div>
+                            <?= Html::beginForm('', 'get', ['class' => 'form-inline']) ?>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="mese" class="form-label">Seleziona Mese</label>
+                                    <select class="form-select" id="mese" name="mese">
+                                        <?php
+                                        $mesi = array(
+                                            1 => 'Gennaio',
+                                            2 => 'Febbraio',
+                                            3 => 'Marzo',
+                                            4 => 'Aprile',
+                                            5 => 'Maggio',
+                                            6 => 'Giugno',
+                                            7 => 'Luglio',
+                                            8 => 'Agosto',
+                                            9 => 'Settembre',
+                                            10 => 'Ottobre',
+                                            11 => 'Novembre',
+                                            12 => 'Dicembre'
+                                        );
+                                        ?>
+                                        <option value="">Scegli...</option>
+                                        <?php
+                                        foreach ($mesi as $numero => $nome)
+                                            echo "<option value='$numero' " . ($mese == $numero ? 'selected' : '') . " >" . $nome . "</option>";
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="anno" class="form-label">Seleziona Anno</label>
+                                    <select class="form-select" id="anno" name="anno">
+                                        <option selected>Scegli...</option>
+                                        <?php
+                                        for ($i = date('Y') - 5; $i <= date('Y'); $i++)
+                                            echo "<option value='$i' " . ($i == date('Y') ? "selected " : "") . ">$i</option>";
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- button submit -->
+                                    <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
+                                </div>
+                            </div>
+                            <?= Html::endForm() ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="divider">
                         <div class="divider-text">Dettagli per distretto</div>
                     </div>
@@ -198,7 +255,7 @@ $formatter = \Yii::$app->formatter;
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-6">
-                <?= Html::beginForm(['/determina'], 'get') ?>
+                <?= Html::beginForm('', 'get') ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
@@ -211,22 +268,26 @@ $formatter = \Yii::$app->formatter;
                     ],
                 ]); ?>
             </div>
-            <div class="col-md-3">
-                <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
-                       id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
-                <label class="form-check-label text-danger bold"
-                       for="solo-problematici">Solo ist. con Errori (ALERT)</label><br/>
-                <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
-                       id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
-                <label class="form-check-label text-danger bold"
-                       for="soloVariazioni">Solo ist. con Variazioni</label><br/>
-                <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
-                       id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
-                <label class="form-check-label text-danger bold"
-                       for="soloRecuperi">Solo ist. con Recuperi in corso</label>
-            </div>
+            <?php if (!$soloVisualizzazione): ?>
+                <div class="col-md-3">
+                    <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
+                           id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
+                    <label class="form-check-label text-danger bold"
+                           for="soloProblematici">Solo ist. con Errori (ALERT)</label><br/>
+                    <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
+                           id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
+                    <label class="form-check-label text-danger bold"
+                           for="soloVariazioni">Solo ist. con Variazioni</label><br/>
+                    <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
+                           id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
+                    <label class="form-check-label text-danger bold"
+                           for="soloRecuperi">Solo ist. con Recuperi in corso</label>
+                </div>
+            <?php else: ?>
+                <div class="col-md-3"></div>
+            <?php endif; ?>
             <div class="col-md-12" style="text-align:center">
-                <button type="submit" class="btn btn-primary">Filtra</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px">Filtra</button>
             </div>
             <div class="divider">
                 <div class="divider-text">Operazioni</div>
@@ -234,19 +295,83 @@ $formatter = \Yii::$app->formatter;
             <?= Html::endForm() ?>
             <div class="col-md-8"><?= ExportWidget::widget([
                     'models' => $istanzeArray,
-                    'columns' => [ 'distretto','cognome', 'nome','cf', 'dataNascita', 'eta', 'isee', 'gruppo','importoPrecedente', 'importo', 'operazione'],
+                    'columns' => ['distretto', 'cognome', 'nome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'],
                 ]) ?></div>
             <div class="col-md-4">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                        data-bs-target="#concludi-determina">
-                    Finalizza determina
-                </button>
+                <?php if (!$soloVisualizzazione): ?>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#concludi-determina">
+                        Finalizza determina
+                    </button>
+                <?php endif; ?>
             </div>
             <div class="divider">
                 <div class="divider-text">Elenco</div>
             </div>
         </div>
-        <?= GridView::widget([
+        <?php
+
+        $columns = [
+            'id',
+            'cognome',
+            'nome',
+            'distretto',
+            [
+                'attribute' => 'isee',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $isee = $model['isee'];
+                    return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
+                },
+            ],
+            'dataNascita:date',
+            'eta',
+            'gruppo'
+        ];
+        if (!$soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'importoPrecedente',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
+        $columns[] = [
+            'attribute' => 'importo',
+            'format' => 'raw',
+            'value' => function ($model) {
+                return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
+            },
+            'contentOptions' => ['class' => 'text-center'],
+        ];
+        if (!$soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'operazione',
+                'format' => 'raw',
+                'label' => "Operazione",
+                'value' => function ($model) {
+                    return "<span class='badge bg-" . ($model['opArray']['alert'] ? 'danger' : 'warning') . "'>" . $model['operazione'] . "</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
+        $columns[] = [
+            'class' => ActionColumn::className(),
+            'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
+            'urlCreator' => function ($action, $model, $key, $index, $column) {
+                return Url::toRoute(['istanza/' . $action, 'id' => $model['id']]);
+            },
+            'buttons' => [
+                'scheda' => function ($url, $model) {
+                    return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
+                        'title' => Yii::t('yii', 'Vai alla scheda'),
+                        'class' => 'btn btn-icon btn-sm btn-primary',
+                    ]);
+                },
+            ]
+        ];
+
+        echo GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'layout' => "<div class='dataTable-top'>
@@ -275,63 +400,7 @@ $formatter = \Yii::$app->formatter;
                 'id' => 'table1',
                 'style' => 'font-size: 14px;'
             ],
-            'columns' => [
-                'id',
-                'cognome',
-                'nome',
-                'distretto',
-                [
-                    'attribute' => 'isee',
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        $isee = $model['isee'];
-                        return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
-                    },
-                ],
-                'dataNascita:date',
-                'eta',
-                'gruppo',
-                [
-                    'attribute' => 'importoPrecedente',
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
-                    },
-                    'contentOptions' => ['class' => 'text-center'],
-                ],
-                [
-                    'attribute' => 'importo',
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
-                    },
-                    'contentOptions' => ['class' => 'text-center'],
-                ],
-                [
-                    'attribute' => 'operazione',
-                    'format' => 'raw',
-                    'label' => "Operazione",
-                    'value' => function ($model) {
-                        return "<span class='badge bg-" . ($model['opArray']['alert'] ? 'danger' : 'warning') . "'>" . $model['operazione'] . "</span>";
-                    },
-                    'contentOptions' => ['class' => 'text-center'],
-                ],
-                [
-                    'class' => ActionColumn::className(),
-                    'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
-                    'urlCreator' => function ($action, $model, $key, $index, $column) {
-                        return Url::toRoute(['istanza/' . $action, 'id' => $model['id']]);
-                    },
-                    'buttons' => [
-                        'scheda' => function ($url, $model) {
-                            return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
-                                'title' => Yii::t('yii', 'Vai alla scheda'),
-                                'class' => 'btn btn-icon btn-sm btn-primary',
-                            ]);
-                        },
-                    ]
-                ],
-            ]
+            'columns' => $columns,
         ]);
         ?>
     </div>

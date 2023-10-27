@@ -169,28 +169,20 @@ class DeterminaController extends \yii\web\Controller
         $getVars = $this->request->get();
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        $soloProblematici = isset($getVars['soloProblematici']) ? $getVars['soloProblematici'] : 'off';
-        $soloVariazioni = isset($getVars['soloVariazioni']) ? $getVars['soloVariazioni'] : 'off';
-        $soloRecuperi = isset($getVars['soloRecuperi']) ? $getVars['soloRecuperi'] : 'off';
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
-        $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
-            ->andwhere(['>=', 'data', $ultimaData->subMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->addMonth()->format('Y-m-d')])->all();
-        $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
-        $pagamentiPrecedentiPerDistretti = [];
-        $pagamentiAttualiPerDistretti = [];
+        $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
+            ->andwhere(['>=', 'data', $ultimaData->subMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->addMonth()->format('Y-m-d')])
+            ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all();
         $importiTotali = [];
         $numeriTotali = [];
         foreach (Distretto::find()->all() as $item) {
             $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
             $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
         }
-        foreach ($allPagamentiPrecedenti as $pagamento) {
-            $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
-        }
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
-        foreach ($allPagamentiPrecedenti as $istanza) {
+        foreach ($allPagamenti as $istanza) {
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id_istanza']);
             $istVal = [
@@ -203,77 +195,26 @@ class DeterminaController extends \yii\web\Controller
                 'isee' => $istanza->getLastIseeType(),
                 'eta' => $istanza->anagraficaDisabile->getEta(),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
-                'importoPrecedente' => $differenza['importoPrecedente'],
+                //'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => $istanza->getProssimoImporto(),
-                'opArray' => $differenza,
-                'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
+                //'opArray' => $differenza,
+                //'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
             ];
-
             $istanzeArray[] = $istVal;
-            $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
-            $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
-            $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
+            if ($istanza->getProssimoImporto() > 0)
+                $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+            $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
         }
 
-        $nonPagati = [];
-        foreach ($distretti as $disPag) {
-            $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
-        }
-
-        foreach ($nonPagati as $idPagato) {
-            $istanza = Istanza::findOne($idPagato);
-            $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            $istVal = [
-                'id' => $istanza->id,
-                'cf' => $istanza->anagraficaDisabile->codice_fiscale,
-                'cognome' => $istanza->anagraficaDisabile->cognome,
-                'nome' => $istanza->anagraficaDisabile->nome,
-                'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
-                'distretto' => $istanza->distretto->nome,
-                'isee' => $istanza->getLastIseeType(),
-                'eta' => $istanza->anagraficaDisabile->getEta(),
-                'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
-                'importoPrecedente' => $differenza['importoPrecedente'],
-                'importo' => $istanza->getProssimoImporto(),
-                'opArray' => $differenza,
-                'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
-            ];
-            if ($differenza['alert'] === true)
-                $alert[$istanza->distretto->id][] = $istVal;
-            else {
-                $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
-                if ($istanza->getProssimoImporto() > 0)
-                    $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
-                if ($differenza['recupero'] === true)
-                    $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
-                if ($differenza['op'] !== "")
-                    $differenzePerDistretto[$istanza->distretto->id][] = $istVal;
-            }
-            $istanzeArray[] = $istVal;
-        }
-        $alertGlobal = [];
-        foreach ($distretti as $disPag) {
-            $alertGlobal = array_merge($alertGlobal, $alert[$disPag->id] ?? []);
-            $recuperiTotali = array_merge($recuperiTotali, $recuperiPerDistretto[$disPag->id] ?? []);
-            $differenzeTotali = array_merge($differenzeTotali, $differenzePerDistretto[$disPag->id] ?? []);
-        }
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,
-            $soloRecuperi === "on" ? $recuperiTotali :
-                ($soloVariazioni === "on" ? $differenzeTotali :
-                    ($soloProblematici === "on" ? $alertGlobal : $istanzeArray)));
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
         return $this->render('simulazione', [
             'istanzeArray' => $istanzeArray,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
-            'allIdPagati' => $allIdPagatiMeseScorso,
-            'soloProblematici' => $soloProblematici,
-            'soloVariazioni' => $soloVariazioni,
-            'soloRecuperi' => $soloRecuperi,
             'distretti' => $distretti,
             'stats' => [
                 'importiTotali' => $importiTotali,
                 'numeriTotali' => $numeriTotali,
-                'alert' => $alert,
             ]
         ]);
     }

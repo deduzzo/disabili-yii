@@ -78,12 +78,6 @@ JS) ?>
 							<a href="/istanza">Istanze</a>
 						</li>
                         <li class="submenu-item">
-                            <a href="/determina">Simulazione Determina</a>
-                        </li>
-                        <li class="submenu-item">
-                            <a href="/determina/pagamenti">Verifica Pagamenti</a>
-                        </li>
-                        <li class="submenu-item">
                             <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php" target="_blank">Ticket</a>
                         </li>
 <!--
@@ -102,6 +96,23 @@ JS) ?>
 						</li>-->
 					</ul>
 				</li>
+                <li class="sidebar-item has-sub">
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-files"></i>
+                        <span>Determine</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a href="/determina">Simulazione nuova</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/determina/visualizza">Determine precedenti</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/determina/pagamenti">Verifica Pagamenti</a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="sidebar-item has-sub">
                     <a href="#" class="sidebar-link">
                         <i class="bi bi-gear"></i>
