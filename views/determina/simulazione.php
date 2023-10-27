@@ -346,14 +346,14 @@ if (!isset($soloVariazioni)) {
             'gruppo'
         ]);
         if (!$soloVisualizzazione)
-            $columns = array_merge($columns, [
+            $columns[] = [
                 'attribute' => 'importoPrecedente',
                 'format' => 'raw',
                 'value' => function ($model) {
                     return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
                 },
                 'contentOptions' => ['class' => 'text-center'],
-            ]);
+            ];
         $columns[] = [
             'attribute' => 'importo',
             'format' => 'raw',
