@@ -173,7 +173,7 @@ class DeterminaController extends \yii\web\Controller
         set_time_limit(0);
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $this->request->get();
-        $distretti = $getVars['distrettiPost'] ?? ['3'];//Distretto::getAllIds();
+        $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
