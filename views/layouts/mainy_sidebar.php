@@ -103,13 +103,13 @@ JS) ?>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a href="/determina">Simulazione nuova</a>
-                        </li>
-                        <li class="submenu-item">
-                            <a href="/determina/visualizza">Determine precedenti</a>
+                            <a href="/determina">Nuova Determina</a>
                         </li>
                         <li class="submenu-item">
                             <a href="/determina/pagamenti">Verifica Pagamenti</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/determina/visualizza">Storico</a>
                         </li>
                     </ul>
                 </li>

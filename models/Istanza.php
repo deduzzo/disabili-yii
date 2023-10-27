@@ -373,7 +373,7 @@ class Istanza extends \yii\db\ActiveRecord
             'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
             'differenza' => $differenza,
             'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
-                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) . ($hacambioiban?"<br />VERIFICARE CAMBIO IBAN":""),
+                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) . ($hacambioiban ? "<br />VERIFICARE CAMBIO IBAN" : ""),
             'recupero' => $this->haRecuperiInCorso(),
             'color' => $op ? 'danger' : ($differenza != 0.0 ? 'warning' : 'success')
         ];
@@ -581,7 +581,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function contoInFaseDiValidazione()
     {
-        $conti = Conto::find()->where(['id_istanza' => $this->id,'attivo' => false,'validato' => false])->all();
+        $conti = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => false, 'validato' => false])->all();
         return count($conti) > 0;
     }
 
@@ -590,7 +590,22 @@ class Istanza extends \yii\db\ActiveRecord
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->count() > 0;
     }
 
-    private function haOmonimi() {
+    public function getIseeTypeInDate(Carbon $date)
+    {
+        $isee = Isee::find()->where(['id_istanza' => $this->id])->andWhere(['<=', 'data_presentazione', $date->format('Y-m-d')])->orderBy(['data_presentazione' => SORT_DESC])->one();
+        if ($isee) {
+            return $isee->maggiore_25mila ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
+        } else {
+            $firstIsee = Isee::find()->where(['id_istanza' => $this->id])->orderBy(['data_presentazione' => SORT_ASC])->one();
+            if ($firstIsee)
+                return $firstIsee->maggiore_25mila ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
+            else
+                return IseeType::NO_ISEE;
+        }
+    }
+
+    private function haOmonimi()
+    {
         // TODO
 
     }

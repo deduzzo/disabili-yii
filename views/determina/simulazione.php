@@ -19,6 +19,8 @@ use yii\helpers\Url;
 /** @var array $distretti */
 /** @var array $stats */
 /** @var array $istanzeArray */
+/** @var string $mese */
+/** @var string $anno */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 
@@ -103,7 +105,7 @@ if (!isset($soloVariazioni)) {
                 <div class="row">
                     <?php if ($soloVisualizzazione): ?>
                         <div class="divider">
-                            <div class="divider-text">Mese e anno da visualizzare</div>
+                            <div class="divider-text" style="margin-bottom:10px">Dati storici</div>
                             <?= Html::beginForm('', 'get', ['class' => 'form-inline']) ?>
                             <div class="row">
                                 <div class="col-md-4">
@@ -138,13 +140,13 @@ if (!isset($soloVariazioni)) {
                                         <option selected>Scegli...</option>
                                         <?php
                                         for ($i = date('Y') - 5; $i <= date('Y'); $i++)
-                                            echo "<option value='$i' " . ($i == date('Y') ? "selected " : "") . ">$i</option>";
+                                            echo "<option value='$i' " . ($i == $anno ? "selected " : "") . ">$i</option>";
                                         ?>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <!-- button submit -->
-                                    <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
+                                    <?= Html::submitButton('Mostra dati', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
                                 </div>
                             </div>
                             <?= Html::endForm() ?>
@@ -310,11 +312,12 @@ if (!isset($soloVariazioni)) {
             </div>
         </div>
         <?php
-
-        $columns = [
-            'id',
-            'cognome',
-            'nome',
+        $columns = ['id'];
+        if ($soloVisualizzazione)
+            $columns[] = ['cognomeNome'];
+        else
+            $columns[] = ['cognome', 'nome'];
+        $columns[] = [
             'distretto',
             [
                 'attribute' => 'isee',

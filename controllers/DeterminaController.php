@@ -161,49 +161,54 @@ class DeterminaController extends \yii\web\Controller
 
     public function actionVisualizza($export = false)
     {
-        $mese = "09";
-        $anno = "2023";
+        if ($this->request->isGet && isset($this->request->get()['anno']) && isset($this->request->get()['mese'])) {
+            $mese = $this->request->get()['mese'];
+            $anno = $this->request->get()['anno'];
+        } else {
+            $ultimoPagamento = Movimento::getDataUltimoPagamento();
+            $mese = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
+            $anno = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
+        }
         ini_set('memory_limit', '-1');
         set_time_limit(0);
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $this->request->get();
-        $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
+        $distretti = $getVars['distrettiPost'] ?? ['3'];//Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
-        $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
-            ->andwhere(['>=', 'data', $ultimaData->subMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->addMonth()->format('Y-m-d')])
+        $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
+            ->andwhere(['>=', 'data', $ultimaData->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->endOfMonth()->format('Y-m-d')])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all();
         $importiTotali = [];
         $numeriTotali = [];
         foreach (Distretto::find()->all() as $item) {
-            $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-            $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
+            $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0,IseeType::NO_ISEE => 0];
+            $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0,IseeType::NO_ISEE => 0];
         }
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
-        foreach ($allPagamenti as $istanza) {
+        foreach ($allPagamenti as $istanzaRaw) {
             /* @var $istanza Istanza */
-            $istanza = Istanza::findOne($istanza['id_istanza']);
+            $istanza = Istanza::findOne($istanzaRaw['id_istanza']);
             $istVal = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
-                'cognome' => $istanza->anagraficaDisabile->cognome,
-                'nome' => $istanza->anagraficaDisabile->nome,
+                'cognomeNome' => $istanza->getAnagraficaDisabile(),
                 'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
                 'distretto' => $istanza->distretto->nome,
-                'isee' => $istanza->getLastIseeType(),
-                'eta' => $istanza->anagraficaDisabile->getEta(),
+                'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
+                'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
                 //'importoPrecedente' => $differenza['importoPrecedente'],
-                'importo' => $istanza->getProssimoImporto(),
+                'importo' => Yii::$app->formatter->asCurrency($istanzaRaw['importo']),
                 //'opArray' => $differenza,
                 //'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
             ];
             $istanzeArray[] = $istVal;
-            if ($istanza->getProssimoImporto() > 0)
-                $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
-            $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
+
+            $numeriTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += 1;
+            $importiTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
         }
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);
@@ -215,7 +220,9 @@ class DeterminaController extends \yii\web\Controller
             'stats' => [
                 'importiTotali' => $importiTotali,
                 'numeriTotali' => $numeriTotali,
-            ]
+            ],
+            'anno' => $anno,
+            'mese' => $mese,
         ]);
     }
 
@@ -239,7 +246,11 @@ class DeterminaController extends \yii\web\Controller
         $result = null;
         $vars = $this->request->get();
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
+        $mese = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
+        $anno = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
         if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
+            $mese = $vars['mese'];
+            $anno = $vars['anno'];
             $result = "";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
@@ -262,8 +273,8 @@ class DeterminaController extends \yii\web\Controller
             }
         }
         return $this->render('pagamenti', [
-            "mese" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month,
-            "anno" => Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year,
+            "mese" => $mese,
+            "anno" => $anno,
             "result" => $result !== null ? ($result === "" ? "🆗Tutto ok! ✔️" : $result) : "",
         ]);
     }
