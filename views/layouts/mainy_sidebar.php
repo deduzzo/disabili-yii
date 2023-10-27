@@ -99,17 +99,17 @@ JS) ?>
                 <li class="sidebar-item has-sub">
                     <a href="#" class="sidebar-link">
                         <i class="bi bi-files"></i>
-                        <span>Determine</span>
+                        <span>Determine e pagamenti</span>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a href="/determina">Nuova Determina</a>
+                            <a href="/determina">Prossima determina</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="/determina/pagamenti">Verifica Pagamenti</a>
+                            <a href="/determina/pagamenti">Verifica pagamenti</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="/determina/visualizza">Storico</a>
+                            <a href="/determina/visualizza">Storico pagamenti</a>
                         </li>
                     </ul>
                 </li>

@@ -151,6 +151,7 @@ class DeterminaController extends \yii\web\Controller
             'soloVariazioni' => $soloVariazioni,
             'soloRecuperi' => $soloRecuperi,
             'distretti' => $distretti,
+            'title' => "Simulazione prossima determina",
             'stats' => [
                 'importiTotali' => $importiTotali,
                 'numeriTotali' => $numeriTotali,
@@ -224,6 +225,7 @@ class DeterminaController extends \yii\web\Controller
             ],
             'anno' => $anno,
             'mese' => $mese,
+            'title' => "Storico pagamenti",
         ]);
     }
 

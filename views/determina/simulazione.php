@@ -21,10 +21,11 @@ use yii\helpers\Url;
 /** @var array $istanzeArray */
 /** @var string $mese */
 /** @var string $anno */
+/** @var string $title */
 /** @var app\models\SimulazioneDeterminaSearch $searchModel */
 
 
-$this->title = 'Simulazione determina';
+$this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;
 $formatter = \Yii::$app->formatter;
 
