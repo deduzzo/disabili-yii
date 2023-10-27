@@ -99,7 +99,7 @@ JS) ?>
                 <li class="sidebar-item has-sub">
                     <a href="#" class="sidebar-link">
                         <i class="bi bi-files"></i>
-                        <span>Determine e pagamenti</span>
+                        <span>Beneficio</span>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
