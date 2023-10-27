@@ -336,7 +336,7 @@ if (!isset($soloVariazioni)) {
                 'label' => 'Stato',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    return $model['dataDecesso'] !== null ? "<span class='badge bg-danger'>DECEDUTO il " . Yii::$app->formatter->asDate($model['dataDecesso']) . "</span>" : "<span class='badge bg-success'>VIVO</span>";
+                    return $model['dataDecesso'] !== null ? "<span class='badge bg-danger'>DECEDUTO il " . Yii::$app->formatter->asDate($model['dataDecesso']) . "</span>" : "<span class='badge bg-success'>IN VITA</span>";
                 },
                 'contentOptions' => ['class' => 'text-center'],
             ];
