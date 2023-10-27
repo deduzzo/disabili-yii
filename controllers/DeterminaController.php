@@ -194,8 +194,9 @@ class DeterminaController extends \yii\web\Controller
             $istVal = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
-                'cognomeNome' => $istanza->getAnagraficaDisabile(),
+                'cognomeNome' => $istanza->getNominativoDisabile(),
                 'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
+                'dataDecesso' => $istanza->data_decesso,
                 'distretto' => $istanza->distretto->nome,
                 'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
                 'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),

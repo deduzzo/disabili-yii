@@ -312,12 +312,11 @@ if (!isset($soloVariazioni)) {
             </div>
         </div>
         <?php
-        $columns = ['id'];
         if ($soloVisualizzazione)
-            $columns[] = ['cognomeNome'];
+            $columns = ['id', 'cognomeNome'];
         else
-            $columns[] = ['cognome', 'nome'];
-        $columns[] = [
+            $columns = ['id', 'cognome', 'nome'];
+        $columns = array_merge($columns, [
             'distretto',
             [
                 'attribute' => 'isee',
@@ -328,18 +327,32 @@ if (!isset($soloVariazioni)) {
                 },
             ],
             'dataNascita:date',
+        ]);
+
+        if ($soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'dataDecesso',
+                'label' => 'Stato',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return $model['dataDecesso'] !== null ? "<span class='badge bg-danger'>DECEDUTO il " . Yii::$app->formatter->asDate($model['dataDecesso']) . "</span>" : "<span class='badge bg-success'>VIVO</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
+
+        $columns = array_merge($columns, [
             'eta',
             'gruppo'
-        ];
+        ]);
         if (!$soloVisualizzazione)
-            $columns[] = [
+            $columns = array_merge($columns, [
                 'attribute' => 'importoPrecedente',
                 'format' => 'raw',
                 'value' => function ($model) {
                     return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
                 },
                 'contentOptions' => ['class' => 'text-center'],
-            ];
+            ]);
         $columns[] = [
             'attribute' => 'importo',
             'format' => 'raw',
