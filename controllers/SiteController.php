@@ -26,6 +26,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Google_Client;
 use Google_Service_Drive;
+use Google_Service_Drive_DriveFile;
 use PHP_IBAN\IBAN;
 use Yii;
 use yii\web\Controller;
@@ -524,7 +525,8 @@ class SiteController extends Controller
             return $this->redirect(['site/index']);
     }
 
-    public function actionAuthGoogle() {
+    public function actionAuthGoogle()
+    {
         $client = new Google_Client();
         $client->setClientId(Yii::$app->params['gdrive_clientID']);
         $client->setClientSecret(Yii::$app->params['gdrive_secret']);
@@ -545,6 +547,106 @@ class SiteController extends Controller
         }
     }
 
+    public function actionTestGoogle()
+    {
+        $folderId =  Yii::$app->params['gdrive_folderId'];
+        $client = new Google_Client();
+        $client->setApplicationName('Disabili DRIVE');
+        $client->setScopes([Google_Service_Drive::DRIVE]);
+        $client->setAuthConfig('../config/private/disabiliyiidrive-6af38192663a.json');  // Sostituisci con il percorso al tuo file JSON scaricato
+        $client->setSubject('disabili-service@disabiliyiidrive.iam.gserviceaccount.com'); // L'email associata al Google Drive privato
+        $service = new Google_Service_Drive($client);
+        // Crea un nuovo file da caricare
+        /*$file = new Google_Service_Drive_DriveFile();
+        $file->setName("prova.txt");
+        $file->setParents(array($folderId));
+
+        // Carica il file
+        $data = file_get_contents('robots.txt');
+        $createdFile = $service->files->create($file, array(
+            'data' => $data,
+            'mimeType' => 'application/octet-stream',
+            'uploadType' => 'media',
+            'supportsAllDrives' => true  // Questa è la parte chiave per lavorare con i Shared Drives
+        ));
+
+        // Stampa l'ID del file caricato
+        echo "File ID: " . $createdFile->getId();*/
+
+        // Crea un nuovo Google Drive File che rappresenta una cartella
+/*        $folder = new Google_Service_Drive_DriveFile();
+        $folder->setName('118');  // Sostituisci con il nome che desideri per la cartella
+        $folder->setMimeType('application/vnd.google-apps.folder');
+        $folder->setParents(array($folderId));  // Sostituisci con l'ID del tuo Shared Drive
+
+        // Crea la cartella
+        $createdFolder = $service->files->create($folder, array('supportsAllDrives' => true));
+
+        // Stampa l'ID della cartella creata
+        echo "Folder ID: " . $createdFolder->getId();*/
+
+        // CARTELLA con nome x presente Su drive?
+        /*$query = "name='118' and mimeType='application/vnd.google-apps.folder' and '".$folderId."' in parents";
+
+        // Esegui la ricerca
+        $results = $service->files->listFiles(array(
+            'q' => $query,
+            'supportsAllDrives' => true,
+            'includeItemsFromAllDrives' => true
+        ));
+
+        $files = $results->getFiles();
+
+        if (count($files) > 0) {
+            echo "Cartella '118' trovata! Ecco l'ID: " . $files[0]->getId();
+        } else {
+            echo "Cartella '118' non trovata nel Shared Drive.";
+        }*/
+
+        // OTTENERE FILES NELLA CARTELLA CON ID:
+         //$idCartella = "16-4YNH_AtvpwiaRj8SKIqkVKPiro8nSC";
+        $query = "'$folderId' in parents";
+
+        // Esegui la ricerca
+        $results = $service->files->listFiles(array(
+            'q' => $query,
+            'supportsAllDrives' => true,
+            'includeItemsFromAllDrives' => true
+        ));
+
+        $files = $results->getFiles();
+
+        if (count($files) > 0) {
+            echo "Ecco la lista dei file nella cartella:\n";
+            foreach ($files as $file) {
+                echo $file->getName() . " (ID: " . $file->getId() . ")\n";
+            }
+        } else {
+            echo "Nessun file trovato nella cartella.";
+        }
+
+        // DOWNLOAD FILE
+
+       /* $fileId = "1YIfRC--uQdVFBpQzDF_PYUZIdYRu5t5d";
+        $params = array(
+            'supportsAllDrives' => true
+        );
+        $file = $service->files->get($fileId, $params);
+
+        // Imposta gli header HTTP appropriati
+        header('Content-Type: ' . $file->getMimeType());
+        header('Content-Disposition: attachment; filename="' . $file->getName() . '"');
+
+        // Ottieni il contenuto del file e invialo come risposta
+        $responseParams = array(
+            'alt' => 'media',
+            'supportsAllDrives' => true
+        );
+        $response = $service->files->get($fileId, $responseParams);
+        echo $response->getBody();*/
+
+
+    }
 
     /*public function actionAggiornaMistretta()
     {

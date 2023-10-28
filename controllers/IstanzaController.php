@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
+use app\helpers\GdriveHelper;
 use app\models\Istanza;
 use app\models\IstanzaSearch;
-use Carbon\Carbon;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -42,7 +42,7 @@ class IstanzaController extends Controller
     {
         // disable main layout
         $searchModel = new IstanzaSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams,isset($this->request->post()['exportWDG']));
+        $dataProvider = $searchModel->search($this->request->queryParams, isset($this->request->post()['exportWDG']));
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -142,8 +142,13 @@ class IstanzaController extends Controller
     public function actionScheda($id)
     {
         $model = $this->findModel($id);
+        if ($model) {
+            $gdhelper = new GdriveHelper();
+            $gdiveFolder =  $gdhelper->createFolderIfNotExist("#$model->id",$gdhelper->folderId);
+        }
         return $this->render('scheda', [
             'istanza' => $model,
+            'gdiveFolder' => $gdiveFolder
         ]);
     }
 
@@ -159,7 +164,7 @@ class IstanzaController extends Controller
                 $istanza->attivo = $this->request->post('stato') === "attivo";
                 $istanza->chiuso = $this->request->post('aperto-chiuso') === "chiuso";
                 $istanza->data_decesso = $this->request->post('data-decesso') ?? null;
-                $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata')  === "on";
+                $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata') === "on";
                 $istanza->data_liquidazione_decesso = $this->request->post('data-liquidazione') ?? null;
                 $istanza->save();
                 if ($istanza->errors)

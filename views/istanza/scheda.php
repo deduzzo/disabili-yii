@@ -6,6 +6,7 @@ use app\models\enums\AnagraficaType;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Istanza;
+use Google\Service\Drive\DriveFile;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Alert;
 use yii\bootstrap5\Html;
@@ -17,6 +18,7 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var Istanza $istanza */
+/** @var DriveFile $gdiveFolder */
 $this->title = $istanza->anagraficaDisabile->cognome_nome;
 $this->params['breadcrumbs'][] = ['label' => 'Istanze', 'url' => ['istanze/index']];
 $this->params['breadcrumbs'][] = $this->title;
