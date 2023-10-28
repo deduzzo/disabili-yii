@@ -534,7 +534,7 @@ class SiteController extends Controller
         if (isset($_GET['code'])) {
             $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
             Yii::$app->session->set('access_token', $token);
-            header('Location: ' . filter_var('https://disabili.robertodedomenico.it/site/auth-google', FILTER_SANITIZE_URL));
+            header('Location: ' . filter_var('https://disabili.robertodedomenico.it', FILTER_SANITIZE_URL));
             exit();
         }
 
