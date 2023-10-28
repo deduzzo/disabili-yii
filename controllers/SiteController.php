@@ -24,6 +24,8 @@ use app\models\Ricovero;
 use app\models\UploadForm;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
+use Google_Client;
+use Google_Service_Drive;
 use PHP_IBAN\IBAN;
 use Yii;
 use yii\web\Controller;
@@ -520,6 +522,27 @@ class SiteController extends Controller
             return $this->render('errore', ['exception' => $exception]);
         } else
             return $this->redirect(['site/index']);
+    }
+
+    public function actionAuthGoogle() {
+        $client = new Google_Client();
+        $client->setClientId(Yii::$app->params['gdrive_clientID']);
+        $client->setClientSecret('YOUR_CLIENT_SECRET');
+        $client->setRedirectUri('http://disabili.localhost/site/auth-google');
+        $client->addScope(Google_Service_Drive::DRIVE);
+
+        if (isset($_GET['code'])) {
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            Yii::$app->session->set('access_token', $token);
+            header('Location: ' . filter_var('YOUR_REDIRECT_URL', FILTER_SANITIZE_URL));
+            exit();
+        }
+
+        if (!isset($_SESSION['access_token']) || !$_SESSION['access_token']) {
+            $authUrl = $client->createAuthUrl();
+            header('Location: ' . $authUrl);
+            exit();
+        }
     }
 
 
