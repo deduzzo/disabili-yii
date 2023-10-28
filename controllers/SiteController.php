@@ -527,18 +527,18 @@ class SiteController extends Controller
     public function actionAuthGoogle() {
         $client = new Google_Client();
         $client->setClientId(Yii::$app->params['gdrive_clientID']);
-        $client->setClientSecret('YOUR_CLIENT_SECRET');
+        $client->setClientSecret(Yii::$app->params['gdrive_secret']);
         $client->setRedirectUri('https://disabili.robertodedomenico.it/site/auth-google');
         $client->addScope(Google_Service_Drive::DRIVE);
 
         if (isset($_GET['code'])) {
             $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
             Yii::$app->session->set('access_token', $token);
-            header('Location: ' . filter_var('YOUR_REDIRECT_URL', FILTER_SANITIZE_URL));
+            header('Location: ' . filter_var('https://disabili.robertodedomenico.it/site/auth-google', FILTER_SANITIZE_URL));
             exit();
         }
 
-        if (!isset($_SESSION['access_token']) || !$_SESSION['access_token']) {
+        if (!Yii::$app->session->get('access_token')) {
             $authUrl = $client->createAuthUrl();
             header('Location: ' . $authUrl);
             exit();
