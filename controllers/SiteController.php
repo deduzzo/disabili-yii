@@ -528,7 +528,7 @@ class SiteController extends Controller
         $client = new Google_Client();
         $client->setClientId(Yii::$app->params['gdrive_clientID']);
         $client->setClientSecret('YOUR_CLIENT_SECRET');
-        $client->setRedirectUri('http://disabili.localhost/site/auth-google');
+        $client->setRedirectUri('https://disabili.localhost/site/auth-google');
         $client->addScope(Google_Service_Drive::DRIVE);
 
         if (isset($_GET['code'])) {
