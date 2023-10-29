@@ -144,10 +144,9 @@ class GdriveHelper
             'includeItemsFromAllDrives' => true
         );
 
-        // Esegui la query
         $results = $this->service->files->listFiles($params);
 
-        return $results->getFiles()[0];
+        return count($results) >0 ? $results->getFiles()[0] : null;
     }
 
 
