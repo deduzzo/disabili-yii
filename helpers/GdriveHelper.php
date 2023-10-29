@@ -45,6 +45,7 @@ class GdriveHelper
 
     public function createFolder($folderName, $remoteFolderId)
     {
+        $folderName =  $this->pulisciNome($folderName);
         $folder = new Google_Service_Drive_DriveFile();
         $folder->setName($folderName);
         $folder->setMimeType('application/vnd.google-apps.folder');
@@ -56,6 +57,7 @@ class GdriveHelper
 
     public function folderExist($folderName, $remoteFolderId)
     {
+        $folderName =  $this->pulisciNome($folderName);
         $query = "name='$folderName' and mimeType='application/vnd.google-apps.folder' and '" . $remoteFolderId . "' in parents";
 
         // Esegui la ricerca
@@ -74,6 +76,7 @@ class GdriveHelper
 
     public function createFolderIfNotExist($folderName, $remoteFolderId)
     {
+        $folderName =  $this->pulisciNome($folderName);
         $folder = $this->folderExist($folderName, $remoteFolderId);
         if ($folder == null)
             $folder = $this->createFolder($folderName, $remoteFolderId);
@@ -82,6 +85,7 @@ class GdriveHelper
 
     public function renameFolder($folderId, $newName)
     {
+        $newName =  $this->pulisciNome($newName);
         $newFolderMeta = new Google_Service_Drive_DriveFile();
         $newFolderMeta->setName($newName);
 
@@ -134,7 +138,7 @@ class GdriveHelper
         $query = sprintf(
             "mimeType='application/vnd.google-apps.folder' and '%s' in parents and name starts with '%s'",
             $folderId,
-            $searchString
+            $this->pulisciNome($searchString)
         );
 
         // Parametri per la richiesta
@@ -147,6 +151,10 @@ class GdriveHelper
         $results = $this->service->files->listFiles($params);
 
         return count($results) >0 ? $results->getFiles()[0] : null;
+    }
+
+    private function pulisciNome($nome) {
+        return  preg_replace('/[^a-zA-Z0-9#-]/', '', $nome);
     }
 
 
