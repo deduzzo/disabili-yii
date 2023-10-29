@@ -154,7 +154,7 @@ class GdriveHelper
     }
 
     private function pulisciNome($nome) {
-        return preg_replace('/[^a-zA-Z0-9#-\s]/', '', $nome);
+        return preg_replace('[^a-zA-Z0-9#-\s]', '', $nome);
     }
 
 
