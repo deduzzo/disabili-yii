@@ -18,7 +18,7 @@ use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var Istanza $istanza */
-/** @var DriveFile $gdiveFolder */
+/** @var array $files */
 $this->title = $istanza->anagraficaDisabile->cognome_nome;
 $this->params['breadcrumbs'][] = ['label' => 'Istanze', 'url' => ['istanze/index']];
 $this->params['breadcrumbs'][] = $this->title;

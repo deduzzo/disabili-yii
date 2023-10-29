@@ -144,11 +144,16 @@ class IstanzaController extends Controller
         $model = $this->findModel($id);
         if ($model) {
             $gdhelper = new GdriveHelper();
-            $gdiveFolder =  $gdhelper->createFolderIfNotExist("#$model->id",$gdhelper->folderId);
+            $folder = $gdhelper->existFolderWithNameThatStartWith("#$model->id", $gdhelper->folderId);
+            if (!$folder)
+                $folder = $gdhelper->createFolderIfNotExist("#$model->id - ".$model->getNominativoDisabile(), $gdhelper->folderId);
+            if ($folder->getName() !== "#$model->id - ".$model->getNominativoDisabile())
+                $gdhelper->renameFolder($folder->getId(), "#$model->id - ".$model->getNominativoDisabile());
+            $files = $gdhelper->getAllFilesInFolder($folder->getId());
         }
         return $this->render('scheda', [
             'istanza' => $model,
-            'gdiveFolder' => $gdiveFolder
+            'files' => $files ?? [],
         ]);
     }
 

@@ -9,6 +9,7 @@ use Yii;
 
 class GdriveHelper
 {
+    const JSON_CONFIG_PATH = '../config/private/drive.json';
     public $folderId;
     private $service;
     private $client;
@@ -19,7 +20,7 @@ class GdriveHelper
         $this->client = new Google_Client();
         $this->client->setApplicationName('Disabili DRIVE');
         $this->client->setScopes([Google_Service_Drive::DRIVE]);
-        $this->client->setAuthConfig('../config/private/disabiliyiidrive-6af38192663a.json');  // Sostituisci con il percorso al tuo file JSON scaricato
+        $this->client->setAuthConfig(self::JSON_CONFIG_PATH);  // Sostituisci con il percorso al tuo file JSON scaricato
         $this->client->setSubject('disabili-service@disabiliyiidrive.iam.gserviceaccount.com'); // L'email associata al Google Drive privato
         $this->service = new Google_Service_Drive($this->client);
     }
@@ -79,7 +80,19 @@ class GdriveHelper
         return $folder;
     }
 
-    public function getAllFilesInFolder($folderId) {
+    public function renameFolder($folderId, $newName)
+    {
+        $newFolderMeta = new Google_Service_Drive_DriveFile();
+        $newFolderMeta->setName($newName);
+
+        // Aggiorna la cartella
+        $updatedFolder = $this->service->files->update($folderId, $newFolderMeta, array('supportsAllDrives' => true));
+
+        return $updatedFolder->getName();
+    }
+
+    public function getAllFilesInFolder($folderId)
+    {
         // OTTENERE FILES NELLA CARTELLA CON ID:
 
         $query = "'$folderId' in parents";
@@ -94,24 +107,47 @@ class GdriveHelper
         return $results->getFiles();
     }
 
-    public function serveFile($fileId) {
+    public function serveFile($fileId)
+    {
 
-         $params = array(
-             'supportsAllDrives' => true
-         );
-         $file = $this->service->files->get($fileId, $params);
+        $params = array(
+            'supportsAllDrives' => true
+        );
+        $file = $this->service->files->get($fileId, $params);
 
-         // Imposta gli header HTTP appropriati
-         header('Content-Type: ' . $file->getMimeType());
-         header('Content-Disposition: attachment; filename="' . $file->getName() . '"');
+        // Imposta gli header HTTP appropriati
+        header('Content-Type: ' . $file->getMimeType());
+        header('Content-Disposition: attachment; filename="' . $file->getName() . '"');
 
-         // Ottieni il contenuto del file e invialo come risposta
-         $responseParams = array(
-             'alt' => 'media',
-             'supportsAllDrives' => true
-         );
-         $response = $this->service->files->get($fileId, $responseParams);
-         echo $response->getBody();
+        // Ottieni il contenuto del file e invialo come risposta
+        $responseParams = array(
+            'alt' => 'media',
+            'supportsAllDrives' => true
+        );
+        $response = $this->service->files->get($fileId, $responseParams);
+        echo $response->getBody();
+    }
+
+    public function existFolderWithNameThatStartWith($searchString, $folderId)
+    {
+        // Creiamo la query
+        $query = sprintf(
+            "mimeType='application/vnd.google-apps.folder' and '%s' in parents and name starts with '%s'",
+            $folderId,
+            $searchString
+        );
+
+        // Parametri per la richiesta
+        $params = array(
+            'q' => $query,
+            'supportsAllDrives' => true,
+            'includeItemsFromAllDrives' => true
+        );
+
+        // Esegui la query
+        $results = $this->service->files->listFiles($params);
+
+        return $results->getFiles()[0];
     }
 
 
