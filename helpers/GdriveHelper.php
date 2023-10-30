@@ -11,12 +11,14 @@ class GdriveHelper
 {
     const JSON_CONFIG_PATH = '../config/private/drive.json';
     public $folderId;
+    public $backupFolderId;
     private $service;
     private $client;
 
     public function __construct()
     {
         $this->folderId = Yii::$app->params['gdrive_folderId'];
+        $this->backupFolderId = Yii::$app->params['gdrive_backupfolderId'];
         $this->client = new Google_Client();
         $this->client->setApplicationName('Disabili DRIVE');
         $this->client->setScopes([Google_Service_Drive::DRIVE]);

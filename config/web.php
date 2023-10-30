@@ -1,6 +1,7 @@
 <?php
 
 use app\assets\MainAsset;
+use app\helpers\Utils;
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
@@ -96,6 +97,13 @@ $config = [
             Yii::$app->response->redirect(['auth/login']);
         },
     ],
+    'on beforeRequest' => function ($event) {
+        $lastBackupDate = Yii::$app->cache->get('lastBackupDate');
+        if (!$lastBackupDate || (new \DateTime())->diff(new \DateTime($lastBackupDate))->days > 1) {
+            Utils::dumpDb();
+            Yii::$app->cache->set('lastBackupDate', date('Y-m-d H:i:s'));
+        }
+    },
     'params' => $params,
 ];
 

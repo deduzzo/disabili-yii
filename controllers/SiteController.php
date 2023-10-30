@@ -547,6 +547,10 @@ class SiteController extends Controller
         }
     }
 
+    public function actionBackupdb() {
+        Utils::dumpDb();
+    }
+
     public function actionTestGoogle()
     {
         $folderId =  Yii::$app->params['gdrive_folderId'];
