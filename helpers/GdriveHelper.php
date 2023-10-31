@@ -5,6 +5,7 @@ namespace app\helpers;
 use Google_Client;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
+use Google_Service_Sheets;
 use Yii;
 
 class GdriveHelper
@@ -12,7 +13,8 @@ class GdriveHelper
     const JSON_CONFIG_PATH = '../config/private/drive.json';
     public $folderId;
     public $backupFolderId;
-    private $service;
+    private $driveService;
+    private $spreeadsheetService;
     private $client;
 
     public function __construct()
@@ -21,10 +23,12 @@ class GdriveHelper
         $this->backupFolderId = Yii::$app->params['gdrive_backupfolderId'];
         $this->client = new Google_Client();
         $this->client->setApplicationName('Disabili DRIVE');
-        $this->client->setScopes([Google_Service_Drive::DRIVE]);
+        $this->client->addScope([Google_Service_Drive::DRIVE]);
+        $this->client->addScope(Google_Service_Sheets::SPREADSHEETS_READONLY);
         $this->client->setAuthConfig(self::JSON_CONFIG_PATH);  // Sostituisci con il percorso al tuo file JSON scaricato
         $this->client->setSubject('disabili-service@disabiliyiidrive.iam.gserviceaccount.com'); // L'email associata al Google Drive privato
-        $this->service = new Google_Service_Drive($this->client);
+        $this->driveService = new Google_Service_Drive($this->client);
+        $this->spreeadsheetService = new Google_Service_Sheets($this->client);
     }
 
 
@@ -35,7 +39,7 @@ class GdriveHelper
         $file->setParents(array($remoteFolderId));
         // Carica il file
         $data = file_get_contents($localFilePath);
-        $createdFile = $this->service->files->create($file, array(
+        $createdFile = $this->driveService->files->create($file, array(
             'data' => $data,
             'mimeType' => 'application/octet-stream',
             'uploadType' => 'media',
@@ -53,7 +57,7 @@ class GdriveHelper
         $folder->setMimeType('application/vnd.google-apps.folder');
         $folder->setParents(array($remoteFolderId));
         // Crea la cartella
-        $createdFolder = $this->service->files->create($folder, array('supportsAllDrives' => true));
+        $createdFolder = $this->driveService->files->create($folder, array('supportsAllDrives' => true));
         return $createdFolder;
     }
 
@@ -63,7 +67,7 @@ class GdriveHelper
         $query = "name='$folderName' and mimeType='application/vnd.google-apps.folder' and '" . $remoteFolderId . "' in parents";
 
         // Esegui la ricerca
-        $results = $this->service->files->listFiles(array(
+        $results = $this->driveService->files->listFiles(array(
             'q' => $query,
             'supportsAllDrives' => true,
             'includeItemsFromAllDrives' => true
@@ -92,7 +96,7 @@ class GdriveHelper
         $newFolderMeta->setName($newName);
 
         // Aggiorna la cartella
-        $updatedFolder = $this->service->files->update($folderId, $newFolderMeta, array('supportsAllDrives' => true));
+        $updatedFolder = $this->driveService->files->update($folderId, $newFolderMeta, array('supportsAllDrives' => true));
 
         return $updatedFolder->getName();
     }
@@ -104,7 +108,7 @@ class GdriveHelper
         $query = "'$folderId' in parents";
 
         // Esegui la ricerca
-        $results = $this->service->files->listFiles(array(
+        $results = $this->driveService->files->listFiles(array(
             'q' => $query,
             'supportsAllDrives' => true,
             'includeItemsFromAllDrives' => true
@@ -119,7 +123,7 @@ class GdriveHelper
         $params = array(
             'supportsAllDrives' => true
         );
-        $file = $this->service->files->get($fileId, $params);
+        $file = $this->driveService->files->get($fileId, $params);
 
         // Imposta gli header HTTP appropriati
         header('Content-Type: ' . $file->getMimeType());
@@ -130,7 +134,7 @@ class GdriveHelper
             'alt' => 'media',
             'supportsAllDrives' => true
         );
-        $response = $this->service->files->get($fileId, $responseParams);
+        $response = $this->driveService->files->get($fileId, $responseParams);
         echo $response->getBody();
     }
 
@@ -150,9 +154,31 @@ class GdriveHelper
             'includeItemsFromAllDrives' => true
         );
 
-        $results = $this->service->files->listFiles($params);
+        $results = $this->driveService->files->listFiles($params);
 
         return count($results) >0 ? $results->getFiles()[0] : null;
+    }
+
+    public function getSpreeadsheetData($spreadsheetId) {
+
+        $response = $this->spreeadsheetService->spreadsheets->get($spreadsheetId);
+        $sheets = $response->getSheets();
+
+        foreach ($sheets as $sheet) {
+            $sheetTitle = $sheet->getProperties()->getTitle();
+
+            $range = $sheetTitle . '!D:D';
+            $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
+
+            $count = 0;
+            foreach ($values as $row) {
+                if (isset($row[0]) && $row[0] === $sheetTitle) {
+                    $count++;
+                }
+            }
+            echo $sheet->getProperties()->getTitle() .": ". $count . "\n";
+        }
+
     }
 
     private function pulisciNome($nome) {

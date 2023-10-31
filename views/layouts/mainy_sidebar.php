@@ -80,8 +80,10 @@ JS) ?>
                         <li class="submenu-item">
                             <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php" target="_blank">Ticket</a>
                         </li>
+                        <li class="submenu-item">
+                            <a href="https://drive.google.com/drive/u/1/folders/1hQHH8UkLdVJ3K-jPHLQ5zM3mZKI6_2sB" target="_blank">Cartella condivisa</a>
+                        </li>
 <!--
-
 						<li class="submenu-item">
 							<a href="<?php /*= Url::current(['layout' => 'auth', 'render' => '/auth/login']) */?>">LogIn</a>
 						</li>
