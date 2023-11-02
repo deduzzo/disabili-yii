@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 
+use Amp\Loop;
+use Amp\Process\Process;
 use app\helpers\GdriveHelper;
 use app\helpers\Utils;
 use app\models\Anagrafica;
@@ -27,7 +29,6 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Google_Client;
 use Google_Service_Drive;
-use Google_Service_Drive_DriveFile;
 use PHP_IBAN\IBAN;
 use Yii;
 use yii\web\Controller;
@@ -557,6 +558,42 @@ class SiteController extends Controller
         $spid = "1ofNJ8KOG-mCMdnS5mum0V_mBmZ5alvKB62FvZKxzB3A";
         $gdrive = new GdriveHelper();
         $gdrive->getSpreeadsheetData($spid);
+    }
+
+    public function actionTestNode() {
+        Loop::run(function () {
+            // Crea il comando per eseguire lo script Node.js
+            $command = '/Users/deduzzo/.nvm/versions/node/v18.12.1/bin/node index.js';
+
+            $process = new Process($command, "../node/");
+            yield $process->start(); // Avvia il processo asincronamente
+
+            $output = '';
+            $error = '';
+
+            // Legge stdout
+            while (($chunk = yield $process->getStdout()->read()) !== null) {
+                $output .= $chunk;
+            }
+
+            // Legge stderr
+            while (($chunk = yield $process->getStderr()->read()) !== null) {
+                $error .= $chunk;
+            }
+
+            // Attendere che il processo termini
+            yield $process->join();
+
+            if ($error) {
+                echo "Errore dello script Node.js: " . trim($error) . "\n";
+            } else {
+                // Stampa l'output se non ci sono errori
+                echo "Output dello script Node.js: " . trim($output) . "\n";
+            }
+
+            // Termina il loop di eventi
+            Loop::stop();
+        });
 
     }
 

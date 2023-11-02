@@ -38,3 +38,4 @@ tests/_support/_generated
 config/db.php
 config/private/
 /web/uploads/
+node/config.json
