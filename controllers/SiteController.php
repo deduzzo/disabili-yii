@@ -563,7 +563,7 @@ class SiteController extends Controller
     public function actionTestNode() {
         Loop::run(function () {
             // Crea il comando per eseguire lo script Node.js
-            $command = '/Users/deduzzo/.nvm/versions/node/v18.12.1/bin/node index.js';
+            $command = Yii::$app->params['nodeBinPath'].' index.js';
 
             $process = new Process($command, "../node/");
             yield $process->start(); // Avvia il processo asincronamente
