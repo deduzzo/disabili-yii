@@ -10,10 +10,12 @@ use app\helpers\DateManagerBehavior;
  * @property int $id
  * @property string|null $descrizione_atto
  * @property string|null $data
+ * @property float|null $importo
  * @property string|null $dal
  * @property string|null $al
  * @property int|null $inclusi_minorenni
  * @property int|null $inclusi_maggiorenni
+ * @property string|null $nome_file
  * @property string|null $note
  *
  * @property DecretoGruppi[] $decretoGruppis
@@ -46,9 +48,10 @@ class Decreto extends \yii\db\ActiveRecord
     {
         return [
             [['data', 'dal', 'al'], 'safe'],
+            [['importo'], 'number'],
             [['inclusi_minorenni', 'inclusi_maggiorenni'], 'integer'],
             [['note'], 'string'],
-            [['descrizione_atto'], 'string', 'max' => 100],
+            [['descrizione_atto', 'nome_file'], 'string', 'max' => 100],
         ];
     }
 
@@ -60,11 +63,13 @@ class Decreto extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'descrizione_atto' => 'Descrizione Atto',
-            'data' => 'Data decreto',
-            'dal' => 'Pagamenti dal',
-            'al' => 'Pagamenti al',
-            'inclusi_minorenni' => 'Minorenni inclusi',
-            'inclusi_maggiorenni' => 'Maggiorenni inclusi',
+            'data' => 'Data',
+            'importo' => 'Importo',
+            'dal' => 'Dal',
+            'al' => 'Al',
+            'inclusi_minorenni' => 'Inclusi Minorenni',
+            'inclusi_maggiorenni' => 'Inclusi Maggiorenni',
+            'nome_file' => 'Nome File',
             'note' => 'Note',
         ];
     }
