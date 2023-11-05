@@ -160,25 +160,38 @@ class GdriveHelper
     }
 
     public function getSpreeadsheetData($spreadsheetId) {
-
+        $out = "";
         $response = $this->spreeadsheetService->spreadsheets->get($spreadsheetId);
         $sheets = $response->getSheets();
 
+        $totaleMeseGlobale = 0;
+        $countTotale = 0;
         foreach ($sheets as $sheet) {
             $sheetTitle = $sheet->getProperties()->getTitle();
 
-            $range = $sheetTitle . '!D:D';
+            $range = $sheetTitle . '!A:AB';
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
 
             $count = 0;
+            $totaleDistretto = 0;
+            $inferiori = 0;
+            $superiori = 0;
             foreach ($values as $row) {
-                if (isset($row[0]) && $row[0] === $sheetTitle) {
+                if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle,$row[3]) && (!isset($row[0]) || $row[0] === "" || strtolower($row[0]) === "positivo")) {
                     $count++;
+                    $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]),"inferiore") || str_contains(strtolower($row[26]),"minore"))) ? "inferiore" : "superiore";
+                    $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
+                    if ($tipo === "inferiore") $inferiori++;
+                    else $superiori++;
                 }
             }
-            echo $sheet->getProperties()->getTitle() .": ". $count . "\n";
+            $out.= $sheet->getProperties()->getTitle() .": ". $count . "-> TOTALE: ".Yii::$app->formatter->asCurrency($totaleDistretto)." inferiori: ".$inferiori." superiori: ".$superiori. "<br />";
+            $totaleMeseGlobale += $totaleDistretto;
+            $countTotale += $count;
         }
-
+        $out.= "<br /> TOTALE NUOVI DISABILI: <b>".$countTotale."</b>";
+        $out.= "<br /> TOTALE GLOBALE: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
+        return $out;
     }
 
     private function pulisciNome($nome) {

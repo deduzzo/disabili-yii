@@ -553,13 +553,6 @@ class SiteController extends Controller
         Utils::dumpDb();
     }
 
-    public function actionTestGoogle()
-    {
-        $spid = "1ofNJ8KOG-mCMdnS5mum0V_mBmZ5alvKB62FvZKxzB3A";
-        $gdrive = new GdriveHelper();
-        $gdrive->getSpreeadsheetData($spid);
-    }
-
     public function actionTestNode() {
         Loop::run(function () {
             // Crea il comando per eseguire lo script Node.js

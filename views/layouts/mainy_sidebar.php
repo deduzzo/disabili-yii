@@ -117,6 +117,20 @@ JS) ?>
                 </li>
                 <li class="sidebar-item has-sub">
                     <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Contabilità</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a href="/contabilita/prossimi">Simulazione prossimi pagamenti</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/contabilita/anno">Per anno</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item has-sub">
+                    <a href="#" class="sidebar-link">
                         <i class="bi bi-gear"></i>
                         <span>Impostazioni</span>
                     </a>
