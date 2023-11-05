@@ -185,7 +185,7 @@ class GdriveHelper
                     else $superiori++;
                 }
             }
-            $out.= $sheet->getProperties()->getTitle() .": ". $count . "-> TOTALE: ".Yii::$app->formatter->asCurrency($totaleDistretto)." inferiori: ".$inferiori." superiori: ".$superiori. "<br />";
+            $out.= $sheet->getProperties()->getTitle() .": ". $count . "-> ".Yii::$app->formatter->asCurrency($totaleDistretto)." [inferiori: ".$inferiori.", superiori: ".$superiori. "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $count;
         }
