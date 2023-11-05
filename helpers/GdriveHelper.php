@@ -190,7 +190,7 @@ class GdriveHelper
             $countTotale += $count;
         }
         $out.= "<br /> TOTALE NUOVI DISABILI: <b>".$countTotale."</b>";
-        $out.= "<br /> TOTALE GLOBALE: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
+        $out.= "<br /> TOTALE MENSILE STIMATO: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
         return $out;
     }
 
