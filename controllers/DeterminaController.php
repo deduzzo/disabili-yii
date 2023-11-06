@@ -257,7 +257,7 @@ class DeterminaController extends \yii\web\Controller
             $result = "";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
-            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id');
+            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true]);
             // and where m.data is between start and and of mesepagamento
             $istanzePagate = $istanzePagate->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
             foreach ($istanzePagate as $istanza) {
