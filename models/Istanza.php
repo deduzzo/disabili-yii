@@ -449,9 +449,10 @@ class Istanza extends \yii\db\ActiveRecord
         $logico = 0;
         $reale = 0;
         foreach ($movimentiIstanzaMese as $movimento) {
-            if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita && !$movimento->tornato_indietro)
-                $reale += $movimento->importo;
-            else
+            if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita) {
+                if (!$movimento->tornato_indietro)
+                    $reale += $movimento->importo;
+            } else
                 $logico += $movimento->importo;
         }
         return $reale - $logico;
