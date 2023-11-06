@@ -83,8 +83,9 @@ class ContabilitaController extends Controller
                             ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
                     ->orderBy('data ASC')->all();
                     if ($fondi) {
+                        $importi["incasso"][$mese] = 0;
                         foreach ($fondi as $fondo) {
-                            $importi["incasso"][$mese] = floatval($fondo['importo']);
+                            $importi["incasso"][$mese]+= floatval($fondo['importo']);
                         }
                         $numMontsFromDalAndAl = Carbon::createfromformat('Y-m-d', $fondi[0]['dal'])->diffInMonths(Carbon::createfromformat('Y-m-d', $fondi[0]['al']), false);
                         $importi['colspan'][$mese] = $numMontsFromDalAndAl + 1;
