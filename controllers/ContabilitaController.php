@@ -81,7 +81,7 @@ class ContabilitaController extends Controller
                         ->from('decreto')
                         ->where(['<=', 'dal', $inizioMese->format('Y-m-d')])
                             ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
-                    ->orderBy('data ASC')->limit(1)->all();
+                    ->orderBy('data ASC')->all();
                     if ($fondi) {
                         foreach ($fondi as $fondo) {
                             $importi["incasso"][$mese] = floatval($fondo['importo']);
