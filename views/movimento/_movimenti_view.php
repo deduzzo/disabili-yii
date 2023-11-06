@@ -106,6 +106,8 @@ $selectedPageSize = isset(Yii::$app->request->queryParams['pageSize']) ? Yii::$a
                     else
                         $out.= '<span class="badge bg-info">BANCARIO UFFICIALE</span>';
                 }
+                if ($model->tornato_indietro)
+                    $out .= '<br /><span class="badge bg-danger">TORNATO INDIETRO</span>';
                 return $out;
             },
             'format' => 'raw',
