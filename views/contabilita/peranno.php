@@ -48,7 +48,7 @@ $formatter = \Yii::$app->formatter;
                         <select class="form-select" id="anno" name="anno">
                             <option selected>Scegli...</option>
                             <?php
-                            for ($i = date('Y') - 5; $i <= date('Y'); $i++)
+                            for ($i = 2019; $i <= date('Y'); $i++)
                                 echo "<option value='$i' " . ($i == $anno ? "selected " : "") . ">$i</option>";
                             ?>
                         </select>
