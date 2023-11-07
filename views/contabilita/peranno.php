@@ -94,7 +94,7 @@ $formatter = \Yii::$app->formatter;
                                     if (($i === 0 || $importi['colspan'][$i - 1] === 1)) {
                                         $spesa = 0;
                                         for ($k = $i; $k < $i + ($importi['colspan'][$i] ?? 0); $k++)
-                                            $spesa += $importi['spesa'][$k];
+                                            $spesa += $importi['spesa'][$k] ?? 0;
                                         $valore = ($importi['incasso'][$i] ?? 0) - $spesa;
                                         $totaleGlobale += $valore;
                                         $classe = $valore >= 0 ? 'positivo' : 'negativo';
