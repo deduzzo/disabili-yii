@@ -65,17 +65,14 @@ class ContabilitaController extends Controller
                 $spesa = (new Query())
                     ->select('SUM(importo)')
                     ->from('movimento')
-                    ->where([
-                        'or',
+                    ->where(
+
                         ['and',
                             ['>=', 'periodo_da', $inizioMese->format('Y-m-d')],
-                            ['<=', 'periodo_a', $fineMese->format('Y-m-d')]
+                            ['<=', 'periodo_da', $fineMese->format('Y-m-d')]
                         ],
-                        ['and',
-                            ['>=', 'data', $inizioMese->format('Y-m-d')],
-                            ['<=', 'data', $fineMese->format('Y-m-d')]
-                        ]
-                    ])
+
+                    )
                     ->andWhere([
                         'is_movimento_bancario' => true,
                         'tornato_indietro' => false
