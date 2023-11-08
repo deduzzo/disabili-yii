@@ -159,11 +159,10 @@ class GdriveHelper
         return count($results) >0 ? $results->getFiles()[0] : null;
     }
 
-    public function getSpreeadsheetData($spreadsheetId) {
-        $out = "";
+    public function verificaDatiNuoviDisabiliFiles($spreadsheetId) {
+        $out = ['out' => "",'cfs' => [],'errors' => []];
         $response = $this->spreeadsheetService->spreadsheets->get($spreadsheetId);
         $sheets = $response->getSheets();
-
         $totaleMeseGlobale = 0;
         $countTotale = 0;
         foreach ($sheets as $sheet) {
@@ -179,18 +178,22 @@ class GdriveHelper
             foreach ($values as $row) {
                 if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle,$row[3]) && (!isset($row[0]) || $row[0] === "" || strtolower($row[0]) === "positivo")) {
                     $count++;
+                    if (isset($row[4]) && $row[4] !== "")
+                        $out['cfs'][] = trim(strtoupper($row[4]));
+                    else
+                        $out['errors'][] = "CF non presente in riga: ".($count+1)." del foglio: ".$sheetTitle;
                     $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]),"inferiore") || str_contains(strtolower($row[26]),"minore"))) ? "inferiore" : "superiore";
                     $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
                     if ($tipo === "inferiore") $inferiori++;
                     else $superiori++;
                 }
             }
-            $out.= $sheet->getProperties()->getTitle() .": ". $count . "-> ".Yii::$app->formatter->asCurrency($totaleDistretto)." [inferiori: ".$inferiori.", superiori: ".$superiori. "]<br />";
+            $out['out'].= $sheet->getProperties()->getTitle() .": ". $count . "-> ".Yii::$app->formatter->asCurrency($totaleDistretto)." [inferiori: ".$inferiori.", superiori: ".$superiori. "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $count;
         }
-        $out.= "<br /> TOTALE NUOVI DISABILI: <b>".$countTotale."</b>";
-        $out.= "<br /> TOTALE MENSILE STIMATO: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
+        $out['out'].= "<br /> TOTALE NUOVI DISABILI: <b>".$countTotale."</b>";
+        $out['out'].= "<br /> TOTALE MENSILE STIMATO: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
         return $out;
     }
 

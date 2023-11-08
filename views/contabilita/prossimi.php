@@ -36,14 +36,22 @@ $formatter = \Yii::$app->formatter;
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-1">
                     <!-- button submit -->
                     <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
+                </div>
+                <div class="col-md-3">
+                    <?php if ($result !== ""): ?>
+                        <div class="col-md-8"><?= ExportWidget::widget([
+                                'models' => $result['cfs'],
+                                'columns' => ['cf'],
+                            ]) ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <?= $result ?>
+            <?= $result['out'] ?? "" ?>
         </div>
     </div>
     <?php JSRegister::begin([

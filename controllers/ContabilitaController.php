@@ -47,7 +47,7 @@ class ContabilitaController extends Controller
             $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
         }
         if (isset($_GET['nomeGruppo'])) {
-            $out = $gdrive->getSpreeadsheetData($allNewGroupMaps[$_GET['nomeGruppo']]);
+            $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']]);
         } else {
             $out = "";
         }
