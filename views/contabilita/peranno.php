@@ -106,39 +106,42 @@ $formatter = \Yii::$app->formatter;
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-md-8">
-                        <?php foreach ($importi['determineStoriche'] as $determina): ?>
-                        <?php $totaleGlobale -= $determina['importo'] ?>
-                            <div class="row">
-                                <div class="col-md-2">
-                                    Numero
+                    <?php if (count($importi['determineStoriche']) > 0): ?>
+                        <div class="col-md-12" style="margin-top:20px">
+                            <h4 class="text-center">Storico Determine</h4>
+                        </div>
+                        <div class="col-md-12">
+                            <?php foreach ($importi['determineStoriche'] as $determina): ?>
+                                <?php $totaleGlobale -= $determina['importo'] ?>
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        Numero
+                                    </div>
+                                    <div class="col-md-2">
+                                        Data
+                                    </div>
+                                    <div class="col-md-2">
+                                        Importo
+                                    </div>
+                                    <div class="col-md-7">
+                                        Descrizione
+                                    </div>
+                                    <div class="col-md-1">
+                                        <h6><?= $determina['numero'] ?></h6>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h6><?= Yii::$app->formatter->asDate($determina['data']) ?></h6>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h6><?= Yii::$app->formatter->asCurrency($determina['importo']) ?></h6>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h6><?= $determina['descrizione'] ?></h6>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    Data
-                                </div>
-                                <div class="col-md-3">
-                                    Importo
-                                </div>
-                                <div class="col-md-3">
-                                    Descrizione
-                                </div>
-                                <div class="col-md-2">
-                                    <h6><?= $determina['numero'] ?></h6>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6><?= Yii::$app->formatter->asDate($determina['data']) ?></h6>
-                                </div>
-                                <div class="col-md-3">
-                                    <h6><?= Yii::$app->formatter->asCurrency($determina['importo']) ?></h6>
-                                </div>
-                                <div class="col-md-3">
-                                    <h6><?= $determina['descrizione'] ?></h6>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="col-md-4">
-                    </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                     <!-- mostra totale globale -->
                     <div class="col-md-12" style="margin-top:20px">
                         <h4 class="text-center">Totale: <?= $formatter->asCurrency($totaleGlobale) ?></h4>
