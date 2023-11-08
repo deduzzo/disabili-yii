@@ -54,10 +54,10 @@ class ContabilitaController extends Controller
     public function actionAnno()
     {
         $anno = $_GET['anno'] ?? date('Y');
-        $importi = ["spesa" => [], "incasso" => [], 'colspan' => [],'determineStoriche' => []];
+        $importi = ["spesa" => [], "incasso" => [], 'colspan' => [], 'determineStoriche' => []];
         foreach (range(0, 11) as $mese) {
             // spesa
-            $inizioMese = Carbon::createfromformat('Y-m-d', $anno . '-' . ($mese +1). '-01');
+            $inizioMese = Carbon::createfromformat('Y-m-d', $anno . '-' . ($mese + 1) . '-01');
             $fineMese = (clone $inizioMese)->endOfMonth();
             $dataUltimoPagamento = Movimento::getDataUltimoPagamento();
             if (Carbon::now()->isAfter($dataUltimoPagamento)) {
@@ -66,9 +66,17 @@ class ContabilitaController extends Controller
                     ->select('SUM(importo)')
                     ->from('movimento')
                     ->where(
-                        ['and',
-                            ['=', 'periodo_da', $inizioMese->format('Y-m-d')],
-                            ['<=', 'periodo_a', $fineMese->format('Y-m-d')]])->andWhere([
+                        ['or',
+                            ['and', [
+                                ['=', 'periodo_da', $inizioMese->format('Y-m-d')],
+                                ['<=', 'periodo_a', $fineMese->format('Y-m-d')]]],
+                            [
+                                ['>=', 'data', $inizioMese->format('Y-m-d')],
+                                ['<=', 'data', $fineMese->format('Y-m-d')]
+                            ]
+                        ]
+                    )
+                    ->andWhere([
                         'is_movimento_bancario' => true,
                         'tornato_indietro' => false
                     ]);
@@ -76,25 +84,25 @@ class ContabilitaController extends Controller
                 $spesa = $spesa->scalar();
                 $importi["spesa"][$mese] = floatval($spesa);
                 // fondi
-                if (!isset($importi['colspan'][$mese -1]) || $importi['colspan'][$mese -1] === 1) {
+                if (!isset($importi['colspan'][$mese - 1]) || $importi['colspan'][$mese - 1] === 1) {
                     $fondi = (new Query())
                         ->select('descrizione_atto,data,importo,dal,al')
                         ->from('decreto')
                         ->where(['<=', 'dal', $inizioMese->format('Y-m-d')])
-                            ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
-                    ->orderBy('data ASC')->all();
+                        ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
+                        ->orderBy('data ASC')->all();
                     if ($fondi) {
                         $numMontsFromDalAndAl = Carbon::createfromformat('Y-m-d', $fondi[0]['dal'])->diffInMonths(Carbon::createfromformat('Y-m-d', $fondi[0]['al']), false);
                         $importi["incasso"][$mese] = 0;
                         foreach ($fondi as $fondo) {
-                            $importi["incasso"][$mese]+= floatval($fondo['importo']);
+                            $importi["incasso"][$mese] += floatval($fondo['importo']);
                         }
 
                         $importi['colspan'][$mese] = $numMontsFromDalAndAl + 1;
                     } else
                         $importi['colspan'][$mese] = 1;
                 } else
-                    $importi['colspan'][$mese] = $importi['colspan'][$mese -1] - 1;
+                    $importi['colspan'][$mese] = $importi['colspan'][$mese - 1] - 1;
             }
         }
         $inizioAnno = Carbon::createfromformat('Y-m-d', $anno . '-01-01');
