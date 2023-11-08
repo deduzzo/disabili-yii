@@ -44,7 +44,7 @@ class ContabilitaController extends Controller
         // $allNewGroupMaps an array with key the name of file and value the id of file
         $allNewGroupMaps = [];
         foreach ($allNewGroupNames as $groupName) {
-            $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
+            $allNewGroupMaps[preg_split("#",$groupName->getName())[0]] = $groupName->getId();
         }
         if (isset($_GET['nomeGruppo'])) {
             $out = $gdrive->getSpreeadsheetData($allNewGroupMaps[$_GET['nomeGruppo']]);
