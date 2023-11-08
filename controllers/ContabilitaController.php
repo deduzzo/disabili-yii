@@ -41,11 +41,10 @@ class ContabilitaController extends Controller
         $spid = "1ofNJ8KOG-mCMdnS5mum0V_mBmZ5alvKB62FvZKxzB3A";
         $gdrive = new GdriveHelper();
         $allNewGroupNames = $gdrive->getAllFilesInFolder("1kCEbTxN_iHKEmD5FCbCERuLOQf9fR-jP");
-        print_r($allNewGroupNames);
         // $allNewGroupMaps an array with key the name of file and value the id of file
         $allNewGroupMaps = [];
         foreach ($allNewGroupNames as $groupName) {
-            $allNewGroupMaps[preg_split("#",$groupName->getName())[0]] = $groupName->getId();
+            $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
         }
         if (isset($_GET['nomeGruppo'])) {
             $out = $gdrive->getSpreeadsheetData($allNewGroupMaps[$_GET['nomeGruppo']]);
