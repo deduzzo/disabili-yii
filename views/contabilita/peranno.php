@@ -110,14 +110,17 @@ $formatter = \Yii::$app->formatter;
                         <?php foreach ($importi['determineStoriche'] as $determina): ?>
                         <?php $totaleGlobale -= $determina['importo'] ?>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-2">
                                     <h5><?= $determina['numero'] ?></h5>
                                 </div>
-                                <div class="col-md-12">
-                                    <h6><?= $determina['oggetto'] ?></h6>
+                                <div class="col-md-4">
+                                    <h6><?= Yii::$app->formatter->asDate($determina['data']) ?></h6>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-3">
                                     <h6><?= $determina['importo'] ?></h6>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6><?= $determina['descrizione'] ?></h6>
                                 </div>
                             </div>
                         <?php endforeach; ?>
