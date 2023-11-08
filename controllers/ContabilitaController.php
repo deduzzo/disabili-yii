@@ -68,7 +68,7 @@ class ContabilitaController extends Controller
                     ->where(
                         ['and',
                             ['>=', 'periodo_da', $inizioMese->format('Y-m-d')],
-                            ['<=', 'periodo_a', $fineMese->format('Y-m-d')]])->andWhere([
+                            ['>=', 'periodo_a', $fineMese->format('Y-m-d')]])->andWhere([
                         'is_movimento_bancario' => true,
                         'tornato_indietro' => false
                     ]);
