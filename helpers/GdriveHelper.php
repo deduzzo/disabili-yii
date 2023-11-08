@@ -179,7 +179,7 @@ class GdriveHelper
                 if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle,$row[3]) && (!isset($row[0]) || $row[0] === "" || strtolower($row[0]) === "positivo")) {
                     $count++;
                     if (isset($row[4]) && $row[4] !== "")
-                        $out['cfs'][] = ["cf" => trim(strtoupper($row[4]))];
+                        $out['cfs'][] = ["cf" => trim(strtoupper($row[4])),"distretto" => trim(strtoupper($row[3])];
                     else
                         $out['errors'][] = "CF non presente in riga: ".($count+1)." del foglio: ".$sheetTitle;
                     $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]),"inferiore") || str_contains(strtolower($row[26]),"minore"))) ? "inferiore" : "superiore";

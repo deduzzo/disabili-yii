@@ -45,7 +45,7 @@ $formatter = \Yii::$app->formatter;
                     <?php if ($result !== null): ?>
                         <?= ExportWidget::widget([
                             'models' => $result['cfs'],
-                            'columns' => ['cf'],
+                            'columns' => ['distretto','cf'],
                         ]) ?>
                     <?php endif; ?>
                 </div>
