@@ -72,8 +72,13 @@ $formatter = \Yii::$app->formatter;
                             <tbody>
                             <tr>
                                 <td class="fw-bold text-center" style="font-size: 12px;">Fondi</td>
-                                <?php for ($i = 0; $i < 12; $i++): ?>
-                                    <?php if ($i === 0 || $importi['colspan'][$i - 1] === 1): ?>
+                                <?php
+                                $totaleFondi = 0;
+                                $totaleUscite = 0;
+                                for ($i = 0; $i < 12; $i++): ?>
+                                    <?php
+                                        $totaleFondi += $importi['incasso'][$i] ?? 0;
+                                        if ($i === 0 || $importi['colspan'][$i - 1] === 1): ?>
                                         <td class="mese text-center" style="font-size: 12px;"
                                             colspan="<?= $importi['colspan'][$i] ?? 1 ?>"><?= $formatter->asCurrency($importi['incasso'][$i] ?? "") ?></td>
                                     <?php endif; ?>
@@ -84,6 +89,7 @@ $formatter = \Yii::$app->formatter;
                                 <?php for ($i = 0; $i < 12; $i++): ?>
                                     <td class="mese text-center"
                                         style="font-size: 12px;"><?= $formatter->asCurrency($importi['spesa'][$i]) ?></td>
+                                <?php $totaleUscite += $importi['spesa'][$i] ?? 0; ?>
                                 <?php endfor; ?>
                             </tr>
                             <tr class="fw-bold totali-bg">
@@ -105,6 +111,13 @@ $formatter = \Yii::$app->formatter;
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- mostra totaleUscite e totaleFondi -->
+                    <div class="col-md-12" style="margin-top:20px">
+                        <h4 class="text-center">Totale Uscite: <?= $formatter->asCurrency($totaleUscite) ?></h4>
+                    </div>
+                    <div class="col-md-12" style="margin-top:20px">
+                        <h4 class="text-center">Totale Fondi: <?= $formatter->asCurrency($totaleFondi) ?></h4>
                     </div>
                     <?php if (count($importi['determineStoriche']) > 0): ?>
                         <div class="col-md-12" style="margin-top:20px">
