@@ -25,10 +25,11 @@ $formatter = \Yii::$app->formatter;
     <div class="card-header">
         <div class="card-toolbar">
             <!-- list of all new group names -->
+            <?= Html::beginForm(['contabilita/prossimi'], 'get', ['class' => 'form-inline']) ?>
             <div class="row">
                 <div class="col-md-8">
-                    <label for="anno" class="form-label">Seleziona Nome Gruppo</label>
-                    <select class="form-select" id="anno" name="anno">
+                    <label for="nomeGruppo" class="form-label">Seleziona Gruppo</label>
+                    <select class="form-select" id="nomeGruppo" name="nomeGruppo">
                         <option selected>Scegli...</option>
                         <?php foreach ($nomiGruppi as $groupName): ?>
                             <option value="<?= $groupName ?>"><?= $groupName ?></option>
