@@ -178,10 +178,19 @@ class GdriveHelper
             foreach ($values as $row) {
                 if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle,$row[3]) && (!isset($row[0]) || $row[0] === "" || strtolower($row[0]) === "positivo")) {
                     $count++;
+
                     if (isset($row[4]) && $row[4] !== "")
                         $out['cfs'][] = ["cf" => trim(strtoupper($row[4])),"distretto" => trim(strtoupper($row[3]))];
                     else
                         $out['errors'][] = "CF non presente in riga: ".($count+1)." del foglio: ".$sheetTitle;
+                    if ((!isset($row[13]) || $row[13] === "") && (!isset($row[20]) || $row[20] === ""))
+                        $out['errors'][] = "Iban non presente nella riga: ".($count+1)." del foglio: ".$sheetTitle;
+                    else
+                    {
+                        $iban = (isset($row[13]) && $row[13] !== "") ? $row[13] : $row[20];
+                        if (!Utils::verificaIban(trim(strtoupper($iban))))
+                            $out['errors'][] = "Iban non valido nella riga: ".($count+1)." del foglio: ".$sheetTitle;
+                    }
                     $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]),"inferiore") || str_contains(strtolower($row[26]),"minore"))) ? "inferiore" : "superiore";
                     $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
                     if ($tipo === "inferiore") $inferiori++;

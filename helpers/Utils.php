@@ -86,4 +86,8 @@ class Utils
             echo 'mysqldump-php error: ' . $e->getMessage();
         }
     }
+
+    public static function verificaIban($iban) {
+        return verify_iban($iban);
+    }
 }
