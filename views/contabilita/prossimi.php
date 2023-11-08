@@ -54,7 +54,7 @@ $formatter = \Yii::$app->formatter;
         <div class="card-body">
             <?php if ($result !== null): ?>
                 <?= $result['out'] ?>
-                <?php echo count($result['errors']) == 0 ? "Nessun errore riscontrato" : "<br /><h5>Errori riscontrati:</h5><br />";
+                <?php echo count($result['errors']) == 0 ? "Nessun errore riscontrato" : "<br /></br /><h5>Errori riscontrati:</h5>";
                 foreach ($result['errors'] as $error) {
                     echo $error . "<br />";
                 } ?>
