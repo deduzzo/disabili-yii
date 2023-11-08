@@ -40,12 +40,13 @@ $formatter = \Yii::$app->formatter;
                     <!-- button submit -->
                     <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
                 </div>
+                <?= Html::endForm() ?>
                 <div class="col-md-3">
                     <?php if ($result !== null): ?>
                         <?= ExportWidget::widget([
-                                'models' => $result['cfs'],
-                                'columns' => ['cf'],
-                            ]) ?>
+                            'models' => $result['cfs'],
+                            'columns' => ['cf'],
+                        ]) ?>
                     <?php endif; ?>
                 </div>
             </div>
