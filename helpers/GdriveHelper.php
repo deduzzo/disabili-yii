@@ -181,7 +181,7 @@ class GdriveHelper
                 if ($index > 1) {
                     if (isset($row[4]) && $row[4] !== "")
                         $out['cfs'][] = ["cf" => trim(strtoupper($row[4])), "distretto" => trim(strtoupper($row[3]))];
-                    if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle, $row[3]) && str_contains(strtolower($row[0]), "positiv") && isset($row[24]) && $row[24] !== "") {
+                    if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle, $row[3]) && str_contains(strtolower($row[0]), "positiv") && isset($row[24]) && trim($row[24]) !== "") {
                         $count++;
 
                         if (isset($row[4]) && $row[4] !== "") {
