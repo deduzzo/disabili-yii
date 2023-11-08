@@ -32,7 +32,7 @@ $formatter = \Yii::$app->formatter;
                     <select class="form-select" id="nomeGruppo" name="nomeGruppo">
                         <option selected>Scegli...</option>
                         <?php foreach ($nomiGruppi as $groupName): ?>
-                            <option value="<?= $groupName ?>" <?= $_GET['nomeGruppo'] === $groupName ? "selected" : "" ?>><?= $groupName ?></option>
+                            <option value="<?= $groupName ?>" <?= isset($_GET['nomeGruppo']) && $_GET['nomeGruppo'] === $groupName ? "selected" : "" ?>><?= $groupName ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
