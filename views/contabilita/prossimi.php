@@ -45,14 +45,19 @@ $formatter = \Yii::$app->formatter;
                     <?php if ($result !== null): ?>
                         <?= ExportWidget::widget([
                             'models' => $result['cfs'],
-                            'columns' => ['distretto','cf'],
+                            'columns' => ['distretto', 'cf'],
                         ]) ?>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <?= $result !== null ? $result['out'] : "" ?>
+            <?php if ($result !== null): ?>
+                <?= $result['out'] ?>
+                <?php foreach ($result['errors'] as $error) {
+                    echo $error . "<br />";
+                } ?>
+            <?php endif; ?>
         </div>
     </div>
     <?php JSRegister::begin([
