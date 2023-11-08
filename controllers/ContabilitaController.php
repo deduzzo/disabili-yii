@@ -46,7 +46,8 @@ class ContabilitaController extends Controller
         }, $allNewGroupNames);
         $out = $gdrive->getSpreeadsheetData($spid);
         return $this->render('prossimi', [
-            'result' => $out
+            'result' => $out,
+            'allNewGroupNames'=> $allNewGroupNames
         ]);
     }
 
