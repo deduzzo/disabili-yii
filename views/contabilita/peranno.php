@@ -106,6 +106,22 @@ $formatter = \Yii::$app->formatter;
                             </tbody>
                         </table>
                     </div>
+                    <div class="col-md-12">
+                        <?php foreach ($importi['determinaStorica'] as $determina): ?>
+                        <?php $totaleGlobale -= $determina['importo'] ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5><?= $determina['numero'] ?></h5>
+                                </div>
+                                <div class="col-md-12">
+                                    <h6><?= $determina['oggetto'] ?></h6>
+                                </div>
+                                <div class="col-md-12">
+                                    <h6><?= $determina['importo'] ?></h6>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                     <!-- mostra totale globale -->
                     <div class="col-md-12" style="margin-top:20px">
                         <h4 class="text-center">Totale: <?= $formatter->asCurrency($totaleGlobale) ?></h4>

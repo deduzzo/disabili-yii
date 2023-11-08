@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\GdriveHelper;
 use app\models\Decreto;
 use app\models\DecretoSearch;
+use app\models\Determina;
 use app\models\Movimento;
 use Carbon\Carbon;
 use yii\db\Query;
@@ -53,7 +54,7 @@ class ContabilitaController extends Controller
     public function actionAnno()
     {
         $anno = $_GET['anno'] ?? date('Y');
-        $importi = ["spesa" => [], "incasso" => [], 'colspan' => []];
+        $importi = ["spesa" => [], "incasso" => [], 'colspan' => [],'determineStoriche' => []];
         foreach (range(0, 11) as $mese) {
             // spesa
             $inizioMese = Carbon::createfromformat('Y-m-d', $anno . '-' . ($mese +1). '-01');
@@ -83,11 +84,12 @@ class ContabilitaController extends Controller
                             ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
                     ->orderBy('data ASC')->all();
                     if ($fondi) {
+                        $numMontsFromDalAndAl = Carbon::createfromformat('Y-m-d', $fondi[0]['dal'])->diffInMonths(Carbon::createfromformat('Y-m-d', $fondi[0]['al']), false);
                         $importi["incasso"][$mese] = 0;
                         foreach ($fondi as $fondo) {
                             $importi["incasso"][$mese]+= floatval($fondo['importo']);
                         }
-                        $numMontsFromDalAndAl = Carbon::createfromformat('Y-m-d', $fondi[0]['dal'])->diffInMonths(Carbon::createfromformat('Y-m-d', $fondi[0]['al']), false);
+
                         $importi['colspan'][$mese] = $numMontsFromDalAndAl + 1;
                     } else
                         $importi['colspan'][$mese] = 1;
@@ -95,6 +97,9 @@ class ContabilitaController extends Controller
                     $importi['colspan'][$mese] = $importi['colspan'][$mese -1] - 1;
             }
         }
+        $inizioAnno = Carbon::createfromformat('Y-m-d', $anno . '-01-01');
+        $fineAnno = (clone $inizioAnno)->endOfYear();
+        $importi['determineStoriche'] = Determina::find()->where(['storico' => true])->andWhere(['>=', 'data', $inizioAnno->format('Y-m-d')])->andWhere(['<=', 'data', $fineAnno->format('Y-m-d')])->all();
         return $this->render('peranno', [
             'anno' => $anno,
             'importi' => $importi
