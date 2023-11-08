@@ -42,10 +42,10 @@ $formatter = \Yii::$app->formatter;
                 </div>
                 <div class="col-md-3">
                     <?php if ($result !== null): ?>
-                        <div class="col-md-8"><?= ExportWidget::widget([
+                        <?= ExportWidget::widget([
                                 'models' => $result['cfs'],
                                 'columns' => ['cf'],
-                            ]) ?></div>
+                            ]) ?>
                     <?php endif; ?>
                 </div>
             </div>
