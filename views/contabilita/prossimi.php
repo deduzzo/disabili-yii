@@ -41,7 +41,7 @@ $formatter = \Yii::$app->formatter;
                     <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
                 </div>
                 <div class="col-md-3">
-                    <?php if ($result !== ""): ?>
+                    <?php if ($result !== null): ?>
                         <div class="col-md-8"><?= ExportWidget::widget([
                                 'models' => $result['cfs'],
                                 'columns' => ['cf'],
