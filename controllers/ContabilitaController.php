@@ -40,6 +40,10 @@ class ContabilitaController extends Controller
     {
         $spid = "1ofNJ8KOG-mCMdnS5mum0V_mBmZ5alvKB62FvZKxzB3A";
         $gdrive = new GdriveHelper();
+        $allNewGroupNames = $gdrive->getAllFilesInFolder("1kCEbTxN_iHKEmD5FCbCERuLOQf9fR-jP");
+        $allNewGroupNames = array_map(function ($item) {
+            return $item['name'];
+        }, $allNewGroupNames);
         $out = $gdrive->getSpreeadsheetData($spid);
         return $this->render('prossimi', [
             'result' => $out
@@ -48,6 +52,11 @@ class ContabilitaController extends Controller
 
     /**
      * Lists all Decreto models.
+     *
+     * USCITE
+     * select sum(res) FROM ( SELECT sum(importo) as res from movimento where movimento.is_movimento_bancario = true AND movimento.tornato_indietro = false UNION ALL SELECT sum(importo) as res from determina where determina.storico = true ) a;
+     * ENTRATE
+     * select sum(importo) from decreto;
      *
      * @return string
      */
