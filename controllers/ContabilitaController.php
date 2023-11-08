@@ -38,9 +38,10 @@ class ContabilitaController extends Controller
 
     public function actionProssimi()
     {
-        $spid = "1ofNJ8KOG-mCMdnS5mum0V_mBmZ5alvKB62FvZKxzB3A";
+        $spid = "1kCEbTxN_iHKEmD5FCbCERuLOQf9fR-jP";
         $gdrive = new GdriveHelper();
-        $allNewGroupNames = $gdrive->getAllFilesInFolder("1kCEbTxN_iHKEmD5FCbCERuLOQf9fR-jP");
+        $out = null;
+        $allNewGroupNames = $gdrive->getAllFilesInFolder($spid);
         // $allNewGroupMaps an array with key the name of file and value the id of file
         $allNewGroupMaps = [];
         foreach ($allNewGroupNames as $groupName) {
@@ -48,8 +49,6 @@ class ContabilitaController extends Controller
         }
         if (isset($_GET['nomeGruppo'])) {
             $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']]);
-        } else {
-            $out = "";
         }
         return $this->render('prossimi', [
             'result' => $out,

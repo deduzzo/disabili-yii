@@ -51,7 +51,7 @@ $formatter = \Yii::$app->formatter;
             </div>
         </div>
         <div class="card-body">
-            <?= $result['out'] ?? "" ?>
+            <?= $result !== null ? $result['out'] : "" ?>
         </div>
     </div>
     <?php JSRegister::begin([
