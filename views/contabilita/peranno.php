@@ -150,14 +150,14 @@ $formatter = \Yii::$app->formatter;
                         </div>
                     <?php endif; ?>
                     <!-- mostra totale globale -->
-                    <div class="col-md-3" style="margin-top:20px">
-                        <h4 class="text-center">Totale Uscite: <?= $formatter->asCurrency($totaleUscite) ?></h4>
+                    <div class="col-md-4" style="margin-top:20px">
+                        <h4 class="text-center" style="color: red;">Totale Uscite: <?= $formatter->asCurrency($totaleUscite) ?></h4>
                     </div>
-                    <div class="col-md-3" style="margin-top:20px">
-                        <h4 class="text-center">Totale Fondi: <?= $formatter->asCurrency($totaleFondi) ?></h4>
+                    <div class="col-md-4" style="margin-top:20px">
+                        <h4 class="text-center" style="color: blue;">Totale Fondi: <?= $formatter->asCurrency($totaleFondi) ?></h4>
                     </div>
-                    <div class="col-md-3" style="margin-top:20px">
-                        <h4 class="text-center">Totale: <?= $formatter->asCurrency($totaleGlobale) ?></h4>
+                    <div class="col-md-4" style="margin-top:20px">
+                        <h4 class="text-center" style="color: green;">Totale: <?= $formatter->asCurrency($totaleGlobale) ?></h4>
                     </div>
                 </div>
                 <?= Html::endForm() ?>
