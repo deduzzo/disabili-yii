@@ -177,32 +177,32 @@ class GdriveHelper
             $totaleDistretto = 0;
             $inferiori = 0;
             $superiori = 0;
-            foreach ($values as $row) {
-                if (isset($row[4]) && $row[4] !== "")
-                    $out['cfs'][] = ["cf" => trim(strtoupper($row[4])), "distretto" => trim(strtoupper($row[3]))];
-                if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle,$row[3]) && str_contains(strtolower($row[0]),"positiv") && isset($row[24]) && $row[24] !== "") {
-                    $count++;
-
-                    if (isset($row[4]) && $row[4] !== "") {
+            foreach ($values as $index => $row) {
+                if ($index > 1) {
+                    if (isset($row[4]) && $row[4] !== "")
                         $out['cfs'][] = ["cf" => trim(strtoupper($row[4])), "distretto" => trim(strtoupper($row[3]))];
-                        $validator = new Validator(trim(strtoupper($row[4])));
-                        if (!$validator->isFormallyValid())
-                            $out['errors'][] = "CF non valido in riga: ".($count+1)." nominativo: <b>".$row[5]." ". $row[6]."</b> del foglio: ".$sheetTitle;
+                    if (isset($row[3]) && $row[3] !== "" && str_contains($sheetTitle, $row[3]) && str_contains(strtolower($row[0]), "positiv") && isset($row[24]) && $row[24] !== "") {
+                        $count++;
+
+                        if (isset($row[4]) && $row[4] !== "") {
+                            $out['cfs'][] = ["cf" => trim(strtoupper($row[4])), "distretto" => trim(strtoupper($row[3]))];
+                            $validator = new Validator(trim(strtoupper($row[4])));
+                            if (!$validator->isFormallyValid())
+                                $out['errors'][] = "CF non valido in riga: " . ($count + 1) . " nominativo: <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
+                        } else
+                            $out['errors'][] = "CF non presente in riga: " . ($count + 1) . " nominativo:  <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
+                        if ((!isset($row[13]) || $row[13] === "") && (!isset($row[20]) || $row[20] === ""))
+                            $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
+                        else {
+                            $iban = (isset($row[13]) && $row[13] !== "") ? $row[13] : $row[20];
+                            if (!Utils::verificaIban(trim(strtoupper($iban))))
+                                $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
+                        }
+                        $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]), "inferiore") || str_contains(strtolower($row[26]), "minore"))) ? "inferiore" : "superiore";
+                        $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
+                        if ($tipo === "inferiore") $inferiori++;
+                        else $superiori++;
                     }
-                    else
-                        $out['errors'][] = "CF non presente in riga: ".($count+1)." nominativo:  <b>".$row[5]." ". $row[6]."</b> del foglio: ".$sheetTitle;
-                    if ((!isset($row[13]) || $row[13] === "") && (!isset($row[20]) || $row[20] === ""))
-                        $out['errors'][] = "Iban non presente nella riga: ".($count+1)." nominativo:  <b>".$row[5]." ". $row[6]."</b> del foglio: ".$sheetTitle;
-                    else
-                    {
-                        $iban = (isset($row[13]) && $row[13] !== "") ? $row[13] : $row[20];
-                        if (!Utils::verificaIban(trim(strtoupper($iban))))
-                            $out['errors'][] = "Iban non valido nella riga: ".($count+1)." nominativo:  <b>".$row[5]." ". $row[6]."</b> del foglio: ".$sheetTitle;
-                    }
-                    $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]),"inferiore") || str_contains(strtolower($row[26]),"minore"))) ? "inferiore" : "superiore";
-                    $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
-                    if ($tipo === "inferiore") $inferiori++;
-                    else $superiori++;
                 }
             }
             $out['out'].= $sheet->getProperties()->getTitle() .": ". $count . "-> ".Yii::$app->formatter->asCurrency($totaleDistretto)." [inferiori: ".$inferiori.", superiori: ".$superiori. "]<br />";
