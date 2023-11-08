@@ -107,7 +107,7 @@ $formatter = \Yii::$app->formatter;
                         </table>
                     </div>
                     <div class="col-md-12">
-                        <?php foreach ($importi['determinaStorica'] as $determina): ?>
+                        <?php foreach ($importi['determineStoriche'] as $determina): ?>
                         <?php $totaleGlobale -= $determina['importo'] ?>
                             <div class="row">
                                 <div class="col-md-12">
