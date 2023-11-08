@@ -13,7 +13,7 @@ use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var string $anno */
-/** @var array $allNewGroupNames */
+/** @var array $nomiGruppi */
 /** @var string $result */
 
 
@@ -30,7 +30,7 @@ $formatter = \Yii::$app->formatter;
                     <label for="anno" class="form-label">Seleziona Nome Gruppo</label>
                     <select class="form-select" id="anno" name="anno">
                         <option selected>Scegli...</option>
-                        <?php foreach ($allNewGroupNames as $groupName): ?>
+                        <?php foreach ($nomiGruppi as $groupName): ?>
                             <option value="<?= $groupName ?>"><?= $groupName ?></option>
                         <?php endforeach; ?>
                     </select>
