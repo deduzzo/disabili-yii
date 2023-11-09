@@ -267,7 +267,6 @@ class DeterminaController extends \yii\web\Controller
             $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])->andWhere(['not in', 'i.id', (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')->andWhere(['>=', 'm2.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->all()])->all();
             $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
             foreach ($allIstanze as $istanza) {
-                $istanzeAttiveArrayId = array_diff($istanzeAttiveArrayId, [$istanza['id']]);
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult !== 0.0) {
