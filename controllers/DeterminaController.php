@@ -269,7 +269,7 @@ class DeterminaController extends \yii\web\Controller
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
-                if ($tempResult !== 0.0) {
+                if ($tempResult != 0.0) {
                     $result .= "<div><p style='display:inline-block;'>❌ Istanza #" . $istanza->id
                         . " nominativo: " . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
