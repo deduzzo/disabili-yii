@@ -132,11 +132,14 @@ JS) ?>
                 <li class="sidebar-item has-sub">
                     <a href="#" class="sidebar-link">
                         <i class="bi bi-gear"></i>
-                        <span>Impostazioni</span>
+                        <span>Utilità</span>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
                             <a href="/site/upload">Carica Files</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/contabilita/verifica-iban">Verifica Iban</a>
                         </li>
                     </ul>
                 </li>
