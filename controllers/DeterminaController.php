@@ -80,8 +80,6 @@ class DeterminaController extends \yii\web\Controller
                     if ($differenza['alert'] === true)
                         $alert[$istanza->distretto->id] = $istVal;
                     else {
-                        if ($idDeterminaFinalizzare !== null)
-                            $istanza->finalizzaMensilita($idDeterminaFinalizzare);
                         if ($istanza->getProssimoImporto() > 0)
                             $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
                         $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
@@ -96,6 +94,8 @@ class DeterminaController extends \yii\web\Controller
                 $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
                 $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
             }
+            if ($idDeterminaFinalizzare !== null)
+                $istanza->finalizzaMensilita($idDeterminaFinalizzare);
         }
         $nonPagati = [];
         foreach ($distretti as $disPag) {
@@ -243,6 +243,8 @@ class DeterminaController extends \yii\web\Controller
         }
     }
 
+
+    //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
     public
     function actionPagamenti()
     {
