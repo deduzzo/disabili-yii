@@ -185,7 +185,6 @@ class GdriveHelper
                         $count++;
 
                         if (isset($row[4]) && $row[4] !== "") {
-                            $out['cfs'][] = ["cf" => trim(strtoupper($row[4])), "distretto" => trim(strtoupper($row[3]))];
                             $validator = new Validator(trim(strtoupper($row[4])));
                             if (!$validator->isFormallyValid())
                                 $out['errors'][] = "CF non valido in riga: " . ($count + 1) . " nominativo: <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
