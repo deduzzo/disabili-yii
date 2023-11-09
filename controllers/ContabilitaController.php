@@ -63,9 +63,9 @@ class ContabilitaController extends Controller
         if (isset($_GET['iban']) && $this->request->isGet) {
             $iban = $_GET['iban'];
             if (Utils::verificaIban($iban))
-                $out = '<span class="badge bg-success">Iban: '.$iban.' VALIDO</span>';
+                $out = '<span class="badge bg-success">IBAN: '.$iban.' VALIDO</span>';
             else
-                $out = '<span class="badge bg-danger">Iban: '.$iban.'NON VALIDO</span>';
+                $out = '<span class="badge bg-danger">IBAN: '.$iban.' NON VALIDO</span>';
         }
         return $this->render('verifica-iban', [
             'result' => $out,
