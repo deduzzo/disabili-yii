@@ -136,10 +136,10 @@ JS) ?>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a href="/site/upload">Carica Files</a>
+                            <a href="/contabilita/verifica-iban">Verifica Iban</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="/contabilita/verifica-iban">Verifica Iban</a>
+                            <a href="/site/upload">Carica Files</a>
                         </li>
                     </ul>
                 </li>
