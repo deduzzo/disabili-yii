@@ -142,7 +142,7 @@ class IstanzaController extends Controller
     public function actionScheda($id)
     {
         $model = $this->findModel($id);
-        if ($model) {
+        if ($model && (Yii::$app->params['gdrive_enabled'] || !isset(Yii::$app->params['gdrive_enabled']))) {
             $gdhelper = new GdriveHelper();
             $folder = $gdhelper->existFolderWithNameThatStartWith("#$model->id", $gdhelper->folderId);
             if (!$folder)

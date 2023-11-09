@@ -11,6 +11,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Yii;
 use yii\base\Model;
+use yii\helpers\Json;
 use yii\web\UploadedFile;
 
 class UploadForm extends Model
@@ -138,13 +139,13 @@ class UploadForm extends Model
                                 $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
                             $conto->iban = $iban;
                             $conto->attivo = $ultimoConto ? 0 : 1;
-                                $conto->save();
+                            $conto->save();
                             if ($conto->errors)
                                 $errors = array_merge($errors, ['conto' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $conto->errors]);
                             $contoCessionario = new ContoCessionario();
                             $contoCessionario->id_conto = $conto->id;
                             $contoCessionario->attivo = 0;
-                                $contoCessionario->save();
+                            $contoCessionario->save();
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
@@ -165,7 +166,7 @@ class UploadForm extends Model
                             $gruppoPagamento = new GruppoPagamento();
                             $gruppoPagamento->descrizione = "# " . $newRow[$header[PagamentiConIban::ID_ELENCO]];
                             $gruppoPagamento->progressivo = $newRow[$header[PagamentiConIban::ID_ELENCO]];
-                                $gruppoPagamento->save();
+                            $gruppoPagamento->save();
                             $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
                             if ($gruppoPagamento->errors)
                                 $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
@@ -179,7 +180,7 @@ class UploadForm extends Model
                         $movimento->contabilizzare = 0;
                         if ($istanza->data_decesso !== null || $istanza->attivo === false)
                             $alert[] = ["Istanza #" . $istanza->id . " pagata ma non è attiva o il disabile è deceduto"];
-                            $movimento->save();
+                        $movimento->save();
                         if ($movimento->errors)
                             $errors = array_merge($errors, ['movimento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $movimento->errors]);
                     }
@@ -196,7 +197,7 @@ class UploadForm extends Model
         // put in var $date the date in format yyyy-mm-dd_hh-mm-ss
         $date = date('Y-m-d_H-i-s');
         $fp = fopen('../import/pagamenti/con_iban/res_' . $date . '.json', 'w');
-        fwrite($fp, json_encode(["simulazione" => $this->simulazione,"nonTrovati" => $nonTrovati, "errors" => $errors, "alert" => $alert]));
+        fwrite($fp, json_encode(["simulazione" => $this->simulazione, "nonTrovati" => $nonTrovati, "errors" => $errors, "alert" => $alert]));
         fclose($fp);
         // send download of file fp
         Yii::$app->response->sendFile('../import/pagamenti/con_iban/res_' . $date . '.json');
@@ -210,8 +211,9 @@ class UploadForm extends Model
         set_time_limit(0);
         $nonTrovati = [];
         $errors = [];
+        $warnings = [];
         $stats = ["aggiunti" => 0, "aggiornati" => 0];
-        if ($clearAll)
+        if ($clearAll && !$this->simulazione)
             Ricovero::deleteAll();
         // for each files with extension ".xlsx" in folder: $path
         foreach ($files as $filename) {
@@ -246,20 +248,28 @@ class UploadForm extends Model
                                         $ricovero->a = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]]);
                                         $ricovero->contabilizzare = 1;
                                         $ricovero->note = "Comunicazione con file " . basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow;
-                                        $ricovero->save();
+                                        if (!$this->simulazione)
+                                            $ricovero->save();
                                         if ($ricovero->errors)
                                             $errors = array_merge($errors, ['ricovero' => $ricovero->errors]);
                                         else
                                             $stats["aggiunti"]++;
                                     } else {
                                         if ($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]] !== "" || $newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]] !== null) {
-                                            $ricoveroPresente->a = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]]);
-                                            $ricoveroPresente->contabilizzare = 1;
-                                            $ricoveroPresente->save();
-                                            if ($ricoveroPresente->errors)
-                                                $errors = array_merge($errors, ['ricoveroModifica' => $ricoveroPresente->errors]);
-                                            else
-                                                $stats["aggiornati"]++;
+                                            $a = Utils::convertDateFromFormat($newRow[$header[FileRicoveri::getLabel(FileRicoveri::DATA_DIMISSIONE)]]);
+                                            if ($ricoveroPresente->a !== $a || $ricoveroPresente->a === null) {
+                                                $precA = $ricoveroPresente->a;
+                                                $ricoveroPresente->a = $a;
+                                                $ricoveroPresente->contabilizzare = 1;
+                                                if (!$this->simulazione)
+                                                    $ricoveroPresente->save();
+                                                if ($ricoveroPresente->errors)
+                                                    $errors = array_merge($errors, [$ricoveroPresente->errors]);
+                                                else {
+                                                    $stats["aggiornati"]++;
+                                                    $warnings[] = ['a_precedente' => $precA, 'nuovo' => $ricoveroPresente->attributes];
+                                                }
+                                            }
                                         }
                                     }
                                 } else
@@ -278,8 +288,8 @@ class UploadForm extends Model
                 if (count($header) === 0)
                     $errors[] = [$errors, ['errore' => [basename($filename) . " - " . $sheet->getName() . " - " . "Header non trovato"]]];
             }
-            unlink($filename);
             $reader->close();
+            unlink($filename);
         }
         //var_dump(['nonTrovati' => $nonTrovati, 'errors' => $errors]);
         // save $nonTrovati as Json File
@@ -288,9 +298,11 @@ class UploadForm extends Model
         // export ['nonTrovati' => $nonTrovati, 'errors' => $errors] in file json with the same name and path of the original + "_report"
         $folder = Yii::getAlias('@webroot') . '/' . Yii::$app->params['importPath'] . '/';
         $fp = fopen($folder . 'esito-importazione_' . $date . '.json', 'w');
-        fwrite($fp, json_encode(['nonTrovati' => $nonTrovati, 'errors' => $errors]));
+        fwrite($fp, json_encode(['stats' => $stats,'nonTrovati' => $nonTrovati, 'errors' => $errors, 'warnings' => $warnings]));
         fclose($fp);
         Yii::$app->session->setFlash('success', "Importazione completata. Ricoveri aggiunti: " . $stats["aggiunti"] . ", aggiornati: " . $stats["aggiornati"] . " errori: " . count($errors));
-        return ['nonTrovati' => $nonTrovati, 'errors' => $errors, 'statsfilename' => 'esito-importazione_' . $date . '.json'];
+        //return ['nonTrovati' => $nonTrovati, 'errors' => $errors, 'statsfilename' => 'esito-importazione_' . $date . '.json'];
+        // send file $fp as download
+        Yii::$app->response->sendFile($folder . 'esito-importazione_' . $date . '.json');
     }
 }

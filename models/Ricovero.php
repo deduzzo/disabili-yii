@@ -118,7 +118,7 @@ class Ricovero extends \yii\db\ActiveRecord
             // id $da and $a are in different months
             list($aAnno, $aMese, $aGiorno) = explode('-', $this->a);
         }
-        if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThan($a)) {
+        if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
             if ($da->month !== $a->month) {
