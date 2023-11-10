@@ -11,9 +11,11 @@ use app\models\Movimento;
 use app\models\SimulazioneDeterminaSearch;
 use Carbon\Carbon;
 use Yii;
+use yii\bootstrap5\Html;
 use yii\data\ArrayDataProvider;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
@@ -256,7 +258,7 @@ class DeterminaController extends \yii\web\Controller
         if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
             $mese = $vars['mese'];
             $anno = $vars['anno'];
-            $result = "";
+            $result = "<div class='row'>";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
             $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true]);
@@ -268,16 +270,20 @@ class DeterminaController extends \yii\web\Controller
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult != 0.0) {
-                    $result .= "<div><p style='display:inline-block;'>❌ Istanza #" . $istanza->id
-                        . " nominativo: " . $istanza->anagraficaDisabile->cognome
+                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id. "</div><div class='col-md-1'>". Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), [
+                            'title' => Yii::t('yii', 'Vai alla scheda'),
+                            'class' => 'btn btn-icon btn-sm btn-primary',
+                            'target' => '_blank',
+                        ])
+                        . "</div><div class='col-md-3'>" . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
-                        . " distretto: " . $istanza->distretto->nome
-                        . ": "
-                        . '</p><span style="margin-left:20px" class="badge ' . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
-                        . '">' . ($tempResult > 0 ? ("+" . $tempResult) : $tempResult)
-                        . '</span></div>';
+                        . "</div><div class='col-md-1'>" . $istanza->distretto->nome
+                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge " . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
+                        . "'>" . ($tempResult > 0 ? ("+" . $tempResult) : $tempResult)
+                        . "</span></div><div class='col-md-5'></div>";
                 }
             }
+            $result.="</div>";
         }
         return $this->render('pagamenti', [
             "mese" => $mese,
