@@ -260,9 +260,7 @@ class DeterminaController extends \yii\web\Controller
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
             $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true]);
-            // and where m.data is between start and and of mesepagamento
             $istanzePagate = $istanzePagate->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
-            // put in $istanzeNonPagateAttive the results of the query:
             //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
             $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])->andWhere(['not in', 'i.id', (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')->andWhere(['>=', 'm2.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->all()])->all();
             $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
