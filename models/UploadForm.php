@@ -28,7 +28,7 @@ class UploadForm extends Model
     public function rules()
     {
         return [
-            [['files'], 'file', 'skipOnEmpty' => false, 'extensions' => 'xlsx, xls', 'maxFiles' => 10],
+            [['files'], 'file', 'skipOnEmpty' => false, 'extensions' => 'xlsx, xls, xml', 'maxFiles' => 10],
             [['tipo'], 'string'],
             [['simulazione'], 'boolean'],
         ];
@@ -317,9 +317,12 @@ class UploadForm extends Model
      */
     private function importaTracciatoSepa(array $okFiles)
     {
-        $sepaParser = new SepaParser($okFiles[0]);
-        $parsedData = $sepaParser->parseToArray();
-        print_r($parsedData);
-        return $parsedData;
+        $allParsedData = [];
+        foreach ($okFiles as $file) {
+            $sepaParser = new SepaParser($file);
+            $parsedData = $sepaParser->parseToArray();
+            $allParsedData[] = $parsedData;
+        }
+        return $allParsedData;
     }
 }
