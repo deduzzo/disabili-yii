@@ -17,6 +17,12 @@ echo GridView::widget([
     'dataProvider' => new ArrayDataProvider([
         'allModels' => $istanza->recuperos,
         'pagination' => false,
+        // add default sort for "data_creazione"
+        'sort' => [
+            'defaultOrder' => [
+                'data_creazione' => SORT_DESC,
+            ]
+        ],
     ]),
     'options' => [
         'tag' => 'div',
