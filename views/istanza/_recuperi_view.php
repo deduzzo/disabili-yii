@@ -20,7 +20,7 @@ echo GridView::widget([
         // add default sort for "data_creazione"
         'sort' => [
             'defaultOrder' => [
-                'data_creazione' => SORT_DESC,
+                'id' => SORT_DESC,
             ]
         ],
     ]),
