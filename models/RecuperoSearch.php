@@ -63,11 +63,14 @@ class RecuperoSearch extends Recupero
         $query->andFilterWhere([
             'id' => $this->id,
             'importo' => $this->importo,
-            'recuperato' => $this->recuperato,
+            'chiuso' => $this->chiuso,
+            'annullato' => $this->annullato,
+            'data_annullamento' => $this->data_annullamento,
             'rateizzato' => $this->rateizzato,
             'num_rate' => $this->num_rate,
             'importo_rata' => $this->importo_rata,
             'id_istanza' => $this->id_istanza,
+            'id_recupero_collegato' => $this->id_recupero_collegato,
         ]);
 
 
