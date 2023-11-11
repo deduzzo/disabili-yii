@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             TipologiaDatiCategoria::RICOVERI => 'Ricoveri',
             TipologiaDatiCategoria::MOVIMENTI_CON_IBAN => 'Pagamenti con IBAN',
             TipologiaDatiCategoria::MOVIMENTI_CON_ELENCHI => 'Pagamenti con Elenchi',
+            TipologiaDatiCategoria::TRACCIATO_SEPA => 'Tracciato SEPA',
         ], ['prompt' => 'Selezionare il tipo di file da importare..']);
         echo $form->field($files, 'simulazione')->checkbox();
         echo $form->field($files, 'files[]')->widget(FileInput::class, [

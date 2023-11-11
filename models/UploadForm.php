@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\SepaParser;
 use app\helpers\Utils;
 use app\models\enums\DatiTipologia;
 use app\models\enums\FileRicoveri;
@@ -76,6 +77,9 @@ class UploadForm extends Model
                 case TipologiaDatiCategoria::MOVIMENTI_CON_IBAN:
                     foreach ($okFiles as $file)
                         $stats = $this->importaFileConElenchi($file);
+                    break;
+                case TipologiaDatiCategoria::TRACCIATO_SEPA:
+                    $stats = $this->importaTracciatoSepa($okFiles);
                     break;
             }
         }
@@ -306,5 +310,16 @@ class UploadForm extends Model
         //return ['nonTrovati' => $nonTrovati, 'errors' => $errors, 'statsfilename' => 'esito-importazione_' . $date . '.json'];
         // send file $fp as download
         Yii::$app->response->sendFile($folder . 'esito-importazione_' . $date . '.json');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function importaTracciatoSepa(array $okFiles)
+    {
+        $sepaParser = new SepaParser($okFiles[0]);
+        $parsedData = $sepaParser->parseToArray();
+        print_r($parsedData);
+        return $parsedData;
     }
 }

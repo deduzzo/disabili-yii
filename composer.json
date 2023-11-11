@@ -41,7 +41,8 @@
     "ifsnop/mysqldump-php": "^2.12",
     "ext-zip": "*",
     "ext-json": "*",
-    "amphp/process": "^1.1"
+    "amphp/process": "^1.1",
+    "ext-simplexml": "*"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

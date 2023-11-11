@@ -12,6 +12,7 @@ class TipologiaDatiCategoria extends BaseEnum
     const RICOVERI = 'ricoveri';
     const MOVIMENTI_CON_IBAN = 'movimenti-con-iban';
     const MOVIMENTI_CON_ELENCHI = 'movimenti-con-elenco';
+    const TRACCIATO_SEPA = 'tracciato-sepa';
 
     /**
      * @var string message category
@@ -30,5 +31,6 @@ class TipologiaDatiCategoria extends BaseEnum
         self::RICOVERI => 'Ricoveri',
         self::MOVIMENTI_CON_IBAN => 'Movimenti con IBAN',
         self::MOVIMENTI_CON_ELENCHI => 'Movimenti con Elenco',
+        self::TRACCIATO_SEPA => 'Tracciato SEPA',
     ];
 }
