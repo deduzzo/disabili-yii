@@ -9,6 +9,7 @@ use app\models\enums\PagamentiConIban;
 use app\models\enums\TipologiaDatiCategoria;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
+use Carbon\Carbon;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Json;
@@ -158,6 +159,7 @@ class UploadForm extends Model
                         $movimento->is_movimento_bancario = true;
                         $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
                         $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
+                        $movimento->note = "Bonifico di ". Carbon::parse($movimento->periodo_da)->locale('it')->monthName. ' ' . Carbon::parse($movimento->periodo_da)->year;
                         $movimento->data = $movimento->periodo_a;
                         $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
                         $movimento->escludi_contabilita = true;

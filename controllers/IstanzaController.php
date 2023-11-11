@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\GdriveHelper;
+use app\models\Determina;
 use app\models\Istanza;
 use app\models\IstanzaSearch;
 use Yii;
@@ -139,16 +140,28 @@ class IstanzaController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionScheda($id)
+    //&rifinalizzaDetermina=true&idDetermina=1
+    public function actionScheda($id, $rifinalizzaDetermina = false, $idDetermina = null)
     {
         $model = $this->findModel($id);
-        if ($model && (Yii::$app->params['gdrive_enabled'] || !isset(Yii::$app->params['gdrive_enabled']))) {
+        if ($rifinalizzaDetermina) {
+            $determina = Determina::find();
+            if ($idDetermina)
+                $determina = $determina->where(['id' => $idDetermina]);
+            $determina = $determina->orderBy(['data' => SORT_DESC])->one();
+            if ($determina && $model) {
+                $model->finalizzaMensilita($determina->id);
+            }
+            // show success message
+            Yii::$app->session->setFlash('success', 'Istanza aggiornata con successo.');
+            return $this->redirect(['scheda', 'id' => $id]);
+        } else if ($model && (Yii::$app->params['gdrive_enabled'] || !isset(Yii::$app->params['gdrive_enabled']))) {
             $gdhelper = new GdriveHelper();
             $folder = $gdhelper->existFolderWithNameThatStartWith("#$model->id", $gdhelper->folderId);
             if (!$folder)
-                $folder = $gdhelper->createFolderIfNotExist("#$model->id - ".$model->getNominativoDisabile(), $gdhelper->folderId);
-            if ($folder->getName() !== "#$model->id - ".$model->getNominativoDisabile())
-                $gdhelper->renameFolder($folder->getId(), "#$model->id - ".$model->getNominativoDisabile());
+                $folder = $gdhelper->createFolderIfNotExist("#$model->id - " . $model->getNominativoDisabile(), $gdhelper->folderId);
+            if ($folder->getName() !== "#$model->id - " . $model->getNominativoDisabile())
+                $gdhelper->renameFolder($folder->getId(), "#$model->id - " . $model->getNominativoDisabile());
             $files = $gdhelper->getAllFilesInFolder($folder->getId());
         }
         return $this->render('scheda', [

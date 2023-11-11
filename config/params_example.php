@@ -8,6 +8,8 @@ return [
     'APP_COPYRIGHT_BY' => "DisAPP",
     'bsVersion' => '5.x',
     'icon-framework' => \kartik\icons\Icon::FAS,  // Font Awesome Icon framework
+    'eseguiBackup' => false,
+    'gdrive_enabled' => false,
     'gdrive_clientID' =>  "",
     'gdrive_secret' => "",
     'gdrive_folderId' => "",

@@ -378,7 +378,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                    onclick="check()">Modifica
                                     Istanza</a>
                             </div>
-                            <div class="col-md-8"></div>
+                            <div class="col-md-2">
+                                <a class="btn btn-warning" id="rifinalizza">Rifinalizza istanza (ultima determina)</a>
+                            </div>
+                            <div class="col-md-6"></div>
                             <div class="col-md-12">
                                 <div class="collapse multi-collapse" id="rowdata">
                                     <div class="card card-body">
@@ -438,6 +441,14 @@ $this->params['breadcrumbs'][] = $this->title;
         pattoDiCuraCheck();
         decedutoCheck();
     }
+
+    document.getElementById('rifinalizza').addEventListener('click', function(event) {
+        event.preventDefault(); // Impedisce il comportamento predefinito del link
+        var userConfirmation = confirm("Sei sicuro di finalizzare nuovamente l'istanza con l'ultima determina?");
+        if (userConfirmation) {
+            window.location.href = '<?= "scheda?id=".$istanza->id."&rifinalizzaUltimaDetermina=true" ?>'; // Reindirizza all'URL definito in PHP
+        }
+    });
 </script>
 
 <?php JSRegister::begin([

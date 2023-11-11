@@ -14,11 +14,11 @@ $config = [
     'sourceLanguage' => 'it-IT',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'layout' => 'mainy',
     'modules' => [
-        'gridview' =>  [
+        'gridview' => [
             'class' => '\kartik\grid\Module'
         ]
     ],
@@ -33,14 +33,14 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
-            'loginUrl'=> ['auth/login'],
-            'authTimeout' => 60*60*24*7, // 7 days
+            'loginUrl' => ['auth/login'],
+            'authTimeout' => 60 * 60 * 24 * 7, // 7 days
             // set 404 url
             'returnUrl' => ['/site/index'],
         ],
-/*        'errorHandler' => [
-            'errorAction' => 'site/errore',
-        ],*/
+        /*        'errorHandler' => [
+                    'errorAction' => 'site/errore',
+                ],*/
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@app/mail',
@@ -62,15 +62,15 @@ $config = [
             // 'cache' => 'cache',
         ],
         'db' => $db,
-/*        'assetManager' => [
-            'bundles' => [
-                MainAsset::class => [
-                    'css' => [
-                        'app.min.css',
+        /*        'assetManager' => [
+                    'bundles' => [
+                        MainAsset::class => [
+                            'css' => [
+                                'app.min.css',
+                            ],
+                        ],
                     ],
-                ],
-            ],
-        ],*/
+                ],*/
 
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -86,7 +86,7 @@ $config = [
     ],
     'as access' => [
         'class' => 'yii\filters\AccessControl',
-        'except' => ['auth/login', 'site/error', 'site/non-autorizzato','auth/password-dimenticata'], // elenco delle azioni escluse
+        'except' => ['auth/login', 'site/error', 'site/non-autorizzato', 'auth/password-dimenticata'], // elenco delle azioni escluse
         'rules' => [
             [
                 'allow' => true,
@@ -98,10 +98,12 @@ $config = [
         },
     ],
     'on beforeRequest' => function ($event) {
-        $lastBackupDate = Yii::$app->cache->get('lastBackupDate');
-        if (!$lastBackupDate || (new \DateTime())->diff(new \DateTime($lastBackupDate))->days > 1) {
-            Utils::dumpDb();
-            Yii::$app->cache->set('lastBackupDate', date('Y-m-d H:i:s'));
+        if (isseT(Yii::$app->params['eseguiBackup']) && Yii::$app->params['eseguiBackup'] === true) {
+            $lastBackupDate = Yii::$app->cache->get('lastBackupDate');
+            if (!$lastBackupDate || (new \DateTime())->diff(new \DateTime($lastBackupDate))->days > 1) {
+                Utils::dumpDb();
+                Yii::$app->cache->set('lastBackupDate', date('Y-m-d H:i:s'));
+            }
         }
     },
     'params' => $params,
