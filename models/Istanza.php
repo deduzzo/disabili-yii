@@ -475,6 +475,7 @@ class Istanza extends \yii\db\ActiveRecord
         $movimento->is_movimento_bancario = false;
         $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
         $movimento->id_determina = $idDetermina;
+        $movimento->note = "Beneficio contabile di ". Carbon::parse($movimento->data)->locale('it')->monthName. ' ' . Carbon::parse($movimento->data)->year;
         $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         $movimento->save();
         if ($movimento->errors)
@@ -488,7 +489,6 @@ class Istanza extends \yii\db\ActiveRecord
             $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
             $movimento->id_determina = $idDetermina;
             // put in $mese the month of the date $movimento-data (format 'Y-m-d')  in italian
-            $movimento->note = "Beneficio contabile di ". Carbon::parse($movimento->data)->locale('it')->monthName. ' ' . Carbon::parse($movimento->data)->year;
             if ($recuperPos->rateizzato) {
                 $movimento->importo = -$recuperPos->getProssimaRata();
                 $movimento->num_rata = $recuperPos->getNumeroProssimaRata();
