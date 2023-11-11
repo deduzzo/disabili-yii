@@ -535,7 +535,7 @@ class Istanza extends \yii\db\ActiveRecord
 
         foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
             if ($importoSurplus > 0) {
-                $importoOriginale = $recuperoNegRat->getNumeroProssimaRata();
+                $importoOriginale = $recuperoNegRat->getProssimaRata();
                 $movimento = new Movimento();
                 $movimento->id_conto = $contoValido->id;
                 $movimento->contabilizzare = false;
@@ -546,7 +546,7 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->importo = abs($recuperoNegRat->getProssimaRata()) < abs($importoSurplus) ? -abs($recuperoNegRat->getProssimaRata()) : -$importoSurplus;
                 $movimento->num_rata = $recuperoNegRat->getNumeroProssimaRata();
                 $importoSurplus -= abs($movimento->importo);
-                if ($movimento->importo < $importoOriginale && $importoSurplus == 0)
+                if (abs($movimento->importo) < $importoOriginale && $importoSurplus == 0)
                     $recuperoNegRat->num_rate += 1;
                 else if ($recuperoNegRat->getRateMancanti() == 1) {
                     $recuperoNegRat->chiuso = true;
