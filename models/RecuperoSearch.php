@@ -18,9 +18,11 @@ class RecuperoSearch extends Recupero
     public function rules()
     {
         return [
-            [['id', 'recuperato', 'rateizzato', 'num_rate', 'id_istanza'], 'integer'],
             [['importo', 'importo_rata'], 'number'],
-            [['note'], 'safe'],
+            [['chiuso', 'annullato', 'rateizzato'], 'boolean'],
+            [['data_annullamento', 'data_creazione', 'data_modifica'], 'safe'],
+            [['num_rate', 'id_istanza', 'id_recupero_collegato'], 'integer'],
+            [['note'], 'string'],
         ];
     }
 
