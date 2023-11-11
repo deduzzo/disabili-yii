@@ -16,10 +16,8 @@ $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 \yii\widgets\Pjax::begin(['id' => 'lista-recuperi']);
 
 echo GridView::widget([
-    'dataProvider' => new ArrayDataProvider([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-    ]),
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'options' => [
         'tag' => 'div',
         'class' => 'grid-view small dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
