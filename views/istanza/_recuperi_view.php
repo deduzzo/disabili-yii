@@ -10,19 +10,15 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\Istanza $istanza */
 
-
+$searchModel = new \app\models\RecuperoSearch();
+$searchModel->id_istanza = $istanza->id;
+$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 \yii\widgets\Pjax::begin(['id' => 'lista-recuperi']);
 
 echo GridView::widget([
     'dataProvider' => new ArrayDataProvider([
-        'allModels' => $istanza->recuperos,
-        'pagination' => false,
-        // add default sort for "data_creazione"
-        'sort' => [
-            'defaultOrder' => [
-                'id' => SORT_DESC,
-            ]
-        ],
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
     ]),
     'options' => [
         'tag' => 'div',

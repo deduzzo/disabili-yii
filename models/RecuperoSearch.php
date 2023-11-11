@@ -11,6 +11,7 @@ use app\models\Recupero;
  */
 class RecuperoSearch extends Recupero
 {
+    public $id_istanza;
     /**
      * {@inheritdoc}
      */
@@ -47,6 +48,7 @@ class RecuperoSearch extends Recupero
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -67,6 +69,10 @@ class RecuperoSearch extends Recupero
             'importo_rata' => $this->importo_rata,
             'id_istanza' => $this->id_istanza,
         ]);
+
+
+        if ($this->id_istanza)
+            $query->andWhere(['id_istanza' => $this->id_istanza]);
 
         $query->andFilterWhere(['like', 'note', $this->note]);
 
