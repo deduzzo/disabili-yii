@@ -197,7 +197,7 @@ class GdriveHelper
                             if (!Utils::verificaIban(trim(strtoupper($iban))))
                                 $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[5] . " " . $row[6] . "</b> del foglio: " . $sheetTitle;
                         }
-                        $tipo = (isset($row[26]) && $row[26] !== "" && (str_contains(strtolower($row[26]), "inferiore") || str_contains(strtolower($row[26]), "minore"))) ? "inferiore" : "superiore";
+                        $tipo = (!isset($row[26]) || $row[26] == "" || str_contains(trim(strtolower($row[26])), "inferiore" || str_contains(trim(strtolower($row[26])), "minore"))) ? "inferiore" : "superiore";
                         $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
                         if ($tipo === "inferiore") $inferiori++;
                         else $superiori++;
