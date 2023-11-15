@@ -3,6 +3,13 @@
 use app\assets\MainAsset;
 use app\helpers\Utils;
 
+/*
+ * ALTER TABLE istanza
+ADD COLUMN unique_attivo INT AS (CASE WHEN attivo = 1 THEN id_anagrafica_disabile ELSE NULL END) PERSISTENT; (o STORED)
+CREATE UNIQUE INDEX idx_unique_attivo ON istanza (unique_attivo);
+
+*/
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
