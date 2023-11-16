@@ -53,7 +53,7 @@ class GdriveHelper
 
     public function createFolder($folderName, $remoteFolderId)
     {
-        $folderName =  $this->pulisciNome($folderName);
+        $folderName = $this->pulisciNome($folderName);
         $folder = new Google_Service_Drive_DriveFile();
         $folder->setName($folderName);
         $folder->setMimeType('application/vnd.google-apps.folder');
@@ -65,7 +65,7 @@ class GdriveHelper
 
     public function folderExist($folderName, $remoteFolderId)
     {
-        $folderName =  $this->pulisciNome($folderName);
+        $folderName = $this->pulisciNome($folderName);
         $query = "name='$folderName' and mimeType='application/vnd.google-apps.folder' and '" . $remoteFolderId . "' in parents";
 
         // Esegui la ricerca
@@ -84,7 +84,7 @@ class GdriveHelper
 
     public function createFolderIfNotExist($folderName, $remoteFolderId)
     {
-        $folderName =  $this->pulisciNome($folderName);
+        $folderName = $this->pulisciNome($folderName);
         $folder = $this->folderExist($folderName, $remoteFolderId);
         if ($folder == null)
             $folder = $this->createFolder($folderName, $remoteFolderId);
@@ -93,7 +93,7 @@ class GdriveHelper
 
     public function renameFolder($folderId, $newName)
     {
-        $newName =  $this->pulisciNome($newName);
+        $newName = $this->pulisciNome($newName);
         $newFolderMeta = new Google_Service_Drive_DriveFile();
         $newFolderMeta->setName($newName);
 
@@ -158,11 +158,12 @@ class GdriveHelper
 
         $results = $this->driveService->files->listFiles($params);
 
-        return count($results) >0 ? $results->getFiles()[0] : null;
+        return count($results) > 0 ? $results->getFiles()[0] : null;
     }
 
-    public function verificaDatiNuoviDisabiliFiles($spreadsheetId) {
-        $out = ['out' => "",'cfs' => [],'errors' => []];
+    public function verificaDatiNuoviDisabiliFiles($spreadsheetId)
+    {
+        $out = ['out' => "", 'cfs' => [], 'errors' => []];
         $response = $this->spreeadsheetService->spreadsheets->get($spreadsheetId);
         $sheets = $response->getSheets();
         $totaleMeseGlobale = 0;
@@ -204,16 +205,22 @@ class GdriveHelper
                     }
                 }
             }
-            $out['out'].= $sheet->getProperties()->getTitle() .": ". $count . "-> ".Yii::$app->formatter->asCurrency($totaleDistretto)." [inferiori: ".$inferiori.", superiori: ".$superiori. "]<br />";
+            $out['out'] .= $sheet->getProperties()->getTitle() . ": " . $count . "-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $count;
         }
-        $out['out'].= "<br /> TOTALE NUOVI DISABILI: <b>".$countTotale."</b>";
-        $out['out'].= "<br /> TOTALE MENSILE STIMATO: <b>".Yii::$app->formatter->asCurrency($totaleMeseGlobale)."</b>";
+        $out['out'] .= "<br /> TOTALE NUOVI DISABILI: <b>" . $countTotale . "</b>";
+        $out['out'] .= "<br /> TOTALE MENSILE STIMATO: <b>" . Yii::$app->formatter->asCurrency($totaleMeseGlobale) . "</b>";
         return $out;
     }
 
-    private function pulisciNome($nome) {
+    public function importaNuoviDisabili($spreadsheetId, $nomeGruppo, $cancellaDatiSePresenti)
+    {
+        echo "ciao";
+    }
+
+    private function pulisciNome($nome)
+    {
         return preg_replace('/[^a-zA-Z0-9#\s-]/', '', $nome);
     }
 

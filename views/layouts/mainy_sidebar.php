@@ -122,7 +122,7 @@ JS) ?>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a href="/contabilita/prossimi">Simulazione prossimi gruppi</a>
+                            <a href="/contabilita/prossimi">Nuovi gruppi</a>
                         </li>
                         <li class="submenu-item">
                             <a href="/contabilita/anno">Per anno</a>
