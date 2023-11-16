@@ -41,7 +41,7 @@ $formatter = \Yii::$app->formatter;
                     </button>
                 </div>
                 <?= Html::beginForm(['contabilita/aggiungi-nuovo-gruppo'], 'post', ['id' => 'aggiungi-nuovo-gruppo-form', 'class' => 'form-horizontal']) ?>
-                <?= Html::hiddenInput('nomeGruppoRaw',  $_GET['nomeGruppo']); ?>
+                <?= Html::hiddenInput('nomeGruppoRaw',  $_GET['nomeGruppo'] ?? ""); ?>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">

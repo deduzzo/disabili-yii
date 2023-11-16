@@ -14,5 +14,6 @@ return [
     'gdrive_secret' => "",
     'gdrive_folderId' => "",
     'gdrive_backupfolderId' => "",
+    'gdrive_prossimiGruppiFolderId' => "",
     'nodeBinPath' => ""
 ];

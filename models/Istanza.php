@@ -69,6 +69,7 @@ class Istanza extends \yii\db\ActiveRecord
             [['id_caregiver'], 'exist', 'skipOnError' => true, 'targetClass' => Anagrafica::class, 'targetAttribute' => ['id_caregiver' => 'id']],
             [['id_distretto'], 'exist', 'skipOnError' => true, 'targetClass' => Distretto::class, 'targetAttribute' => ['id_distretto' => 'id']],
             [['id_gruppo'], 'exist', 'skipOnError' => true, 'targetClass' => Gruppo::class, 'targetAttribute' => ['id_gruppo' => 'id']],
+            ['id_anagrafica_disabile', 'validateActiveAnagrafica'],
         ];
     }
 
@@ -101,6 +102,17 @@ class Istanza extends \yii\db\ActiveRecord
             'id_caregiver' => 'Id Caregiver',
         ];
     }
+
+    public function validateActiveAnagrafica($attribute, $params, $validator)
+    {
+        if ($this->attivo && static::find()->where([
+                'id_anagrafica_disabile' => $this->id_anagrafica_disabile,
+                'attivo' => true,
+            ])->andWhere(['<>', 'id', $this->id])->exists()) {
+            $this->addError($attribute, 'Non può esistere un\'altra istanza attiva con lo stesso id_anagrafica_disabile.');
+        }
+    }
+
 
     /**
      * Gets query for [[AnagraficaDisabile]].
