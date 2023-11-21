@@ -2,12 +2,28 @@
 
 namespace app\helpers;
 
+use app\models\Anagrafica;
+use app\models\AnagraficaAltricampi;
+use app\models\Conto;
+use app\models\ContoCessionario;
+use app\models\Distretto;
+use app\models\enums\FileGruppiGoogle;
+use app\models\enums\FileParisi;
+use app\models\Gruppo;
+use app\models\Isee;
+use app\models\Istanza;
+use app\models\Movimento;
+use app\models\Recupero;
+use app\models\Ricovero;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Box\Spout\Reader\XLSX\Sheet;
 use CodiceFiscale\Checker;
 use CodiceFiscale\Validator;
 use Google_Client;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
 use Google_Service_Sheets;
+use PHP_IBAN\IBAN;
 use Yii;
 
 class GdriveHelper
@@ -214,9 +230,106 @@ class GdriveHelper
         return $out;
     }
 
-    public function importaNuoviDisabili($spreadsheetId, $nomeGruppo, $cancellaDatiSePresenti)
+    public function importaNuovoGruppo($spreadsheetId, $gruppo, $cancellaTuttiDelGruppo = false)
     {
-        echo "ciao";
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+
+        $response = $this->spreeadsheetService->spreadsheets->get($spreadsheetId);
+        $sheets = $response->getSheets();
+        $errors = [];
+        //TODO
+        if ($cancellaTuttiDelGruppo) {
+            /*AnagraficaAltricampi::deleteAll();
+            Ricovero::deleteAll();
+            Isee::deleteAll();
+            ContoCessionario::deleteAll();
+            Conto::deleteAll();
+            Movimento::deleteAll();
+            Recupero::deleteAll();
+            Istanza::deleteAll();
+            Anagrafica::deleteAll();*/
+            //Gruppo::deleteAll();
+        }
+
+        foreach ($sheets as $sheet) {
+            $sheetTitle = $sheet->getProperties()->getTitle();
+
+            $range = $sheetTitle . '!A:AB';
+            $distretto = Distretto::find()->where(['like', 'nome', '%' . strtoupper(substr($sheetTitle, 0, 4)) . '%', false])->one();
+            $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
+
+            foreach ($values as $index => $row) {
+                $disabile = Anagrafica::findOne(['codice_fiscale' => strtoupper($row[FileGruppiGoogle::CODICE_FISCALE])]);
+                if (!$disabile) {
+                    $disabile = new Anagrafica();
+                    $disabile->codice_fiscale = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]));
+                    $disabile->cognome = strtoupper(trim($row[FileGruppiGoogle::COGNOME]));
+                    $disabile->nome = strtoupper(trim($row[FileGruppiGoogle::NOME]));
+                    $disabile->save();
+                    if ($disabile->errors)
+                        $errors = array_merge($errors, ['disabile-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $disabile->errors]);
+                }
+                if (strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE_CESSIONARIO])) !== "") {
+                    $cessionario = Anagrafica::findOne(['codice_fiscale' => strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE_CESSIONARIO]))]);
+                    if (!$cessionario) {
+                        $cessionario = new Anagrafica();
+                        $cessionario->codice_fiscale = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE_CESSIONARIO]));
+                        $cessionario->cognome = strtoupper(trim($row[FileGruppiGoogle::COGNOME_CESSIONARIO]));
+                        $cessionario->nome = strtoupper(trim($row[FileGruppiGoogle::NOME_CESSIONARIO]));
+                        $cessionario->save();
+                        if ($cessionario->errors)
+                            $errors = array_merge($errors, ['cessionario-' . $row[FileGruppiGoogle::CODICE_FISCALE_CESSIONARIO] => $cessionario->errors]);
+                    }
+                } else $cessionario = null;
+                if ($disabile && $distretto && $gruppo) {
+                    $istanza = new Istanza();
+                    $istanza->id_distretto = $distretto->id;
+                    $istanza->riconosciuto = 1;
+                    $istanza->id_gruppo = $gruppo->id;
+                    $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA];
+                    $istanza->patto_di_cura = 1;
+                    $istanza->id_anagrafica_disabile = $disabile->id;
+                    if ($cessionario)
+                        $istanza->id_caregiver = $cessionario->id;
+                    $istanza->attivo = false;
+                    $istanza->data_decesso = Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]);
+                    $istanza->chiuso = false;
+                    $istanza->note = $row[FileGruppiGoogle::NOTE];
+                    $istanza->save();
+                    if ($istanza->errors)
+                        $errors = array_merge($errors, ['istanza-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $istanza->errors]);
+                    $conto = strtoupper(trim($row[FileGruppiGoogle::IBAN_DISABILE])) !== "" ? strtoupper(trim($row[FileGruppiGoogle::IBAN_DISABILE])) : strtoupper(trim($row[FileGruppiGoogle::IBAN_CESSIONARIO]));
+                    if ((new IBAN($conto))->Verify()) {
+                        $conto = new Conto();
+                        $conto->id_istanza = $istanza->id;
+                        $conto->iban = $conto;
+                        $conto->intestatario = strtoupper(trim($row[FileGruppiGoogle::IBAN_DISABILE])) !== "" ? ($disabile->nome . " " . $disabile->cognome) : ($cessionario->nome . " " . $cessionario->cognome);
+                        $conto->save();
+                        if ($conto->errors)
+                            $errors = array_merge($errors, ['conto-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $conto->errors]);
+                        if (strtoupper(trim($row[FileGruppiGoogle::IBAN_DISABILE])) !== "" || $cessionario) {
+                            $contoCessionario = new ContoCessionario();
+                            $contoCessionario->id_conto = $conto->id;
+                            if ($cessionario)
+                                $contoCessionario->id_cessionario = $cessionario->id;
+                            else
+                                $contoCessionario->id_cessionario = $disabile->id;
+                            $contoCessionario->save();
+                            if ($contoCessionario->errors)
+                                $errors = array_merge($errors, ['contoCessionario-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $contoCessionario->errors]);
+                        }
+                    }
+                    $isee = new Isee();
+                    $isee->id_istanza = $istanza->id;
+                    $isee->maggiore_25mila = !((strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE"));
+                    $isee->valido = 1;
+                    $isee->save();
+                    if ($isee->errors)
+                        $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
+                }
+            }
+        }
     }
 
     private function pulisciNome($nome)
