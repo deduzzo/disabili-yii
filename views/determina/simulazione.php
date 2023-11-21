@@ -287,7 +287,7 @@ if (!isset($soloVariazioni)) {
                 ]); ?>
             </div>
             <?php if (!$soloVisualizzazione): ?>
-                <div class="col-md-3">
+                <div class="col-md-12">
                     <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                            id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
                     <label class="form-check-label text-danger bold"
@@ -302,10 +302,8 @@ if (!isset($soloVariazioni)) {
                            for="soloRecuperi">Solo ist. con Recuperi in corso</label>
                 </div>
             <?php else: ?>
-                <div class="col-md-3"></div>
+                <div class="col-md-12"></div>
             <?php endif; ?>
-            <div class="col-md-6"></div>
-            <div class="col-md-12" style="text-align:center">
                 <button type="submit" class="btn btn-primary" style="margin-top:10px">Filtra</button>
             </div>
             <div class="divider">
