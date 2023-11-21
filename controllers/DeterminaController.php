@@ -157,6 +157,7 @@ class DeterminaController extends \yii\web\Controller
             'soloVariazioni' => $soloVariazioni,
             'soloRecuperi' => $soloRecuperi,
             'distretti' => $distretti,
+            'gruppi' => $gruppi,
             'title' => "Simulazione prossima determina",
             'stats' => [
                 'importiTotali' => $importiTotali,
