@@ -276,7 +276,7 @@ if (!isset($soloVariazioni)) {
             <div class="col-md-12">
                 <?= Select2::widget([
                     'name' => 'gruppiPost',
-                    'data' => ArrayHelper::map(Gruppo::find()->all(), 'id', 'descrizione_gruppo'),
+                    'data' => ArrayHelper::map(Gruppo::find()->orderBy('descrizione_gruppo')->all(), 'id', 'descrizione_gruppo'),
                     'value' => ArrayHelper::getColumn($gruppi, 'id'),
                     'options' => ['placeholder' => 'Seleziona un gruppo ...'],
                     'pluginOptions' => [
