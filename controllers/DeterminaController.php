@@ -108,7 +108,7 @@ class DeterminaController extends \yii\web\Controller
         }
         $nonPagati = [];
         foreach ($distretti as $disPag) {
-            $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id]);
+            $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id] ?? []);
         }
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
