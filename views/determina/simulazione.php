@@ -287,24 +287,24 @@ if (!isset($soloVariazioni)) {
                 ]); ?>
             </div>
             <?php if (!$soloVisualizzazione): ?>
-                <div class="col-md-12">
-                    <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
-                           id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
-                    <label class="form-check-label text-danger bold"
-                           for="soloProblematici">Solo ist. con Errori (ALERT)</label><br/>
-                    <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni"
-                           id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
-                    <label class="form-check-label text-danger bold"
-                           for="soloVariazioni">Solo ist. con Variazioni</label><br/>
-                    <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
-                           id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
-                    <label class="form-check-label text-danger bold"
-                           for="soloRecuperi">Solo ist. con Recuperi in corso</label>
+                <div class="col-md-12" style="text-align: center;">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici" id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
+                        <label class="form-check-label text-danger bold" for="soloProblematici">Solo ist. con Errori (ALERT)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" role="switch" name="soloVariazioni" id="soloVariazioni" <?= $soloVariazioni == "on" ? "checked" : "" ?>>
+                        <label class="form-check-label text-danger bold" for="soloVariazioni">Solo ist. con Variazioni</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi" id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
+                        <label class="form-check-label text-danger bold" for="soloRecuperi">Solo ist. con Recuperi in corso</label>
+                    </div>
                 </div>
             <?php else: ?>
                 <div class="col-md-12"></div>
             <?php endif; ?>
-                <button type="submit" class="btn btn-primary" style="margin-top:10px">Filtra</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px; width: 100px">Filtra</button>
             </div>
             <div class="divider">
                 <div class="divider-text">Operazioni</div>
