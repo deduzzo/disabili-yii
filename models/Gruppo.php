@@ -94,6 +94,6 @@ class Gruppo extends \yii\db\ActiveRecord
 
     public function getDescrizioneCompleta()
     {
-        return $this->descrizione_gruppo_old . ' [' . $this->descrizione_gruppo . ']';
+        return$this->descrizione_gruppo;
     }
 }
