@@ -259,7 +259,7 @@ if (!isset($soloVariazioni)) {
             <div class="divider">
                 <div class="divider-text">Filtri</div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <?= Html::beginForm('', 'get') ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
@@ -273,7 +273,7 @@ if (!isset($soloVariazioni)) {
                     ],
                 ]); ?>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <?= Select2::widget([
                     'name' => 'gruppiPost',
                     'data' => ArrayHelper::map(Gruppo::find()->all(), 'id', 'descrizione_gruppo'),
