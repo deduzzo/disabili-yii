@@ -333,87 +333,86 @@ if (!isset($soloVariazioni)) {
         <div class="divider">
             <div class="divider-text">Elenco</div>
         </div>
-    </div>
-    <?php
-    if ($soloVisualizzazione)
-        $columns = ['id', 'cognomeNome'];
-    else
-        $columns = ['id', 'cognome', 'nome'];
-    $columns = array_merge($columns, [
-        'distretto',
-        [
-            'attribute' => 'isee',
-            'format' => 'raw',
-            'value' => function ($model) {
-                $isee = $model['isee'];
-                return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
-            },
-        ],
-        'dataNascita:date',
-    ]);
+        <?php
+        if ($soloVisualizzazione)
+            $columns = ['id', 'cognomeNome'];
+        else
+            $columns = ['id', 'cognome', 'nome'];
+        $columns = array_merge($columns, [
+            'distretto',
+            [
+                'attribute' => 'isee',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $isee = $model['isee'];
+                    return '<span class="badge ' . ($isee === IseeType::MAGGIORE_25K ? IseeType::MAGGIORE_25K_COLOR : ($isee === IseeType::MINORE_25K ? IseeType::MINORE_25K_COLOR : IseeType::NO_ISEE_COLOR)) . '">' . Html::encode($isee) . '</span>';
+                },
+            ],
+            'dataNascita:date',
+        ]);
 
-    if ($soloVisualizzazione)
+        if ($soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'dataDecesso',
+                'label' => 'Stato',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return $model['dataDecesso'] !== null ? "<span class='badge bg-danger'>DECEDUTO il " . Yii::$app->formatter->asDate($model['dataDecesso']) . "</span>" : "<span class='badge bg-success'>IN VITA</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
+
+        $columns = array_merge($columns, [
+            'eta',
+            'gruppo'
+        ]);
+        if (!$soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'importoPrecedente',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
         $columns[] = [
-            'attribute' => 'dataDecesso',
-            'label' => 'Stato',
+            'attribute' => 'importo',
             'format' => 'raw',
             'value' => function ($model) {
-                return $model['dataDecesso'] !== null ? "<span class='badge bg-danger'>DECEDUTO il " . Yii::$app->formatter->asDate($model['dataDecesso']) . "</span>" : "<span class='badge bg-success'>IN VITA</span>";
+                return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
             },
             'contentOptions' => ['class' => 'text-center'],
         ];
-
-    $columns = array_merge($columns, [
-        'eta',
-        'gruppo'
-    ]);
-    if (!$soloVisualizzazione)
+        if (!$soloVisualizzazione)
+            $columns[] = [
+                'attribute' => 'operazione',
+                'format' => 'raw',
+                'label' => "Operazione",
+                'value' => function ($model) {
+                    return "<span class='badge bg-" . ($model['opArray']['alert'] ? 'danger' : 'warning') . "'>" . $model['operazione'] . "</span>";
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ];
         $columns[] = [
-            'attribute' => 'importoPrecedente',
-            'format' => 'raw',
-            'value' => function ($model) {
-                return !$model['importoPrecedente'] ? "<span class='badge bg-danger'>NESSUNO</span>" : "<span class='badge bg-" . ($model['importoPrecedente'] == $model['importo'] ? "success" : "warning") . "'>" . ($model['importoPrecedente'] == $model['importo'] ? "=" : $model['importoPrecedente']) . "</span>";
+            'class' => ActionColumn::className(),
+            'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
+            'urlCreator' => function ($action, $model, $key, $index, $column) {
+                return Url::toRoute(['istanza/' . $action, 'id' => $model['id']]);
             },
-            'contentOptions' => ['class' => 'text-center'],
+            'buttons' => [
+                'scheda' => function ($url, $model) {
+                    return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
+                        'title' => Yii::t('yii', 'Vai alla scheda'),
+                        'class' => 'btn btn-icon btn-sm btn-primary',
+                    ]);
+                },
+            ]
         ];
-    $columns[] = [
-        'attribute' => 'importo',
-        'format' => 'raw',
-        'value' => function ($model) {
-            return !$model['importo'] ? "<span class='badge bg-danger'>ALERT</span>" : "<span class='badge bg-success'>" . $model['importo'] . "</span>";
-        },
-        'contentOptions' => ['class' => 'text-center'],
-    ];
-    if (!$soloVisualizzazione)
-        $columns[] = [
-            'attribute' => 'operazione',
-            'format' => 'raw',
-            'label' => "Operazione",
-            'value' => function ($model) {
-                return "<span class='badge bg-" . ($model['opArray']['alert'] ? 'danger' : 'warning') . "'>" . $model['operazione'] . "</span>";
-            },
-            'contentOptions' => ['class' => 'text-center'],
-        ];
-    $columns[] = [
-        'class' => ActionColumn::className(),
-        'template' => '<div class="btn-group btn-group-sm">{scheda}</div>',
-        'urlCreator' => function ($action, $model, $key, $index, $column) {
-            return Url::toRoute(['istanza/' . $action, 'id' => $model['id']]);
-        },
-        'buttons' => [
-            'scheda' => function ($url, $model) {
-                return Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', $url, [
-                    'title' => Yii::t('yii', 'Vai alla scheda'),
-                    'class' => 'btn btn-icon btn-sm btn-primary',
-                ]);
-            },
-        ]
-    ];
 
-    echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'layout' => "<div class='dataTable-top'>
+        echo GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'layout' => "<div class='dataTable-top'>
                            </div><div class='table-container'>{items}</div>
                             <div class='dataTable-bottom'>
                                   <div class='dataTable-info'>{summary}<br />TOTALE:</div>
@@ -421,60 +420,60 @@ if (!isset($soloVariazioni)) {
                                         {pager}
                                   </nav>
                             </div>",
-        'pager' => [
-            'class' => 'yii\bootstrap5\LinkPager',
-            'firstPageLabel' => 'PRIMA',
-            'lastPageLabel' => 'ULTIMA',
-            'nextPageLabel' => '>>',
-            'prevPageLabel' => '<<',
-            'linkOptions' => ['class' => 'page-link'],
-        ],
-        'options' => [
-            'tag' => 'div',
-            'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
-            'id' => 'datatable',
-        ],
-        'tableOptions' => [
-            'class' => 'table table-striped dataTable-table',
-            'id' => 'table1',
-            'style' => 'font-size: 14px;'
-        ],
-        'columns' => $columns,
-    ]);
-    ?>
-</div>
-<?php JSRegister::begin([
-    'key' => 'manage',
-    'position' => \yii\web\View::POS_READY
-]); ?>
-<script>
-    $(document).ready(function () {
-        const soloProblematici = document.getElementById('soloProblematici');
-        const soloVariazioni = document.getElementById('soloVariazioni');
-        const soloRecuperi = document.getElementById('soloRecuperi');
+            'pager' => [
+                'class' => 'yii\bootstrap5\LinkPager',
+                'firstPageLabel' => 'PRIMA',
+                'lastPageLabel' => 'ULTIMA',
+                'nextPageLabel' => '>>',
+                'prevPageLabel' => '<<',
+                'linkOptions' => ['class' => 'page-link'],
+            ],
+            'options' => [
+                'tag' => 'div',
+                'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
+                'id' => 'datatable',
+            ],
+            'tableOptions' => [
+                'class' => 'table table-striped dataTable-table',
+                'id' => 'table1',
+                'style' => 'font-size: 14px;'
+            ],
+            'columns' => $columns,
+        ]);
+        ?>
+    </div>
+    <?php JSRegister::begin([
+        'key' => 'manage',
+        'position' => \yii\web\View::POS_READY
+    ]); ?>
+    <script>
+        $(document).ready(function () {
+            const soloProblematici = document.getElementById('soloProblematici');
+            const soloVariazioni = document.getElementById('soloVariazioni');
+            const soloRecuperi = document.getElementById('soloRecuperi');
 
-        soloProblematici.addEventListener('change', function () {
-            if (soloProblematici.checked) {
-                soloVariazioni.checked = false;
-                soloRecuperi.checked = false;
-            }
+            soloProblematici.addEventListener('change', function () {
+                if (soloProblematici.checked) {
+                    soloVariazioni.checked = false;
+                    soloRecuperi.checked = false;
+                }
+            });
+
+            soloVariazioni.addEventListener('change', function () {
+                if (soloVariazioni.checked) {
+                    soloProblematici.checked = false;
+                    soloRecuperi.checked = false;
+                }
+            });
+
+            soloRecuperi.addEventListener('change', function () {
+                if (soloRecuperi.checked) {
+                    soloProblematici.checked = false;
+                    soloVariazioni.checked = false;
+                }
+            });
+
         });
-
-        soloVariazioni.addEventListener('change', function () {
-            if (soloVariazioni.checked) {
-                soloProblematici.checked = false;
-                soloRecuperi.checked = false;
-            }
-        });
-
-        soloRecuperi.addEventListener('change', function () {
-            if (soloRecuperi.checked) {
-                soloProblematici.checked = false;
-                soloVariazioni.checked = false;
-            }
-        });
-
-    });
-</script>
-<?php JSRegister::end(); ?>
+    </script>
+    <?php JSRegister::end(); ?>
 </div>
