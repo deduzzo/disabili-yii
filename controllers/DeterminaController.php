@@ -26,7 +26,7 @@ class DeterminaController extends \yii\web\Controller
         ini_set('memory_limit', '-1');
         set_time_limit(0);
         $searchModel = new SimulazioneDeterminaSearch();
-        $getVars = $idDeterminaFinalizzare === null ? $this->request->get() : [];
+        $getVars = $idDeterminaFinalizzare === null ? $this->request->post() : [];
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();

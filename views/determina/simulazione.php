@@ -260,7 +260,7 @@ if (!isset($soloVariazioni)) {
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-12">
-                <?= Html::beginForm('', 'get') ?>
+                <?= Html::beginForm('', 'post',['name' => 'filterForm', 'id' => 'filterForm']) ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
