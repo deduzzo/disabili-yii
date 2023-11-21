@@ -19,7 +19,7 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var Istanza $istanza */
 /** @var array $files */
-$this->title = $istanza->anagraficaDisabile->cognome_nome;
+$this->title = $istanza->getNominativoDisabile();
 $this->params['breadcrumbs'][] = ['label' => 'Istanze', 'url' => ['istanze/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

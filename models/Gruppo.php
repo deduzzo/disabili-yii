@@ -27,6 +27,16 @@ class Gruppo extends \yii\db\ActiveRecord
         return 'gruppo';
     }
 
+    public static function getAllIds()
+    {
+        $gruppi = Gruppo::find()->all();
+        $ids = [];
+        foreach ($gruppi as $gruppo) {
+            $ids[] = $gruppo->id;
+        }
+        return $ids;
+    }
+
     /**
      * {@inheritdoc}
      */

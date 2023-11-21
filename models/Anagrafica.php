@@ -10,10 +10,10 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "anagrafica".
  *
  * @property int $id
- * @property string $cognome_nome
+ * @property string|null $cognome_nome
  * @property string|null $cognome
  * @property string|null $nome
- * @property string|null $codice_fiscale
+ * @property string $codice_fiscale
  * @property string|null $data_nascita
  * @property string|null $comune_nascita
  * @property string|null $indirizzo_residenza
@@ -48,7 +48,7 @@ class Anagrafica extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cognome_nome'], 'required'],
+            [['codice_fiscale'], 'required'],
             [['data_nascita'], 'safe'],
             [['cognome_nome', 'nome','cognome', 'comune_nascita', 'comune_residenza'], 'string', 'max' => 100],
             [['codice_fiscale'], 'string', 'max' => 20],

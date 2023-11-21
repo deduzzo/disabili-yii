@@ -3,6 +3,7 @@
 use app\components\ExportWidget;
 use app\models\Distretto;
 use app\models\enums\IseeType;
+use app\models\Gruppo;
 use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
@@ -17,6 +18,7 @@ use yii\helpers\Url;
 /** @var string $soloVariazioni */
 /** @var string $soloProblematici */
 /** @var array $distretti */
+/** @var array $gruppi */
 /** @var array $stats */
 /** @var array $istanzeArray */
 /** @var string $mese */
@@ -271,6 +273,19 @@ if (!isset($soloVariazioni)) {
                     ],
                 ]); ?>
             </div>
+            <div class="col-md-6">
+                <?= Select2::widget([
+                    'name' => 'gruppiPost',
+                    'data' => ArrayHelper::map(Gruppo::find()->all(), 'id', 'descrizione_gruppo'),
+                    'value' => ArrayHelper::getColumn($gruppi, 'id'),
+                    'options' => ['placeholder' => 'Seleziona un gruppo ...'],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'multiple' => true,
+                        'class' => 'form-control'
+                    ],
+                ]); ?>
+            </div>
             <?php if (!$soloVisualizzazione): ?>
                 <div class="col-md-3">
                     <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
@@ -289,6 +304,7 @@ if (!isset($soloVariazioni)) {
             <?php else: ?>
                 <div class="col-md-3"></div>
             <?php endif; ?>
+            <div class="col-md-6"></div>
             <div class="col-md-12" style="text-align:center">
                 <button type="submit" class="btn btn-primary" style="margin-top:10px">Filtra</button>
             </div>

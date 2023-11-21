@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
+use app\models\Gruppo;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
@@ -28,6 +29,8 @@ class DeterminaController extends \yii\web\Controller
         $getVars = $idDeterminaFinalizzare === null ? $this->request->get() : [];
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
+        $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
+        $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         $soloProblematici = isset($getVars['soloProblematici']) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = isset($getVars['soloVariazioni']) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = isset($getVars['soloRecuperi']) ? $getVars['soloRecuperi'] : 'off';
@@ -55,6 +58,7 @@ class DeterminaController extends \yii\web\Controller
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
         }
         $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
+        $allIstanzeAttive->andWhere(['id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')]);
         $allIstanzeAttive = $allIstanzeAttive->all();
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo

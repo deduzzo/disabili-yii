@@ -7,6 +7,7 @@ use app\helpers\Utils;
 use app\models\Decreto;
 use app\models\DecretoSearch;
 use app\models\Determina;
+use app\models\Gruppo;
 use app\models\Movimento;
 use Carbon\Carbon;
 use Yii;
@@ -69,7 +70,21 @@ class ContabilitaController extends Controller
                 $allNewGroupMaps = [];
                 foreach ($allNewGroupNames as $groupName)
                     $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
-                $gdrive->importaNuoviDisabili($allNewGroupMaps[$_POST['nomeGruppoRaw']],$_POST['nomeGruppo'], boolval($_POST['cancellaDatiSePresenti']));
+                $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $_POST['nomeGruppo']])->one();
+                if (!$gruppo) {
+                    $gruppo = new Gruppo();
+                    $gruppo->descrizione_gruppo = $_POST['nomeGruppo'];
+                    $gruppo->data_inizio_beneficio = $_POST['dataInizioBeneficio'];
+                    $gruppo->data_termine_istanze = $_POST['dataTermineIstanze'];
+                    $gruppo->save();
+                }
+                $res = $gdrive->importaNuovoGruppo($allNewGroupMaps[$_POST['nomeGruppoRaw']],$gruppo,boolval($_POST['cancellaDatiSePresenti']));
+                // show success
+                if ($res === true)
+                    Yii::$app->session->setFlash('success', 'Gruppo creato e dati importati con successo');
+                else
+                    Yii::$app->session->setFlash('error', 'Errore durante la creazione del gruppo e l\'importazione dei dati');
+                return $this->redirect(['istanza/index']);
             }
         }
     }
