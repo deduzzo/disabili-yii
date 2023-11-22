@@ -167,6 +167,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <span class="badge bg-danger" style="margin-right: 10px">ALERT!</span>
             <span class="badge bg-warning"><?= $istanza->isInAlert() ?></span>
         <?php endif; ?>
+        <?php if ($istanza->inChiusura()): ?>
+            <span class="badge bg-warning">In chiusura il <?= Yii::$app->formatter->asDate($istanza->data_chiusura) ?></span>
+        <?php endif; ?>
     </div>
     <div class="card-body" id="card-content">
         <div class="row p-1">

@@ -608,7 +608,7 @@ class Istanza extends \yii\db\ActiveRecord
         return count($conti) > 0;
     }
 
-    private function haCambioIbanInCorso()
+    public function haCambioIbanInCorso()
     {
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->count() > 0;
     }
@@ -627,7 +627,7 @@ class Istanza extends \yii\db\ActiveRecord
         }
     }
 
-    private function haOmonimi(): bool
+    public function haOmonimi(): bool
     {
         // SELECT ISTANZE WITH SAME NAME AND COGNOME AND DIFFERENT ID
         return (new Query())->select('id_anagrafica_disabile')
@@ -637,7 +637,7 @@ class Istanza extends \yii\db\ActiveRecord
                 ->andWhere(['i.id_distretto' => $this->id_distretto])->count() >0;
     }
 
-    private function inChiusura() {
+    public function inChiusura() {
         return (!$this->chiuso && $this->data_chiusura !== null);
     }
 }
