@@ -171,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <span class="badge bg-warning">In chiusura il <?= Yii::$app->formatter->asDate($istanza->data_chiusura) ?></span>
         <?php endif; ?>
         <?php if ($istanza->haOmonimi()): ?>
-            <span class="badge bg-warning">Attenzione: Ha un omonimo nel distretto</span>
+            <span class="badge bg-warning">ATTENZIONE: Ha un omonimo nel distretto</span>
         <?php endif; ?>
     </div>
     <div class="card-body" id="card-content">
