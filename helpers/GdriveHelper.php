@@ -211,7 +211,7 @@ class GdriveHelper
                         if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
                             $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[$row[FileGruppiGoogle::COGNOME]] . " " . $row[$row[FileGruppiGoogle::NOME]] . "</b> del foglio: " . $sheetTitle;
                         else {
-                            $iban = (isset($row[$row[FileGruppiGoogle::IBAN_DISABILE]]) && $row[$row[FileGruppiGoogle::IBAN_DISABILE]] !== "") ? $row[FileGruppiGoogle::IBAN_DISABILE] : $row[FileGruppiGoogle::IBAN_CESSIONARIO];
+                            $iban = (isset($row[FileGruppiGoogle::IBAN_DISABILE]) && $row[FileGruppiGoogle::IBAN_DISABILE] !== "") ? $row[FileGruppiGoogle::IBAN_DISABILE] : $row[FileGruppiGoogle::IBAN_CESSIONARIO];
                             if (!Utils::verificaIban(trim(strtoupper($iban))))
                                 $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         }
