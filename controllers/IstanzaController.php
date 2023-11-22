@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\GdriveHelper;
+use app\helpers\Utils;
 use app\models\Determina;
 use app\models\Istanza;
 use app\models\IstanzaSearch;
@@ -42,6 +43,7 @@ class IstanzaController extends Controller
     public function actionIndex()
     {
         // disable main layout
+        Utils::verificaChiusuraAutomaticaIstanze();
         $searchModel = new IstanzaSearch();
         $dataProvider = $searchModel->search($this->request->queryParams, isset($this->request->post()['exportWDG']));
 
@@ -143,6 +145,7 @@ class IstanzaController extends Controller
     //&rifinalizzaDetermina=true&idDetermina=1
     public function actionScheda($id, $rifinalizzaDetermina = false, $idDetermina = null)
     {
+        Utils::verificaChiusuraAutomaticaIstanze();
         $model = $this->findModel($id);
         if ($rifinalizzaDetermina) {
             $determina = Determina::find();

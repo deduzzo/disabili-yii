@@ -64,6 +64,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        Utils::verificaChiusuraAutomaticaIstanze();
         return $this->render('index');
     }
 

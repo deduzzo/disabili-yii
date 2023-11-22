@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 
+use app\models\Istanza;
 use Carbon\Carbon;
 use DateTime;
 use Ifsnop\Mysqldump\Mysqldump;
@@ -89,5 +90,20 @@ class Utils
 
     public static function verificaIban($iban) {
         return verify_iban($iban);
+    }
+
+    public static function verificaChiusuraAutomaticaIstanze()
+    {
+        // SELECT * FROM `istanza` WHERE chiuso = false AND data_chiusura is not null;
+        $istanze = Istanza::find()->where(['chiuso' => false])->andWhere(['not', ['data_chiusura' => null]])->all();
+        foreach ($istanze as $istanza) {
+            /* @var $istanza Istanza */
+            if (Carbon::createFromFormat('Y-m-d', $istanza->data_chiusura)->isBefore(Carbon::now())) {
+                $istanza->chiuso = true;
+                $istanza->attivo = false;
+                $istanza->save();
+            }
+
+        }
     }
 }

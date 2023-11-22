@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\Utils;
 use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
@@ -11,6 +12,7 @@ use app\models\Istanza;
 use app\models\Movimento;
 use app\models\SimulazioneDeterminaSearch;
 use Carbon\Carbon;
+use Monolog\Handler\Curl\Util;
 use Yii;
 use yii\bootstrap5\Html;
 use yii\data\ArrayDataProvider;
@@ -25,6 +27,7 @@ class DeterminaController extends \yii\web\Controller
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
+        Utils::verificaChiusuraAutomaticaIstanze();
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $idDeterminaFinalizzare === null ? $this->request->post() : [];
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
