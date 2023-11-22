@@ -223,7 +223,7 @@ class GdriveHelper
                         if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" &&
                             str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) &&
                             str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "deced") && isset($row[FileGruppiGoogle::DATA_DECESSO]) &&
-                            $row[FileGruppiGoogle::DATA_DECESSO] === "" && Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) !== null)
+                            $row[FileGruppiGoogle::DATA_DECESSO] === "" && Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) === null)
                             $out['errors'][] = "Data decesso non presente o non valida nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                 }
             }
