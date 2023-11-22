@@ -627,9 +627,17 @@ class Istanza extends \yii\db\ActiveRecord
         }
     }
 
-    private function haOmonimi()
+    private function haOmonimi(): bool
     {
-        // TODO
+        // SELECT ISTANZE WITH SAME NAME AND COGNOME AND DIFFERENT ID
+        return (new Query())->select('id_anagrafica_disabile')
+            ->from('istanza i, anagrafica a')->where('i.id_anagrafica_disabile = a.id')
+            ->andWhere(['i.id' => $this->id])
+                ->andWhere(['a.cognome' => $this->anagraficaDisabile->cognome, 'a.nome' => $this->anagraficaDisabile->nome])
+                ->andWhere(['i.id_distretto' => $this->id_distretto])->count() >0;
+    }
 
+    private function inChiusura() {
+        return (!$this->chiuso && $this->data_chiusura !== null);
     }
 }
