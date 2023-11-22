@@ -170,6 +170,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if ($istanza->inChiusura()): ?>
             <span class="badge bg-warning">In chiusura il <?= Yii::$app->formatter->asDate($istanza->data_chiusura) ?></span>
         <?php endif; ?>
+        <?php if ($istanza->haOmonimi()): ?>
+            <span class="badge bg-warning">Attenzione: Ha un omonimo nel distretto</span>
+        <?php endif; ?>
     </div>
     <div class="card-body" id="card-content">
         <div class="row p-1">
