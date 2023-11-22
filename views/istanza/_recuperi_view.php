@@ -65,9 +65,9 @@ echo GridView::widget([
             'buttons' => [
                 'delete' => function ($url, $model) {
                     return Html::a('<i class="bi bi-trash"></i>', '#', [
-                        'class' => 'btn btn-sm btn-danger',
+                        'class' => 'btn btn-sm btn-danger '.($model->getRateSaldate() >0 ? "disabled" : ""),
                         'onclick' => "confirmDeleteRecupero({$model->id}); return false;",
-                        'style' => 'display: block; '.($model->getRateSaldate() >0 ? "disabled" : ""),
+                        'style' => 'display: block',
                         'title' => 'Elimina recupero',
                     ]);
                 },
