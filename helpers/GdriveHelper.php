@@ -311,8 +311,8 @@ class GdriveHelper
                             $istanza->id_anagrafica_disabile = $disabile->id;
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
-                            $istanza->attivo = false;
                             $istanza->data_decesso = isset($row[FileGruppiGoogle::DATA_DECESSO]) ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
+                            $istanza->attivo = $istanza->data_decesso !== null;
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE] ?? "";
                             $istanza->save();
@@ -355,6 +355,9 @@ class GdriveHelper
                                     $recupero->id_istanza = $istanza->id;
                                     $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
                                     $recupero->note = $noteRecupero ?? ("Recupero automatico per " . $numMesiDaCaricare . " mesi");
+                                    $recupero->save();
+                                    if ($recupero->errors)
+                                        $errors = array_merge($errors, ['recupero-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $recupero->errors]);
                                 }
                             }
                         }
