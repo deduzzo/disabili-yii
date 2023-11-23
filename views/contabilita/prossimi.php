@@ -40,6 +40,9 @@ $formatter = \Yii::$app->formatter;
                         </svg>
                     </button>
                 </div>
+                <?php
+                 echo \app\helpers\Utils::getDataNascitaFromCf("DDMRRT86A03F158E");
+                ?>
                 <?= Html::beginForm(['contabilita/aggiungi-nuovo-gruppo'], 'post', ['id' => 'aggiungi-nuovo-gruppo-form', 'class' => 'form-horizontal']) ?>
                 <?= Html::hiddenInput('nomeGruppoRaw',  $_GET['nomeGruppo'] ?? ""); ?>
                 <div class="modal-body">

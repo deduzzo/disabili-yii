@@ -314,8 +314,8 @@ class GdriveHelper
                             $istanza->id_anagrafica_disabile = $disabile->id;
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
-                            $istanza->data_decesso = isset($row[FileGruppiGoogle::DATA_DECESSO]) ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = (strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "")) && !isset($row[FileGruppiGoogle::DATA_DECESSO]);
+                            $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] !== "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
+                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_decesso !== null);
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE] ?? "";
                             $istanza->save();
