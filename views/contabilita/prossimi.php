@@ -58,7 +58,7 @@ $formatter = \Yii::$app->formatter;
                         </div>
                         <!-- num mesi da caricare (input number) -->
                         <div class="col-md-3" style="margin-top:10px">
-                            <?= Html::label('Mesi arretrati da includere', 'numMesiDaCaricare', ['class' => 'form-label']) ?>
+                            <?= Html::label('Mesi arretrati', 'numMesiDaCaricare', ['class' => 'form-label']) ?>
                             <?= Html::textInput('numMesiDaCaricare', null, ['class' => 'form-control', 'placeholder' => 'Numero mesi da caricare', 'type' => 'number']) ?>
                         </div>
                         <!-- nota recupero (text) -->
