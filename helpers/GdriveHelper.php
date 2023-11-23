@@ -283,7 +283,7 @@ class GdriveHelper
                             $disabile->codice_fiscale = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]));
                             $disabile->cognome = strtoupper(trim($row[FileGruppiGoogle::COGNOME]));
                             $disabile->nome = strtoupper(trim($row[FileGruppiGoogle::NOME]));
-                            $disabile->data_nascita = Utils::getDataNascitaFromCf(strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])));
+                            $disabile->data_nascita = Utils::convertDateFromFormat(Utils::getDataNascitaFromCf(strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]))));
                             $disabile->indirizzo_residenza = strtoupper(trim($row[FileGruppiGoogle::INDIRIZZO_RESIDENZA_DISABILE]));
                             $disabile->save();
                             if ($disabile->errors)
@@ -312,7 +312,7 @@ class GdriveHelper
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_decesso !== null);
+                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_decesso === null);
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE] ?? "";
                             $istanza->save();
