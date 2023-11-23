@@ -57,16 +57,16 @@ $formatter = \Yii::$app->formatter;
                             <?= Html::textInput('dataTermineIstanze', null, ['class' => 'form-control', 'placeholder' => 'Data termine istanze', 'type' => 'date']) ?>
                         </div>
                         <!-- num mesi da caricare (input number) -->
-                        <div class="col-md-6" style="margin-top:10px">
-                            <?= Html::label('Numero mesi arretrati pagare', 'numMesiDaCaricare', ['class' => 'form-label']) ?>
+                        <div class="col-md-3" style="margin-top:10px">
+                            <?= Html::label('Mesi arretrati da includere', 'numMesiDaCaricare', ['class' => 'form-label']) ?>
                             <?= Html::textInput('numMesiDaCaricare', null, ['class' => 'form-control', 'placeholder' => 'Numero mesi da caricare', 'type' => 'number']) ?>
                         </div>
                         <!-- nota recupero (text) -->
-                        <div class="col-md-6" style="margin-top:10px">
+                        <div class="col-md-7" style="margin-top:10px">
                             <?= Html::label('Nota recupero', 'notaRecupero', ['class' => 'form-label']) ?>
                             <?= Html::textInput('notaRecupero', null, ['class' => 'form-control', 'placeholder' => 'Nota recupero']) ?>
                         </div>
-                        <div class="col-md-12" style="margin-top:10px">
+                        <div class="col-md-2" style="margin-top:10px">
                             <?= Html::checkbox('cancellaDatiSePresenti', true, ['label' => 'Cancella dati se presenti']) ?>
                         </div>
                     </div>
