@@ -40,9 +40,6 @@ $formatter = \Yii::$app->formatter;
                         </svg>
                     </button>
                 </div>
-                <?php
-                 echo \app\helpers\Utils::getDataNascitaFromCf("DDMRRT86A03F158E");
-                ?>
                 <?= Html::beginForm(['contabilita/aggiungi-nuovo-gruppo'], 'post', ['id' => 'aggiungi-nuovo-gruppo-form', 'class' => 'form-horizontal']) ?>
                 <?= Html::hiddenInput('nomeGruppoRaw',  $_GET['nomeGruppo'] ?? ""); ?>
                 <div class="modal-body">
@@ -93,6 +90,9 @@ $formatter = \Yii::$app->formatter;
     <div class="card">
         <div class="card-header">
             <div class="card-toolbar">
+                <?php
+                echo \app\helpers\Utils::getDataNascitaFromCf("DDMRRT86A03F158E");
+                ?>
                 <!-- list of all new group names -->
                 <?= Html::beginForm(['contabilita/prossimi'], 'get', ['class' => 'form-inline']) ?>
                 <div class="row">
