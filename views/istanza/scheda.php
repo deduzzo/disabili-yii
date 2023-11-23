@@ -170,18 +170,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-header" style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
             <?php if (!$istanza->riconosciuto): ?>
                 <span class="badge bg-danger">NON RICONOSCIUTO DISABILE GRAVISSIMO</span>
-            <?php else: { ?>
-                <?php if ($istanza->isInAlert()): ?>
-                    <span class="badge bg-danger" style="margin-right: 10px">ALERT!</span>
-                    <span class="badge bg-warning"><?= $istanza->isInAlert() ?></span>
-                <?php endif; ?>
-                <?php if ($istanza->inChiusura()): ?>
-                    <span class="badge bg-warning">In chiusura il <?= Yii::$app->formatter->asDate($istanza->data_chiusura) ?></span>
-                <?php endif; ?>
-                <?php if ($istanza->haOmonimi()): ?>
-                    <span class="badge bg-warning">ATTENZIONE: Ha un omonimo nel distretto</span>
-                <?php endif;
-            } ?>
+            <?php endif; ?>
+            <?php if ($istanza->isInAlert()): ?>
+                <span class="badge bg-danger" style="margin-right: 10px">ALERT!</span>
+                <span class="badge bg-warning"><?= $istanza->isInAlert() ?></span>
+            <?php endif; ?>
+            <?php if ($istanza->inChiusura()): ?>
+                <span class="badge bg-warning">In chiusura il <?= Yii::$app->formatter->asDate($istanza->data_chiusura) ?></span>
+            <?php endif; ?>
+            <?php if ($istanza->haOmonimi()): ?>
+                <span class="badge bg-warning">ATTENZIONE: Ha un omonimo nel distretto</span>
             <?php endif; ?>
         </div>
         <div class="card-body" id="card-content">
