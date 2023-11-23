@@ -307,12 +307,12 @@ class GdriveHelper
                             $istanza->riconosciuto = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
                             $istanza->id_gruppo = $gruppo->id;
                             $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA] ?? null;
-                            $istanza->patto_di_cura = $istanza->riconosciuto;
+                            $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
                             $istanza->id_anagrafica_disabile = $disabile->id;
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = isset($row[FileGruppiGoogle::DATA_DECESSO]) ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = $istanza->data_decesso !== null;
+                            $istanza->attivo = (strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "")) && !isset($row[FileGruppiGoogle::DATA_DECESSO]);
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE] ?? "";
                             $istanza->save();
