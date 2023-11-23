@@ -216,8 +216,10 @@ class GdriveHelper
                                 $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         }
                         $tipoOk = str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore");
-                        if (!$tipoOk)
+                        $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE]);
+                        if ((!$tipoOk && ($eta && $eta>=18)) || ($eta && $eta>18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
                             $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                        $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE]);
                         $tipo = (!isset($row[FileGruppiGoogle::ISEE]) || $row[FileGruppiGoogle::ISEE] == "" || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")) ? "inferiore" : "superiore";
                         $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
                         if ($tipo === "inferiore") $inferiori++;

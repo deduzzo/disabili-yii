@@ -5,6 +5,8 @@ namespace app\helpers;
 
 use app\models\Istanza;
 use Carbon\Carbon;
+use CodiceFiscale\InverseCalculator;
+use CodiceFiscale\Validator;
 use DateTime;
 use Ifsnop\Mysqldump\Mysqldump;
 use Yii;
@@ -63,23 +65,24 @@ class Utils
         return is_array($var) && array_diff_key($var, array_keys(array_keys($var)));
     }
 
-    static function dumpDb($importToGdrive = true) {
+    static function dumpDb($importToGdrive = true)
+    {
         try {
             $dump = new Mysqldump(Yii::$app->db->dsn, Yii::$app->db->username, Yii::$app->db->password);
             //create a temp folder in system temp directory
-            $tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dump_'.Carbon::now()->timestamp;
+            $tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dump_' . Carbon::now()->timestamp;
             mkdir($tempDir);
             // filename var is backup_YYYY-MM-DD_HH-MM-SS.sql
             $filename = 'backup_' . Carbon::now()->format('Y-m-d_H-i-s');
-            $dump->start($tempDir.'/'.$filename.'.sql');
+            $dump->start($tempDir . '/' . $filename . '.sql');
             //create a zip file
             $zip = new ZipArchive();
-            $zip->open($tempDir.'/'.$filename.'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-            $zip->addFile($tempDir.'/'.$filename.'.sql', $filename.'.sql');
+            $zip->open($tempDir . '/' . $filename . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+            $zip->addFile($tempDir . '/' . $filename . '.sql', $filename . '.sql');
             $zip->close();
             if ($importToGdrive) {
                 $gdrive = new GdriveHelper();
-                $gdrive->uploadFileInFolder($tempDir.'/'.$filename.'.zip', $gdrive->backupFolderId,$filename.'.zip');
+                $gdrive->uploadFileInFolder($tempDir . '/' . $filename . '.zip', $gdrive->backupFolderId, $filename . '.zip');
                 // remove temp folder and all files
                 array_map('unlink', glob("$tempDir/*.*"));
             }
@@ -88,7 +91,8 @@ class Utils
         }
     }
 
-    public static function verificaIban($iban) {
+    public static function verificaIban($iban)
+    {
         return verify_iban($iban);
     }
 
@@ -105,5 +109,16 @@ class Utils
             }
 
         }
+    }
+
+    public static function getEtaFromCf($cf,$dataRiferimento= null)
+    {
+        $inverseCalculator = new InverseCalculator($cf);
+        if ((new Validator($cf))->isFormallyValid()) {
+            $birthDate = $inverseCalculator->getSubject()->getBirthDate();
+            $referenceDate = $dataRiferimento ? Carbon::parse($dataRiferimento) : Carbon::now();
+            return Carbon::parse($birthDate)->diffInYears($referenceDate);
+        }
+        else return null;
     }
 }
