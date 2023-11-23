@@ -90,9 +90,6 @@ $formatter = \Yii::$app->formatter;
     <div class="card">
         <div class="card-header">
             <div class="card-toolbar">
-                <?php
-                echo \app\helpers\Utils::getDataNascitaFromCf("DDMRRT86A03F158E");
-                ?>
                 <!-- list of all new group names -->
                 <?= Html::beginForm(['contabilita/prossimi'], 'get', ['class' => 'form-inline']) ?>
                 <div class="row">
