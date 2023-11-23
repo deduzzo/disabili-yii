@@ -283,7 +283,10 @@ class GdriveHelper
                             $disabile->codice_fiscale = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]));
                             $disabile->cognome = strtoupper(trim($row[FileGruppiGoogle::COGNOME]));
                             $disabile->nome = strtoupper(trim($row[FileGruppiGoogle::NOME]));
-                            $disabile->data_nascita = Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_NASCITA_DISABILE]);
+                            $dataNascita = Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_NASCITA_DISABILE]);
+                            if (!$dataNascita)
+                                $dataNascita = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]));
+                            $disabile->data_nascita = $dataNascita;
                             $disabile->indirizzo_residenza = strtoupper(trim($row[FileGruppiGoogle::INDIRIZZO_RESIDENZA_DISABILE]));
                             $disabile->save();
                             if ($disabile->errors)

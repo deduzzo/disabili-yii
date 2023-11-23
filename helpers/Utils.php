@@ -121,4 +121,14 @@ class Utils
         }
         else return null;
     }
+
+    public static function getDataNascitaFromCf($cf)
+    {
+        $inverseCalculator = new InverseCalculator($cf);
+        if ((new Validator($cf))->isFormallyValid()) {
+            $birthDate = $inverseCalculator->getSubject()->getBirthDate();
+            return Carbon::parse($birthDate)->format('d/m/Y');
+        }
+        else return null;
+    }
 }
