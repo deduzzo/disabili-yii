@@ -78,7 +78,7 @@ class ContabilitaController extends Controller
                     $gruppo->data_termine_istanze = $_POST['dataTermineIstanze'];
                     $gruppo->save();
                 }
-                $res = $gdrive->importaNuovoGruppo($allNewGroupMaps[$_POST['nomeGruppoRaw']],$gruppo,boolval($_POST['cancellaDatiSePresenti']),intval($_POST['numMesiDaCaricare'] ?? 0));
+                $res = $gdrive->importaNuovoGruppo($allNewGroupMaps[$_POST['nomeGruppoRaw']],$gruppo,boolval($_POST['cancellaDatiSePresenti']),intval($_POST['numMesiDaCaricare'] ?? 0),$_POST['notaRecupero'] ?? null);
                 // show success
                 if ($res === true)
                     Yii::$app->session->setFlash('success', 'Gruppo creato e dati importati con successo');
