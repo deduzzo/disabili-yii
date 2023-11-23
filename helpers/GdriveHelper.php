@@ -9,6 +9,8 @@ use app\models\ContoCessionario;
 use app\models\Distretto;
 use app\models\enums\FileGruppiGoogle;
 use app\models\enums\FileParisi;
+use app\models\enums\ImportoBase;
+use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Isee;
 use app\models\Istanza;
@@ -217,7 +219,7 @@ class GdriveHelper
                         }
                         $tipoOk = isset($row[FileGruppiGoogle::ISEE]) && (str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore"));
                         $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE]);
-                        if ((!$tipoOk && ($eta && $eta>=18)) || ($eta && $eta>18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
+                        if ((!$tipoOk && ($eta && $eta >= 18)) || ($eta && $eta > 18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
                             $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
 
                         $tipo = (!isset($row[FileGruppiGoogle::ISEE]) || $row[FileGruppiGoogle::ISEE] == "" || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")) ? "inferiore" : "superiore";
@@ -241,7 +243,7 @@ class GdriveHelper
         return $out;
     }
 
-    public function importaNuovoGruppo($spreadsheetId, $gruppo, $cancellaTuttiDelGruppo = false)
+    public function importaNuovoGruppo($spreadsheetId, $gruppo, $cancellaTuttiDelGruppo = false, $numMesiDaCaricare = 0,$noteRecupero = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -348,6 +350,12 @@ class GdriveHelper
                                 $isee->save();
                                 if ($isee->errors)
                                     $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
+                                if ($numMesiDaCaricare > 0) {
+                                    $recupero = new Recupero();
+                                    $recupero->id_istanza = $istanza->id;
+                                    $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
+                                    $recupero->note = $noteRecupero ?? ("Recupero automatico per " . $numMesiDaCaricare . " mesi");
+                                }
                             }
                         }
                     } else
