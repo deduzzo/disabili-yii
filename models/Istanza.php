@@ -385,7 +385,9 @@ class Istanza extends \yii\db\ActiveRecord
             'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
             'differenza' => $differenza,
             'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
-                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) . ($hacambioiban ? "<br />VERIFICARE CAMBIO IBAN" : ""),
+                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) .
+                ($hacambioiban ? "<br />VERIFICARE CAMBIO IBAN" : "") .
+                ($haOmonimi ? "<br />ATTENZIONE! OMONIMI NEL DISTRETTO" : ""),
             'recupero' => $this->haRecuperiInCorso(),
             'color' => $op ? 'danger' : ($differenza != 0.0 ? 'warning' : 'success')
         ];
