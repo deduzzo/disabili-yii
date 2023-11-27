@@ -297,10 +297,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getContoValido()
     {
-        $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
-        if (!$conto)
-            $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true])->one();
-        return $conto;
+        return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
     }
 
     public static function getNumIstanzeAttive()
