@@ -184,6 +184,17 @@ class SiteController extends Controller
         fclose($fp);
     }
 
+    public function actionIstanzeContoNonValido() {
+        $out = "";
+        foreach (Istanza::find()->where(['attivo' => true])->all() as $istanza) {
+            /* @var $istanza Istanza */
+            $conto = $istanza->getContoValido();
+            if (!$conto)
+                $out .= $istanza->id . "\n";
+        }
+        echo $out;
+    }
+
     public function actionImportaSoloAlcuniPagamenti()
     {
         $azzeraPagamenti = true;
