@@ -602,7 +602,8 @@ class Istanza extends \yii\db\ActiveRecord
                         $errors = array_merge($recuperoNegNonRateizzato->errors, $errors);
                 }
             }
-            if (count($errors) > 0) print_r($errors);
+            if (count($errors) > 0)
+                print_r($errors);
         }
     }
 

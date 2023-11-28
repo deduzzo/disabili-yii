@@ -154,23 +154,28 @@ class DeterminaController extends \yii\web\Controller
             $soloRecuperi === "on" ? $recuperiTotali :
                 ($soloVariazioni === "on" ? $differenzeTotali :
                     ($soloProblematici === "on" ? $alertGlobal : $istanzeArray)));
-        return $this->render('simulazione', [
-            'istanzeArray' => $istanzeArray,
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel,
-            'allIdPagati' => $allIdPagatiMeseScorso,
-            'soloProblematici' => $soloProblematici,
-            'soloVariazioni' => $soloVariazioni,
-            'soloRecuperi' => $soloRecuperi,
-            'distretti' => $distretti,
-            'gruppi' => $gruppi,
-            'title' => "Simulazione prossima determina",
-            'stats' => [
-                'importiTotali' => $importiTotali,
-                'numeriTotali' => $numeriTotali,
-                'alert' => $alert,
-            ]
-        ]);
+        if (!$idDeterminaFinalizzare)
+            return $this->render('simulazione', [
+                'istanzeArray' => $istanzeArray,
+                'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel,
+                'allIdPagati' => $allIdPagatiMeseScorso,
+                'soloProblematici' => $soloProblematici,
+                'soloVariazioni' => $soloVariazioni,
+                'soloRecuperi' => $soloRecuperi,
+                'distretti' => $distretti,
+                'gruppi' => $gruppi,
+                'title' => "Simulazione prossima determina",
+                'stats' => [
+                    'importiTotali' => $importiTotali,
+                    'numeriTotali' => $numeriTotali,
+                    'alert' => $alert,
+                ]
+            ]);
+        else {
+            Yii::$app->session->setFlash('success', 'Determina finalizzata correttamente!');
+            return $this->redirect(['istanza/index']);
+        }
     }
 
     public function actionVisualizza($export = false)
@@ -197,8 +202,8 @@ class DeterminaController extends \yii\web\Controller
         $importiTotali = [];
         $numeriTotali = [];
         foreach (Distretto::find()->all() as $item) {
-            $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0,IseeType::NO_ISEE => 0];
-            $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0,IseeType::NO_ISEE => 0];
+            $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
+            $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
         }
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
@@ -281,7 +286,7 @@ class DeterminaController extends \yii\web\Controller
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult != 0.0) {
-                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id. "</div><div class='col-md-1'>". Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), [
+                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), [
                             'title' => Yii::t('yii', 'Vai alla scheda'),
                             'class' => 'btn btn-icon btn-sm btn-primary',
                             'target' => '_blank',
@@ -294,7 +299,7 @@ class DeterminaController extends \yii\web\Controller
                         . "</span></div><div class='col-md-5'></div>";
                 }
             }
-            $result.="</div>";
+            $result .= "</div>";
         }
         return $this->render('pagamenti', [
             "mese" => $mese,
