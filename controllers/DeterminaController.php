@@ -250,6 +250,8 @@ class DeterminaController extends \yii\web\Controller
     public
     function actionFinalizza()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
         $vars = $this->request->post();
         if (isset($vars['numero_determina'])) {
             $determina = new Determina();
