@@ -477,130 +477,133 @@ class Istanza extends \yii\db\ActiveRecord
     public function finalizzaMensilita($idDetermina)
     {
         $errors = [];
-        $contoValido = $this->getContoValido();
-        $recuperiPositivi = $this->getRecuperi(Recupero::POSITIVO);
-        $lastIseeType = $this->getLastIseeType();
-        $determina = Determina::findOne($idDetermina);
-        $importoSurplus = 0;
-        // caricamento importo base
-        $movimento = new Movimento();
-        $movimento->contabilizzare = false;
-        $movimento->is_movimento_bancario = false;
-        $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
-        $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($movimento->data)->startOfMonth())->format('Y-m-d');
-        $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($movimento->data)->endOfMonth())->format('Y-m-d');
-        $movimento->id_determina = $idDetermina;
-        $movimento->note = "Beneficio contabile di ". Carbon::parse($movimento->data)->locale('it')->monthName. ' ' . Carbon::parse($movimento->data)->year;
-        $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
-        $movimento->save();
-        if ($movimento->errors)
-            $errors = array_merge($movimento->errors, $errors);
-        foreach ($recuperiPositivi as $recuperPos) {
+        if (!$this->haRicoveriInCorso()) {
+            $contoValido = $this->getContoValido();
+            $recuperiPositivi = $this->getRecuperi(Recupero::POSITIVO);
+            $lastIseeType = $this->getLastIseeType();
+            $determina = Determina::findOne($idDetermina);
+            $importoSurplus = 0;
+            // caricamento importo base
             $movimento = new Movimento();
             $movimento->id_conto = $contoValido->id;
             $movimento->contabilizzare = false;
-            $movimento->id_recupero = $recuperPos->id;
             $movimento->is_movimento_bancario = false;
             $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+            $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($movimento->data)->startOfMonth())->format('Y-m-d');
+            $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($movimento->data)->endOfMonth())->format('Y-m-d');
             $movimento->id_determina = $idDetermina;
-            // put in $mese the month of the date $movimento-data (format 'Y-m-d')  in italian
-            if ($recuperPos->rateizzato) {
-                $movimento->importo = -$recuperPos->getProssimaRata();
-                $movimento->num_rata = $recuperPos->getNumeroProssimaRata();
-                $importoSurplus += $movimento->importo;
-                if ($recuperPos->getRateMancanti() == 1) {
+            $movimento->note = "Beneficio contabile di " . Carbon::parse($movimento->data)->locale('it')->monthName . ' ' . Carbon::parse($movimento->data)->year;
+            $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+            $movimento->save();
+            if ($movimento->errors)
+                $errors = array_merge($movimento->errors, $errors);
+            foreach ($recuperiPositivi as $recuperPos) {
+                $movimento = new Movimento();
+                $movimento->id_conto = $contoValido->id;
+                $movimento->contabilizzare = false;
+                $movimento->id_recupero = $recuperPos->id;
+                $movimento->is_movimento_bancario = false;
+                $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+                $movimento->id_determina = $idDetermina;
+                // put in $mese the month of the date $movimento-data (format 'Y-m-d')  in italian
+                if ($recuperPos->rateizzato) {
+                    $movimento->importo = -$recuperPos->getProssimaRata();
+                    $movimento->num_rata = $recuperPos->getNumeroProssimaRata();
+                    $importoSurplus += $movimento->importo;
+                    if ($recuperPos->getRateMancanti() == 1) {
+                        $recuperPos->chiuso = true;
+                        $recuperPos->save();
+                        if ($recuperPos->errors)
+                            $errors = array_merge($recuperPos->errors, $errors);
+                    }
+                } else {
+                    $movimento->importo = $recuperPos->importo;
+                    $importoSurplus += $movimento->importo;
                     $recuperPos->chiuso = true;
                     $recuperPos->save();
                     if ($recuperPos->errors)
                         $errors = array_merge($recuperPos->errors, $errors);
                 }
-            } else {
-                $movimento->importo = $recuperPos->importo;
-                $importoSurplus += $movimento->importo;
-                $recuperPos->chiuso = true;
-                $recuperPos->save();
-                if ($recuperPos->errors)
-                    $errors = array_merge($recuperPos->errors, $errors);
+                $movimento->save();
+                if ($movimento->errors)
+                    $errors = array_merge($movimento->errors, $errors);
             }
-            $movimento->save();
-            if ($movimento->errors)
-                $errors = array_merge($movimento->errors, $errors);
-        }
-        $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
-        // priorità i recuperi negativi rateizzati
-        $ricoveri = $this->getRicoveriDaContabilizzare();
-        foreach ($ricoveri as $ricoveroDaCont) {
-            $recupero = new Recupero();
-            $recupero->id_istanza = $this->id;
-            $recupero->importo = -$ricoveroDaCont->getImportoRicovero();
-            $recupero->rateizzato = false;
-            $recupero->save();
-            if ($recupero->errors)
-                $errors = array_merge($recupero->errors, $errors);
-            $ricoveroDaCont->id_recupero = $recupero->id;
-            $ricoveroDaCont->contabilizzare = false;
-            $ricoveroDaCont->save();
-            if ($ricoveroDaCont->errors)
-                $errors = array_merge($ricoveroDaCont->errors, $errors);
-        }
-        if (count($ricoveri) > 0)
-            $this->refresh();
+            $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+            // priorità i recuperi negativi rateizzati
+            $ricoveri = $this->getRicoveriDaContabilizzare();
+            foreach ($ricoveri as $ricoveroDaCont) {
+                $recupero = new Recupero();
+                $recupero->id_istanza = $this->id;
+                $recupero->importo = -$ricoveroDaCont->getImportoRicovero();
+                $recupero->rateizzato = false;
+                $recupero->save();
+                if ($recupero->errors)
+                    $errors = array_merge($recupero->errors, $errors);
+                $ricoveroDaCont->id_recupero = $recupero->id;
+                $ricoveroDaCont->contabilizzare = false;
+                $ricoveroDaCont->save();
+                if ($ricoveroDaCont->errors)
+                    $errors = array_merge($ricoveroDaCont->errors, $errors);
+            }
+            if (count($ricoveri) > 0)
+                $this->refresh();
 
-        foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
-            if ($importoSurplus > 0) {
-                $importoOriginale = $recuperoNegRat->getProssimaRata();
-                $movimento = new Movimento();
-                $movimento->id_conto = $contoValido->id;
-                $movimento->contabilizzare = false;
-                $movimento->id_recupero = $recuperoNegRat->id;
-                $movimento->is_movimento_bancario = false;
-                $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
-                $movimento->id_determina = $idDetermina;
-                $movimento->importo = abs($recuperoNegRat->getProssimaRata()) < abs($importoSurplus) ? -abs($recuperoNegRat->getProssimaRata()) : -$importoSurplus;
-                $movimento->num_rata = $recuperoNegRat->getNumeroProssimaRata();
-                $importoSurplus -= abs($movimento->importo);
-                if (abs($movimento->importo) < $importoOriginale && $importoSurplus == 0)
-                    $recuperoNegRat->num_rate += 1;
-                else if ($recuperoNegRat->getRateMancanti() == 1) {
-                    $recuperoNegRat->chiuso = true;
-                }
-                $recuperoNegRat->save();
-                if ($recuperoNegRat->errors)
-                    $errors = array_merge($recuperoNegRat->errors, $errors);
-                $movimento->save();
-                if ($movimento->errors)
-                    $errors = array_merge($movimento->errors, $errors);
-            }
-        }
-        foreach ($this->getRecuperiNegativiNonRateizzati() as $recuperoNegNonRateizzato) {
-            if ($importoSurplus > 0) {
-                $movimento = new Movimento();
-                $movimento->id_conto = $contoValido->id;
-                $movimento->contabilizzare = false;
-                $movimento->id_recupero = $recuperoNegNonRateizzato->id;
-                $movimento->is_movimento_bancario = false;
-                $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
-                $movimento->id_determina = $idDetermina;
-                $movimento->importo = abs($recuperoNegNonRateizzato->getImportoResiduo()) < abs($importoSurplus) ? -abs($recuperoNegNonRateizzato->getImportoResiduo()) : -$importoSurplus;
-                $movimento->save();
-                if ($movimento->errors)
-                    $errors = array_merge($movimento->errors, $errors);
-                $importoSurplus -= abs($movimento->importo);
-                $recuperoNegNonRateizzato->refresh();
-                if ($recuperoNegNonRateizzato->getImportoResiduo() >0 && $importoSurplus == 0) {
-                    $recuperoNegNonRateizzato->rateizzato = true;
-                    $recuperoNegNonRateizzato->num_rate = 2;
-                    $movimento->num_rata = 1;
+            foreach ($this->getRecuperiNegativiRateizzati() as $recuperoNegRat) {
+                if ($importoSurplus > 0) {
+                    $importoOriginale = $recuperoNegRat->getProssimaRata();
+                    $movimento = new Movimento();
+                    $movimento->id_conto = $contoValido->id;
+                    $movimento->contabilizzare = false;
+                    $movimento->id_recupero = $recuperoNegRat->id;
+                    $movimento->is_movimento_bancario = false;
+                    $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+                    $movimento->id_determina = $idDetermina;
+                    $movimento->importo = abs($recuperoNegRat->getProssimaRata()) < abs($importoSurplus) ? -abs($recuperoNegRat->getProssimaRata()) : -$importoSurplus;
+                    $movimento->num_rata = $recuperoNegRat->getNumeroProssimaRata();
+                    $importoSurplus -= abs($movimento->importo);
+                    if (abs($movimento->importo) < $importoOriginale && $importoSurplus == 0)
+                        $recuperoNegRat->num_rate += 1;
+                    else if ($recuperoNegRat->getRateMancanti() == 1) {
+                        $recuperoNegRat->chiuso = true;
+                    }
+                    $recuperoNegRat->save();
+                    if ($recuperoNegRat->errors)
+                        $errors = array_merge($recuperoNegRat->errors, $errors);
                     $movimento->save();
-                } else
-                    $recuperoNegNonRateizzato->chiuso = true;
-
-                $recuperoNegNonRateizzato->save();
-                if ($recuperoNegNonRateizzato->errors)
-                    $errors = array_merge($recuperoNegNonRateizzato->errors, $errors);
+                    if ($movimento->errors)
+                        $errors = array_merge($movimento->errors, $errors);
+                }
             }
+            foreach ($this->getRecuperiNegativiNonRateizzati() as $recuperoNegNonRateizzato) {
+                if ($importoSurplus > 0) {
+                    $movimento = new Movimento();
+                    $movimento->id_conto = $contoValido->id;
+                    $movimento->contabilizzare = false;
+                    $movimento->id_recupero = $recuperoNegNonRateizzato->id;
+                    $movimento->is_movimento_bancario = false;
+                    $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+                    $movimento->id_determina = $idDetermina;
+                    $movimento->importo = abs($recuperoNegNonRateizzato->getImportoResiduo()) < abs($importoSurplus) ? -abs($recuperoNegNonRateizzato->getImportoResiduo()) : -$importoSurplus;
+                    $movimento->save();
+                    if ($movimento->errors)
+                        $errors = array_merge($movimento->errors, $errors);
+                    $importoSurplus -= abs($movimento->importo);
+                    $recuperoNegNonRateizzato->refresh();
+                    if ($recuperoNegNonRateizzato->getImportoResiduo() > 0 && $importoSurplus == 0) {
+                        $recuperoNegNonRateizzato->rateizzato = true;
+                        $recuperoNegNonRateizzato->num_rate = 2;
+                        $movimento->num_rata = 1;
+                        $movimento->save();
+                    } else
+                        $recuperoNegNonRateizzato->chiuso = true;
+
+                    $recuperoNegNonRateizzato->save();
+                    if ($recuperoNegNonRateizzato->errors)
+                        $errors = array_merge($recuperoNegNonRateizzato->errors, $errors);
+                }
+            }
+            if (count($errors) > 0) print_r($errors);
         }
-        if (count($errors) > 0) print_r($errors);
     }
 
     public function contoInFaseDiValidazione()
