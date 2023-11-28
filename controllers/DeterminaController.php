@@ -284,10 +284,12 @@ class DeterminaController extends \yii\web\Controller
             //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
             $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])->andWhere(['not in', 'i.id', (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')->andWhere(['>=', 'm2.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->all()])->all();
             $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
+            $errori = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult != 0.0) {
+                    $errori = true;
                     $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), [
                             'title' => Yii::t('yii', 'Vai alla scheda'),
                             'class' => 'btn btn-icon btn-sm btn-primary',
@@ -301,6 +303,8 @@ class DeterminaController extends \yii\web\Controller
                         . "</span></div><div class='col-md-5'></div>";
                 }
             }
+            if (!$errori)
+                $result .= "<div class='col-md-12'>🆗Tutto ok! ✔️</div>";
             $result .= "</div>";
         }
         return $this->render('pagamenti', [
