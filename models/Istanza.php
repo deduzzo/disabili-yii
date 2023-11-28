@@ -484,7 +484,6 @@ class Istanza extends \yii\db\ActiveRecord
         $importoSurplus = 0;
         // caricamento importo base
         $movimento = new Movimento();
-        $movimento->id_conto = $contoValido->id;
         $movimento->contabilizzare = false;
         $movimento->is_movimento_bancario = false;
         $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
