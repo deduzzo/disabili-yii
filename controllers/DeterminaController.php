@@ -194,10 +194,13 @@ class DeterminaController extends \yii\web\Controller
         $getVars = $this->request->get();
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
+        $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
+        $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
         $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
             ->andwhere(['>=', 'data', $ultimaData->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->endOfMonth()->format('Y-m-d')])
+            ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all();
         $importiTotali = [];
         $numeriTotali = [];
@@ -220,6 +223,7 @@ class DeterminaController extends \yii\web\Controller
                 'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
                 'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
+                'gruppi' => $gruppi,
                 //'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => Yii::$app->formatter->asCurrency($istanzaRaw['importo']),
                 //'opArray' => $differenza,
