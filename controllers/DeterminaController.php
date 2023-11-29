@@ -223,7 +223,6 @@ class DeterminaController extends \yii\web\Controller
                 'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
                 'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
-                'gruppi' => $gruppi,
                 //'importoPrecedente' => $differenza['importoPrecedente'],
                 'importo' => Yii::$app->formatter->asCurrency($istanzaRaw['importo']),
                 //'opArray' => $differenza,
@@ -247,6 +246,7 @@ class DeterminaController extends \yii\web\Controller
             ],
             'anno' => $anno,
             'mese' => $mese,
+            'gruppi' => $gruppi,
             'title' => "Storico pagamenti",
         ]);
     }
