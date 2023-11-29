@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'sil' => ['anagraficaDisabile.codice_fiscale'],
                         'istanze' => [
                             'attivo',
-                            'cf',
+                            'anagraficaDisabile.codice_fiscale',
                             'anagraficaDisabile.nome',
                             'anagraficaDisabile.cognome',
                             'gruppo.descrizione_gruppo',
