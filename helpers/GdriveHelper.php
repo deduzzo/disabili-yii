@@ -188,6 +188,8 @@ class GdriveHelper
         $sheets = $response->getSheets();
         $totaleMeseGlobale = 0;
         $countTotale = 0;
+        $inferioriTotali = 0;
+        $superioriTotali = 0;
         foreach ($sheets as $sheet) {
             $sheetTitle = $sheet->getProperties()->getTitle();
 
@@ -237,8 +239,12 @@ class GdriveHelper
             $out['out'] .= $sheet->getProperties()->getTitle() . ": " . $count . "-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $count;
+            $inferioriTotali += $inferiori;
+            $superioriTotali += $superiori;
         }
         $out['out'] .= "<br /> TOTALE NUOVI DISABILI: <b>" . $countTotale . "</b>";
+        $out['out'] .= "<br /> TOTALE INFERIORI: <b>" . $inferioriTotali . "</b>";
+        $out['out'] .= "<br /> TOTALE SUPERIORI: <b>" . $superioriTotali . "</b>";
         $out['out'] .= "<br /> TOTALE MENSILE STIMATO: <b>" . Yii::$app->formatter->asCurrency($totaleMeseGlobale) . "</b>";
         return $out;
     }
