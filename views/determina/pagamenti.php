@@ -25,49 +25,63 @@ $formatter = \Yii::$app->formatter;
         <div class="card-header">
             <div class="card-toolbar">
                 <?= Html::beginForm(['determina/pagamenti'], 'get', ['class' => 'form-inline']) ?>
+                <!-- bootstrap separator with name "Pagamenti" -->
                 <div class="row">
-                    <div class="col-md-4">
-                        <label for="mese" class="form-label">Seleziona Mese</label>
-                        <select class="form-select" id="mese" name="mese">
-                            <?php
-                            $mesi = array(
-                                1 => 'Gennaio',
-                                2 => 'Febbraio',
-                                3 => 'Marzo',
-                                4 => 'Aprile',
-                                5 => 'Maggio',
-                                6 => 'Giugno',
-                                7 => 'Luglio',
-                                8 => 'Agosto',
-                                9 => 'Settembre',
-                                10 => 'Ottobre',
-                                11 => 'Novembre',
-                                12 => 'Dicembre'
-                            );
-                            ?>
-                            <option value="">Scegli...</option>
-                            <?php
-                            foreach ($mesi as $numero => $nome)
-                                echo "<option value='$numero' ".($mese == $numero ? 'selected' : '')." >" . $nome . "</option>";
-                            ?>
-                        </select>
+                    <div class="col-md-6">
+                        <div class="divider">
+                            <div class="divider-text">Pagamenti Mensili</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="mese" class="form-label">Seleziona Mese</label>
+                                <select class="form-select" id="mese" name="mese">
+                                    <?php
+                                    $mesi = array(
+                                        1 => 'Gennaio',
+                                        2 => 'Febbraio',
+                                        3 => 'Marzo',
+                                        4 => 'Aprile',
+                                        5 => 'Maggio',
+                                        6 => 'Giugno',
+                                        7 => 'Luglio',
+                                        8 => 'Agosto',
+                                        9 => 'Settembre',
+                                        10 => 'Ottobre',
+                                        11 => 'Novembre',
+                                        12 => 'Dicembre'
+                                    );
+                                    ?>
+                                    <option value="">Scegli...</option>
+                                    <?php
+                                    foreach ($mesi as $numero => $nome)
+                                        echo "<option value='$numero' " . ($mese == $numero ? 'selected' : '') . " >" . $nome . "</option>";
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="anno" class="form-label">Seleziona Anno</label>
+                                <select class="form-select" id="anno" name="anno">
+                                    <option selected>Scegli...</option>
+                                    <?php
+                                    for ($i = date('Y') - 5; $i <= date('Y'); $i++)
+                                        echo "<option value='$i' " . ($i == date('Y') ? "selected " : "") . ">$i</option>";
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <!-- button submit -->
+                                <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
+                            </div>
+                            <?= Html::endForm() ?>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label for="anno" class="form-label">Seleziona Anno</label>
-                        <select class="form-select" id="anno" name="anno">
-                            <option selected>Scegli...</option>
-                            <?php
-                            for ($i = date('Y') - 5; $i <= date('Y'); $i++)
-                                echo "<option value='$i' " . ($i == date('Y') ? "selected " : "") . ">$i</option>";
-                            ?>
-                        </select>
+                    <div class="col-md-6">
+                        <div class="divider">
+                            <div class="divider-text">Verifica Iban</div>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <!-- button submit -->
-                        <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px','name' => "submit"]) ?>
-                    </div>
+
                 </div>
-                <?= Html::endForm() ?>
             </div>
         </div>
         <div class="card-body">
