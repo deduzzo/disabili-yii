@@ -79,6 +79,9 @@ $formatter = \Yii::$app->formatter;
                         <div class="divider">
                             <div class="divider-text">Verifica Iban</div>
                         </div>
+                        <?= Html::beginForm(['determina/verifica-iban'], 'get', ['class' => 'form-inline']) ?>
+                        <div style="text-ali" <button type="submit" class="btn btn-primary" value="verifica-iban">
+                            Verifica Iban</button>
                     </div>
 
                 </div>
