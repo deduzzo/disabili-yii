@@ -92,7 +92,7 @@ $formatter = \Yii::$app->formatter;
                                     echo $key ."<br />";
                                     foreach ($iban as $istanza) {
                                         /* @var \app\models\Istanza $istanza */
-                                        echo "<a href='" . Url::to(['istanza/scheda', 'id' => $istanza->id]) . "' target='_blank'>" . $istanza->id . "-" . $istanza->getNominativoDisabile(). " - ".$istanza->gruppo->descrizione_gruppo. "</a><br />";
+                                        echo "<a href='" . Url::to(['istanza/scheda', 'id' => $istanza->id]) . "' target='_blank'>" . $istanza->id . "-" . $istanza->getNominativoDisabile(). " - ".$istanza->distretto->nome. " ".$istanza->gruppo->descrizione_gruppo. "</a><br />";
                                     }
                                     echo "<br />";
                                 } ?>
