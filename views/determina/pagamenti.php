@@ -15,6 +15,7 @@ use yii\helpers\Url;
 /** @var string $mese */
 /** @var string $anno */
 /** @var string $result */
+/** @var array $ibanRipetuti */
 
 
 $this->title = 'Verifica pagamenti';
@@ -79,9 +80,23 @@ $formatter = \Yii::$app->formatter;
                         <div class="divider">
                             <div class="divider-text">Verifica Iban</div>
                         </div>
-                        <?= Html::beginForm(['determina/verifica-iban'], 'get', ['class' => 'form-inline']) ?>
-                        <div style="text-ali" <button type="submit" class="btn btn-primary" value="verifica-iban">
-                            Verifica Iban</button>
+                        <?= Html::beginForm(['determina/pagamenti'], 'get', ['class' => 'form-inline']) ?>
+                        <button type="submit" class="btn btn-primary" value="verifica-iban" name="verifica-iban">
+                            Verifica Iban
+                        </button>
+                        <?php if ($ibanRipetuti !== null): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <strong>Attenzione!</strong> Sono stati trovati <?= count($ibanRipetuti) ?> iban
+                                ripetuti.<br /><br />
+                                <?php foreach ($ibanRipetuti as $key => $iban) {
+                                    echo $key ."<br />";
+                                    foreach ($iban as $istanza) {
+                                        echo "<a href='" . Url::to(['istanza/scheda', 'id' => $istanza->id]) . "' target='_blank'>" . $istanza->id . "-" . $istanza->getNominativoDisabile(). "</a><br />";
+                                    }
+                                    echo "<br />";
+                                } ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>

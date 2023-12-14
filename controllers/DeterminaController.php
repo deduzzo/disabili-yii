@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\Utils;
+use app\models\Conto;
 use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
@@ -311,10 +312,34 @@ class DeterminaController extends \yii\web\Controller
                 $result .= "<div class='col-md-12'>🆗Tutto ok! ✔️</div>";
             $result .= "</div>";
         }
+        $ibanRipetuti = [];
+        if (isset($vars['verifica-iban'])) {
+            $istanze = Istanza::find()->where(['attivo' => true])->andWhere(['chiuso' => false])->all();
+            $ibans = [];
+            /* @var $istanza Istanza */
+            foreach ($istanze as $istanza) {
+                /* @var $contoValido Conto */
+                $contoValido = $istanza->getContoValido();
+                if ($contoValido) {
+                    if (!array_key_exists($contoValido->iban, $ibans)) {
+                        $ibans[$contoValido->iban] = [$istanza];
+                    } else {
+                        $ibans[$contoValido->iban][] = $istanza;
+                        if (!array_key_exists($contoValido->iban, $ibanRipetuti))
+                            $ibanRipetuti[] = $contoValido->iban;
+                    }
+                }
+            }
+            $out = [];
+            foreach ($ibanRipetuti as $ibanRipetuto)
+                $out[$ibanRipetuto] = $ibans[$ibanRipetuto];
+            $ibanRipetuti = $out;
+        }
         return $this->render('pagamenti', [
             "mese" => $mese,
             "anno" => $anno,
             "result" => $result !== null ? ($result === "" ? "🆗Tutto ok! ✔️" : $result) : "",
+            "ibanRipetuti" => isset($vars['verifica-iban']) ? $ibanRipetuti : null,
         ]);
     }
 
