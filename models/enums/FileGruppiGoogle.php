@@ -34,6 +34,8 @@ class FileGruppiGoogle extends BaseEnum
     const TIPOLOGIA_DISABILITA = 25;
     const ISEE = 26;
     const NOTE = 27;
+    const SOLO_NUOVI = 28;
+    const GRUPPO = 29;
 
 
     /**
@@ -75,5 +77,7 @@ class FileGruppiGoogle extends BaseEnum
         self::TIPOLOGIA_DISABILITA => "Tipologia Disabilita",
         self::ISEE => "Isee",
         self::NOTE => "Note",
+        self::SOLO_NUOVI => "Solo Nuovi",
+        self::GRUPPO => "Gruppo",
     ];
 }

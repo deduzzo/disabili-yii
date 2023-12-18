@@ -29,7 +29,7 @@ $formatter = \Yii::$app->formatter;
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title white" id="label-modifica">
-                        Modifica Istanza
+                        Importazione dati
                     </h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -41,13 +41,20 @@ $formatter = \Yii::$app->formatter;
                     </button>
                 </div>
                 <?= Html::beginForm(['contabilita/aggiungi-nuovo-gruppo'], 'post', ['id' => 'aggiungi-nuovo-gruppo-form', 'class' => 'form-horizontal']) ?>
-                <?= Html::hiddenInput('nomeGruppoRaw',  $_GET['nomeGruppo'] ?? ""); ?>
+                <?= Html::hiddenInput('nomeGruppoRaw', $_GET['nomeGruppo'] ?? ""); ?>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-12">
-                            <?= Html::label('Nome gruppo', 'nomeGruppo', ['class' => 'form-label']) ?>
-                            <?= Html::textInput('nomeGruppo', isset($_GET['nomeGruppo']) ? (explode('#', $_GET['nomeGruppo'])[0]) : "", ['class' => 'form-control', 'placeholder' => 'Nome gruppo', 'id' => 'nomeGruppo']) ?>
-                        </div>
+                        <?php if (isset($_GET['soloNuovi']) && $_GET['soloNuovi'] == "1"): ?>
+                            <div class="col-md-12">
+                                <b>Nome gruppo:</b>: da colonna AD
+                                <?= Html::hiddenInput('nomeGruppo', "*") ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="col-md-12">
+                                <?= Html::label('Nome gruppo', 'nomeGruppo', ['class' => 'form-label']) ?>
+                                <?= Html::textInput('nomeGruppo', isset($_GET['nomeGruppo']) ? (explode('#', $_GET['nomeGruppo'])[0]) : "", ['class' => 'form-control', 'placeholder' => 'Nome gruppo', 'id' => 'nomeGruppo']) ?>
+                            </div>
+                        <?php endif; ?>
                         <div class="col-md-12" style="margin-top:10px">
                             <?= Html::label('Data inizio beneficio', 'dataInizioBeneficio', ['class' => 'form-label']) ?>
                             <?= Html::textInput('dataInizioBeneficio', null, ['class' => 'form-control', 'placeholder' => 'Data inizio beneficio', 'type' => 'date']) ?>
@@ -62,12 +69,15 @@ $formatter = \Yii::$app->formatter;
                             <?= Html::textInput('numMesiDaCaricare', null, ['class' => 'form-control', 'placeholder' => 'Numero mesi da caricare', 'type' => 'number']) ?>
                         </div>
                         <!-- nota recupero (text) -->
-                        <div class="col-md-7" style="margin-top:10px">
+                        <div class="col-md-9" style="margin-top:10px">
                             <?= Html::label('Nota recupero', 'notaRecupero', ['class' => 'form-label']) ?>
                             <?= Html::textInput('notaRecupero', null, ['class' => 'form-control', 'placeholder' => 'Nota recupero']) ?>
                         </div>
-                        <div class="col-md-2" style="margin-top:10px">
+                        <div class="col-md-6" style="margin-top:10px">
                             <?= Html::checkbox('cancellaDatiSePresenti', true, ['label' => 'Cancella dati se presenti']) ?>
+                        </div>
+                        <div class="col-md-6" style="margin-top:10px">
+                            <?= Html::checkbox('soloNuovi', (isset($_GET['soloNuovi']) && $_GET['soloNuovi'] == "1"), ['label' => 'Solo Nuovi', 'disabled' => true]) ?>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -78,7 +88,7 @@ $formatter = \Yii::$app->formatter;
 
                         <button type="submit" class="btn btn-warning ms-1">
                             <i class="bx bx-check d-block d-sm-none"></i>
-                            <span class="d-none d-sm-block">Crea nuovo gruppo e importa dati</span>
+                            <span class="d-none d-sm-block"><?= (isset($_GET['soloNuovi']) && $_GET['soloNuovi'] == "1") ? "Importa disabili selezionati" : "Crea nuovo gruppo e importa dati" ?></span>
                         </button>
                     </div>
                 </div>
@@ -101,6 +111,8 @@ $formatter = \Yii::$app->formatter;
                                 <option value="<?= $groupName ?>" <?= isset($_GET['nomeGruppo']) && $_GET['nomeGruppo'] === $groupName ? "selected" : "" ?>><?= $groupName ?></option>
                             <?php endforeach; ?>
                         </select>
+                        <!-- add checkbox named "solo nuovi (colonna AC)" -->
+                        <?= Html::checkbox('soloNuovi', isset($_GET['soloNuovi']) ? true : false, ['label' => 'Solo nuovi']) ?>
                     </div>
                     <div class="col-md-1">
                         <!-- button submit -->
@@ -133,7 +145,7 @@ $formatter = \Yii::$app->formatter;
                         <?php if ($result !== null && count($result['errors']) == 0): ?>
                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                     data-bs-target="#crea-gruppo">
-                                Crea nuovo gruppo
+                                Importa disabili selezionati
                             </button>
                         <?php endif; ?>
                     </div>

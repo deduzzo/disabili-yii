@@ -52,7 +52,7 @@ class ContabilitaController extends Controller
             $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
         }
         if (isset($_GET['nomeGruppo'])) {
-            $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']]);
+            $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']],isset($_GET['soloNuovi'])  && $_GET['soloNuovi'] === '1');
         }
         return $this->render('prossimi', [
             'result' => $out,
@@ -70,15 +70,15 @@ class ContabilitaController extends Controller
                 $allNewGroupMaps = [];
                 foreach ($allNewGroupNames as $groupName)
                     $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
-                $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $_POST['nomeGruppo']])->one();
-                if (!$gruppo) {
+                $gruppo = $_POST['nomeGruppo'] == "*" ? "*" : Gruppo::find()->where(['descrizione_gruppo' => $_POST['nomeGruppo']])->one();
+                if (!$gruppo && $gruppo !== "*") {
                     $gruppo = new Gruppo();
                     $gruppo->descrizione_gruppo = $_POST['nomeGruppo'];
                     $gruppo->data_inizio_beneficio = $_POST['dataInizioBeneficio'];
                     $gruppo->data_termine_istanze = $_POST['dataTermineIstanze'];
                     $gruppo->save();
                 }
-                $res = $gdrive->importaNuovoGruppo($allNewGroupMaps[$_POST['nomeGruppoRaw']],$gruppo,boolval($_POST['cancellaDatiSePresenti']),intval($_POST['numMesiDaCaricare'] ?? 0),$_POST['notaRecupero'] ?? null);
+                $res = $gdrive->importaDatiGoogle($allNewGroupMaps[$_POST['nomeGruppoRaw']],$gruppo,boolval($_POST['cancellaDatiSePresenti']),intval($_POST['numMesiDaCaricare'] ?? 0),$_POST['notaRecupero'] ?? null);
                 // show success
                 if ($res === true)
                     Yii::$app->session->setFlash('success', 'Gruppo creato e dati importati con successo');
