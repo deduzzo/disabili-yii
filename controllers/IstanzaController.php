@@ -183,6 +183,7 @@ class IstanzaController extends Controller
                 $istanza->rinuncia = $this->request->post('rinuncia') !== null;
                 $istanza->data_chiusura = $this->request->post('data-chiusura') ?? null;
                 $istanza->attivo = $this->request->post('stato') === "attivo";
+                $istanza->riconosciuto = $this->request->post('riconosciuto') === "on";
                 $istanza->chiuso = $this->request->post('aperto-chiuso') === "chiuso";
                 $istanza->data_decesso = $this->request->post('data-decesso') ?? null;
                 $istanza->liquidazione_decesso_completata = $this->request->post('liquidazione-decesso-completata') === "on";
