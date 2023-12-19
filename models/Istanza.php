@@ -300,6 +300,10 @@ class Istanza extends \yii\db\ActiveRecord
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
     }
 
+    public function haContoValido() {
+        return $this->getContoValido() !== null || $this->haCambioIbanInCorso();
+    }
+
     public static function getNumIstanzeAttive()
     {
         return Istanza::find()->where(['attivo' => 1])->count();
@@ -408,7 +412,7 @@ class Istanza extends \yii\db\ActiveRecord
             $out .= "RINUNCIA - ";
         if ($this->haRicoveriInCorso())
             $out .= "ATTUALMENTE RICOVERATO - ";
-        if ($this->getContoValido() === null)
+        if ($this->haContoValido() === null)
             $out .= "MANCA CONTO - ";
         return $out ? substr($out, 0, strlen($out) - 3) : null;
     }
