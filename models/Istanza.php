@@ -412,7 +412,7 @@ class Istanza extends \yii\db\ActiveRecord
             $out .= "RINUNCIA - ";
         if ($this->haRicoveriInCorso())
             $out .= "ATTUALMENTE RICOVERATO - ";
-        if ($this->haContoValido() === null)
+        if ($this->haContoValido())
             $out .= "MANCA CONTO - ";
         return $out ? substr($out, 0, strlen($out) - 3) : null;
     }
