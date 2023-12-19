@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <input class="form-check-input" type="checkbox" role="switch" id="riconosciuto"
                                        name="riconosciuto" <?= $istanza->riconosciuto ? "checked" : "" ?>
                                        onchange="pattoDiCuraCheck()">
-                                <label class="form-check-label" for="patto-di-cura">Riconosciuto positivo</label>
+                                <label class="form-check-label" for="patto-di-cura">Riconosciuto</label>
                             </div>
                         </div>
                         <div class="col-md-3">
