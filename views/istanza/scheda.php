@@ -57,6 +57,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                        onchange="pattoDiCuraCheck()">
                                 <label class="form-check-label" for="patto-di-cura">Patto di cura</label>
                             </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="riconosciuto"
+                                       name="riconosciuto" <?= $istanza->riconosciuto ? "checked" : "" ?>
+                                       onchange="pattoDiCuraCheck()">
+                                <label class="form-check-label" for="patto-di-cura">Patto di cura</label>
+                            </div>
                         </div>
                         <div class="col-md-3">
                             <label for="data-patto-cura">Data firma patto:</label>
@@ -421,7 +427,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <script>
         function attivoCheck() {
             console.log("attivo")
-            if (!document.getElementById("patto-di-cura").checked) {
+            if (!document.getElementById("patto-di-cura").checked || !document.getElementById("riconosciuto").checked) {
                 document.getElementById("stato-attivo").checked = false;
                 document.getElementById("stato-nonattivo").checked = true;
             }
