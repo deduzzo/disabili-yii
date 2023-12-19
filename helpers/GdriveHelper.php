@@ -293,11 +293,11 @@ class GdriveHelper
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
             foreach ($values as $index => $row) {
                 if ($index > 1 && isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "") {
-                    if ($gruppoOriginale == "*")
-                        $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $row[FileGruppiGoogle::GRUPPO]])->one();
-                    else
-                        $gruppo = $gruppoOriginale;
                     if ($gruppoOriginale !== "*" || (isset($row[FileGruppiGoogle::SOLO_NUOVI]) && strtoupper($row[FileGruppiGoogle::SOLO_NUOVI]) == "X")) {
+                        if ($gruppoOriginale == "*")
+                            $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $row[FileGruppiGoogle::GRUPPO]])->one();
+                        else
+                            $gruppo = $gruppoOriginale;
                         $istanza = Istanza::find()->innerJoin('anagrafica', 'anagrafica.id = istanza.id_anagrafica_disabile')->where(['codice_fiscale' => strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])), 'chiuso' => false])->one();
                         if (!$istanza && !in_array(strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])), $cfs)) {
                             $cfs[] = $row[FileGruppiGoogle::CODICE_FISCALE];
