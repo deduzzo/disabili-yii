@@ -259,12 +259,23 @@ class DeterminaController extends \yii\web\Controller
         set_time_limit(0);
         $vars = $this->request->post();
         if (isset($vars['numero_determina'])) {
-            $determina = new Determina();
-            $determina->numero = $vars['numero_determina'];
-            $determina->data = $vars['data_determina'];
-            $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'];
-            $determina->save();
-            $this->actionIndex(false, $determina->id);
+            $contiOk = Istanza::verificaContiMancantiIstanzeAttive();
+            if ($contiOk === "") {
+                $determina = new Determina();
+                $determina->numero = $vars['numero_determina'];
+                $determina->data = $vars['data_determina'];
+                $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'];
+                $determina->save();
+                $this->actionIndex(false, $determina->id);
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
+                return $this->redirect(['contabilita/conti-validi']);
+            }
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Errore durante la creazione della determina, manca numero');
+            return $this->redirect(['istanza/index']);
         }
     }
 
