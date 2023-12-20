@@ -24,17 +24,11 @@ $formatter = \Yii::$app->formatter;
             <div class="card-toolbar">
                 <!-- list of all new group names -->
                 <?php
-                $istanzeAttive = \app\models\Istanza::findAll(['attivo' => true]);
-                $ok = true;
-                foreach ($istanzeAttive as $istanza) {
-                    $contoValido = $istanza->getContoValido();
-                    if (!$contoValido && !$istanza->haRicoveriInCorso()) {
-                        $ok = false;
-                        echo "<div class='col-md-12'><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO</div>";
-                    }
-                }
-                if ($ok)
+                $ok = \app\models\Istanza::verificaContiMancantiIstanzeAttive();
+                if ($ok === "")
                     echo "✔️Conti validi per tutte le istanze attive";
+                else
+                    echo $ok;
                 ?>
             </div>
         </div>

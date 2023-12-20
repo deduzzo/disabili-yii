@@ -54,6 +54,19 @@ class Istanza extends \yii\db\ActiveRecord
         return 'istanza';
     }
 
+    public static function verificaContiMancantiIstanzeAttive()
+    {
+        $istanzeAttive = Istanza::findAll(['attivo' => true]);
+        $out = "";
+        foreach ($istanzeAttive as $istanza) {
+            $contoValido = $istanza->getContoValido();
+            if (!$contoValido && !$istanza->haRicoveriInCorso()) {
+                $out.= "<div><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO</div><br />";
+            }
+        }
+        return $out;
+    }
+
     /**
      * {@inheritdoc}
      */
