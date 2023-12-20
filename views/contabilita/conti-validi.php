@@ -51,7 +51,7 @@ $formatter = \Yii::$app->formatter;
             $istanzeAttive = \app\models\Istanza::findAll(['attivo' => true]);
             foreach ($istanzeAttive as $istanza) {
                 $contoValido = $istanza->getContoValido();
-                if (!$contoValido)
+                if (!$contoValido && !$istanza->haRicoveriInCorso())
                     echo "<div class='col-md-12'>ISTANZA <b>" . $istanza->id . "</b> CON CONTO NON VALIDO</div>";
             }
             ?>
