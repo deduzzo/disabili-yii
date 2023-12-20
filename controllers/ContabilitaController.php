@@ -89,7 +89,7 @@ class ContabilitaController extends Controller
         }
     }
 
-    public function actionGetContiValidi()
+    public function actionContiValidi()
     {
 
         return $this->render('conti-validi', [
