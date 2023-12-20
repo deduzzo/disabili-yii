@@ -127,6 +127,9 @@ JS) ?>
                         <li class="submenu-item">
                             <a href="/contabilita/anno">Per anno</a>
                         </li>
+                        <li class="submenu-item">
+                            <a href="/contabilita/conti-validi">Verifica conti</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="sidebar-item has-sub">

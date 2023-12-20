@@ -89,6 +89,14 @@ class ContabilitaController extends Controller
         }
     }
 
+    public function actionGetContiValidi()
+    {
+
+        return $this->render('conti-validi', [
+
+        ]);
+    }
+
     public function actionVerificaIban()
     {
         $out = "";
