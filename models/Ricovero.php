@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\Utils;
 use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
 use Carbon\Carbon;
@@ -105,38 +106,7 @@ class Ricovero extends \yii\db\ActiveRecord
 
     public function getNumGiorni(): ?array
     {
-        $out = ['giorni' => 0, 'mesi' => 0];
-        $da = Carbon::createFromFormat('Y-m-d', $this->da);
-        list($daAnno, $daMese, $daGiorno) = explode('-', $this->da);
-        if ($this->contabilizzare && !$this->a) {
-            $a = Carbon::now();
-            list($aAnno, $aMese, $aGiorno) = explode('-', $a->toDateString());
-        }
-        else if (!$this->da || !$this->a) return null;
-        else {
-            $a = Carbon::createFromFormat('Y-m-d', $this->a);
-            // id $da and $a are in different months
-            list($aAnno, $aMese, $aGiorno) = explode('-', $this->a);
-        }
-        if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
-            return null;
-        } else {
-            if ($da->month !== $a->month) {
-                if ($da->day !== 1)
-                    $out['giorni'] += $da->daysInMonth - $da->day + 1;
-                $out['mesi'] += $a->diffInMonths($da);
-                if ($a->day !== $a->daysInMonth)
-                    $out['giorni'] += $a->day;
-                else
-                    $out['mesi'] += 1;
-            } else {
-                if ($da->day === 1 && $a->day === $a->daysInMonth)
-                    $out['mesi'] += 1;
-                else
-                    $out['giorni'] += $a->diffInDays($da) + 1;
-            }
-            return $out;
-        }
+        return Utils::getNumGiorni($this->da, $this->a);
     }
 
     public function getImportoRicovero()

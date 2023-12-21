@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\Utils;
 use app\models\enums\DatiTipologia;
 use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
@@ -342,6 +343,22 @@ class Istanza extends \yii\db\ActiveRecord
             return $this->anagraficaDisabile->cognome . ' ' . $this->anagraficaDisabile->nome;
         else
             return $this->anagraficaDisabile->cognome_nome;
+    }
+
+    public function getGiorniResiduoDecesso() {
+        $ultimoMovimentoBancario = $this->getLastMovimentoBancario();
+        $dataUltimoMovimentoBancario = $ultimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d',$ultimoMovimentoBancario->data)->endOfMonth()->format('Y-m-d') : null;
+        $dataInizioDovuta = $dataUltimoMovimentoBancario ?? $this->gruppo->data_inizio_beneficio;
+        $movimentiTornatiIndietro = $this->getPagamentiTornatiIndietro($dataUltimoMovimentoBancario);
+        $restituire = false;
+        // if dataInizioDovuta > data_decesso
+        if (Carbon::createFromFormat('Y-m-d', $dataInizioDovuta)->isAfter(Carbon::createFromFormat('Y-m-d', $this->data_decesso)) && $dataUltimoMovimentoBancario)
+            $restituire = true;
+        $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : $this->data_decesso,!$restituire? $this->data_decesso: $dataInizioDovuta);
+        if ($totaleGiorniDovuti === null)
+            return 0;
+        $totale =  ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
+        return ($restituire ? -$totale : $totale);
     }
 
     public function getLastMovimentoBancario($data = null)

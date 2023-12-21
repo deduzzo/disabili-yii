@@ -1,5 +1,7 @@
 <?php
 
+use app\models\enums\ImportoBase;
+use app\models\enums\IseeType;
 use app\models\IstanzaSearch;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
@@ -55,19 +57,14 @@ $formatter = \Yii::$app->formatter;
                     'columns' => [
                         [
                             'class' => CheckboxColumn::class,
-                            'checkboxOptions' => function($model) {
-                                    return ['value' => $model->id];
+                            'checkboxOptions' => function ($model) {
+                                return ['value' => $model->id];
                             },
                         ],
                         'id',
                         'distretto.nome',
                         'data_decesso:date',
-                        [
-                            'label' => 'Nominativo',
-                            'value' => function ($model) {
-                                return $model->getNominativoDisabile();
-                            }
-                        ],
+                        'gruppo.descrizione_gruppo',
                         [
                             'label' => 'Data Ultimo pagamento',
                             'value' => function ($model) {
@@ -75,6 +72,12 @@ $formatter = \Yii::$app->formatter;
                                 if (!$last)
                                     return "-";
                                 return Yii::$app->formatter->asDate($last->data);
+                            }
+                        ],
+                        [
+                            'label' => 'Nominativo',
+                            'value' => function ($model) {
+                                return $model->getNominativoDisabile();
                             }
                         ],
                         [
@@ -94,8 +97,29 @@ $formatter = \Yii::$app->formatter;
                                     return "NO";
                                 return $last->tornato_indietro ? "SI" : "NO";
                             }
+                        ],
+                        [
+                            'label' => 'Giorni dovuti',
+                            'value' => function ($model) {
+                                return $model->getGiorniResiduoDecesso();
+                            }
+                        ],
+                        [
+                            'label' => 'Isee',
+                            'value' => function ($model) {
+                                return $model->getLastIseeType();
+                            }
+                        ],
+                        [
+                            'label' => 'Importo a conguaglio',
+                            'value' => function ($model) {
+                                $giorniResiduo = $model->getGiorniResiduoDecesso();
+                                if ($giorniResiduo === null)
+                                    return "-";
+                                else
+                                    return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                            }
                         ]
-
                     ],
                 ]); ?>
             </div>

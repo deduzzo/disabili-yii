@@ -131,4 +131,41 @@ class Utils
         }
         else return null;
     }
+
+    public static function getNumGiorni($da, $a = null): ?array
+    {
+        $out = ['giorni' => 0, 'mesi' => 0];
+        $da = Carbon::createFromFormat('Y-m-d', $da);
+        list($daAnno, $daMese, $daGiorno) = explode('-',$da);
+        if (!$a) {
+            $a = Carbon::now();
+            list($aAnno, $aMese, $aGiorno) = explode('-', $a->toDateString());
+        }
+        else if (!$da) return null;
+        else {
+            $a = Carbon::createFromFormat('Y-m-d', $a);
+            // id $da and $a are in different months
+            list($aAnno, $aMese, $aGiorno) = explode('-', $a);
+        }
+        if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
+            return null;
+        } else {
+            if ($da->month !== $a->month) {
+                if ($da->day !== 1)
+                    $out['giorni'] += $da->daysInMonth - $da->day + 1;
+                $out['mesi'] += $a->diffInMonths($da);
+                if ($a->day !== $a->daysInMonth)
+                    $out['giorni'] += $a->day;
+                else
+                    $out['mesi'] += 1;
+            } else {
+                if ($da->day === 1 && $a->day === $a->daysInMonth)
+                    $out['mesi'] += 1;
+                else
+                    $out['giorni'] += $a->diffInDays($da) + 1;
+            }
+            return $out;
+        }
+    }
+
 }
