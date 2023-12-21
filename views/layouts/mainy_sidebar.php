@@ -78,6 +78,9 @@ JS) ?>
 							<a href="/istanza">Istanze</a>
 						</li>
                         <li class="submenu-item">
+                            <a href="/determina/liquidazione-deceduti">Liquidazione deceduti</a>
+                        </li>
+                        <li class="submenu-item">
                             <a href="https://supportodisabili.robertodedomenico.it/support/scp/login.php" target="_blank">Ticket</a>
                         </li>
                         <li class="submenu-item">

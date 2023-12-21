@@ -10,6 +10,7 @@ use app\models\enums\IseeType;
 use app\models\Gruppo;
 use app\models\Isee;
 use app\models\Istanza;
+use app\models\IstanzaSearch;
 use app\models\Movimento;
 use app\models\SimulazioneDeterminaSearch;
 use Carbon\Carbon;
@@ -178,6 +179,30 @@ class DeterminaController extends \yii\web\Controller
             return $this->redirect(['istanza/index']);
         }
     }
+
+    public function actionLiquidazioneDeceduti() {
+
+        if ($this->request->isPost) {
+            $vars = $this->request->post();
+            echo $vars;
+        }
+        $decedutiAttivi = Istanza::find()->where(['chiuso' => false])->andWhere(['not', ['data_decesso' => null]])->all();
+        // get data provider from deceduti attivi
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $decedutiAttivi,
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+        $searchModel = new IstanzaSearch();
+        $searchModel = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('liquidazione-deceduti', [
+            "dataProvider" => $dataProvider,
+            "searchModel" => $searchModel
+        ]);
+    }
+
 
     public function actionVisualizza($export = false)
     {

@@ -347,9 +347,17 @@ class Istanza extends \yii\db\ActiveRecord
     public function getLastMovimentoBancario($data = null)
     {
         if (!$data)
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->orderBy(['periodo_a' => SORT_DESC])->one();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => false])->orderBy(['periodo_a' => SORT_DESC])->one();
         else
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true])->andWhere(['=', 'data', $data])->one();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => false])->andWhere(['=', 'data', $data])->one();
+    }
+
+    public function getPagamentiTornatiIndietro($afterDate = null)
+    {
+        if (!$afterDate)
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => true])->orderBy(['periodo_a' => SORT_DESC])->all();
+        else
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => true])->andWhere(['>=', 'data', $afterDate])->all();
     }
 
     public function cancellaMovimentiCollegati()
