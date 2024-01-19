@@ -1,5 +1,6 @@
 <?php
 
+use app\components\ExportWidget;
 use app\models\enums\ImportoBase;
 use app\models\enums\IseeType;
 use app\models\IstanzaSearch;
@@ -19,12 +20,27 @@ $this->title = 'Liquidazione Deceduti';
 $this->params['breadcrumbs'][] = $this->title;
 $formatter = \Yii::$app->formatter;
 ?>
+
+<?= ExportWidget::widget([
+    'models' => $dataProvider->getModels(),
+    'columns' => [
+        'id',
+        'distretto.nome',
+        'anagraficaDisabile.codice_fiscale',
+        'anagraficaDisabile.cognome',
+        'anagraficaDisabile.nome',
+        'gruppo.descrizione_gruppo',
+        'distretto.nome',
+        'data_decesso:date',
+    ],
+]) ?>
+
 <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
     <div class="card">
         <div class="card-header">
             <div class="card-toolbar">
                 <!--begin::Button-->
-                <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3']) ?>
+                <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
             </div>
             <div class="card-body">
                 <?= GridView::widget([

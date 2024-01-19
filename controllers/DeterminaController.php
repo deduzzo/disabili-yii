@@ -184,7 +184,6 @@ class DeterminaController extends \yii\web\Controller
 
         if ($this->request->isPost) {
             $vars = $this->request->post();
-            echo $vars;
         }
         $decedutiAttivi = Istanza::find()->where(['chiuso' => false])->andWhere(['not', ['data_decesso' => null]])->all();
         // get data provider from deceduti attivi
