@@ -39,6 +39,6 @@ config/db.php
 config/params.php
 config/private/
 /web/uploads/
-/web/index.php
+web/index.php
 node/config.js
 node/node_modules/
