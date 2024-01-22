@@ -19,23 +19,96 @@ use yii\grid\GridView;
 $this->title = 'Liquidazione Deceduti';
 $this->params['breadcrumbs'][] = $this->title;
 $formatter = \Yii::$app->formatter;
+
+
+$cols = [
+    [
+        'class' => CheckboxColumn::class,
+        'checkboxOptions' => function ($model) {
+            return ['value' => $model->id];
+        },
+    ],
+    'id',
+    [
+        'attribute' => 'distretto',
+        'value' => function ($model) {
+            return $model->distretto->nome;
+        }
+    ],
+    'data_decesso:date',
+    [
+        'attribute' => 'descrizione_gruppo',
+        'value' => function ($model) {
+            return $model->gruppo->descrizione_gruppo;
+        }
+    ],
+    [
+        'label' => 'Data Ultimo pagamento',
+        'value' => function ($model) {
+            $last = $model->getLastMovimentoBancario();
+            if (!$last)
+                return "-";
+            return Yii::$app->formatter->asDate($last->data);
+        }
+    ],
+    [
+        'label' => 'Nominativo',
+        'attribute' => 'cognomeNome',
+        'value' => function ($model) {
+            return $model->getNominativoDisabile();
+        }
+    ],
+    [
+        'label' => 'Importo Ultimo pagamento',
+        'value' => function ($model) {
+            $last = $model->getLastMovimentoBancario();
+            if (!$last)
+                return "-";
+            return Yii::$app->formatter->asCurrency($last->importo);
+        }
+    ],
+    [
+        'label' => 'Pagamenti Tornati indietro?',
+        'value' => function ($model) {
+            $last = $model->getLastMovimentoBancario();
+            if (!$last)
+                return "NO";
+            return $last->tornato_indietro ? "SI" : "NO";
+        }
+    ],
+    [
+        'label' => 'Giorni dovuti',
+        'value' => function ($model) {
+            return $model->getGiorniResiduoDecesso();
+        }
+    ],
+    [
+        'label' => 'Isee',
+        'value' => function ($model) {
+            return $model->getLastIseeType();
+        }
+    ],
+    [
+        'label' => 'Importo a conguaglio',
+        'value' => function ($model) {
+            $giorniResiduo = $model->getGiorniResiduoDecesso();
+            if ($giorniResiduo === null)
+                return "-";
+            else
+                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+        }
+    ]
+];
+
+
+
+
 ?>
 
 <?= ExportWidget::widget([
     //'models' => $dataProvider->getModels(),
     'dataProvider' => $dataProvider,
-    'columns' => [
-        'id',
-        'distretto.nome',
-        [
-            'label' => 'Nominativo',
-            'attribute' => 'cognomeNome',
-            'value' => function ($model) {
-                return $model->getNominativoDisabile();
-            }
-        ],
-        'data_decesso:date',
-    ],
+    'columns' => $cols,
 ]) ?>
 
 <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
@@ -73,84 +146,7 @@ $formatter = \Yii::$app->formatter;
                     'tableOptions' => [
                         'class' => 'table table-striped dataTable-table',
                     ],
-                    'columns' => [
-                        [
-                            'class' => CheckboxColumn::class,
-                            'checkboxOptions' => function ($model) {
-                                return ['value' => $model->id];
-                            },
-                        ],
-                        'id',
-                        [
-                            'attribute' => 'distretto',
-                            'value' => function ($model) {
-                                return $model->distretto->nome;
-                            }
-                        ],
-                        'data_decesso:date',
-                        [
-                                'attribute' => 'descrizione_gruppo',
-                                'value' => function ($model) {
-                                    return $model->gruppo->descrizione_gruppo;
-                                }
-                        ],
-                        [
-                            'label' => 'Data Ultimo pagamento',
-                            'value' => function ($model) {
-                                $last = $model->getLastMovimentoBancario();
-                                if (!$last)
-                                    return "-";
-                                return Yii::$app->formatter->asDate($last->data);
-                            }
-                        ],
-                        [
-                            'label' => 'Nominativo',
-                            'attribute' => 'cognomeNome',
-                            'value' => function ($model) {
-                                return $model->getNominativoDisabile();
-                            }
-                        ],
-                        [
-                            'label' => 'Importo Ultimo pagamento',
-                            'value' => function ($model) {
-                                $last = $model->getLastMovimentoBancario();
-                                if (!$last)
-                                    return "-";
-                                return Yii::$app->formatter->asCurrency($last->importo);
-                            }
-                        ],
-                        [
-                            'label' => 'Pagamenti Tornati indietro?',
-                            'value' => function ($model) {
-                                $last = $model->getLastMovimentoBancario();
-                                if (!$last)
-                                    return "NO";
-                                return $last->tornato_indietro ? "SI" : "NO";
-                            }
-                        ],
-                        [
-                            'label' => 'Giorni dovuti',
-                            'value' => function ($model) {
-                                return $model->getGiorniResiduoDecesso();
-                            }
-                        ],
-                        [
-                            'label' => 'Isee',
-                            'value' => function ($model) {
-                                return $model->getLastIseeType();
-                            }
-                        ],
-                        [
-                            'label' => 'Importo a conguaglio',
-                            'value' => function ($model) {
-                                $giorniResiduo = $model->getGiorniResiduoDecesso();
-                                if ($giorniResiduo === null)
-                                    return "-";
-                                else
-                                    return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
-                            }
-                        ]
-                    ],
+                    'columns' => $cols
                 ]); ?>
             </div>
         </div>
