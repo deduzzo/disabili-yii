@@ -34,7 +34,7 @@ tests/_support/_generated
 
 #vagrant folder
 /.vagrant
-/web/assets/
+/web/assets/*
 config/db.php
 config/params.php
 config/private/
