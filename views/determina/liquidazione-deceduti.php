@@ -22,15 +22,18 @@ $formatter = \Yii::$app->formatter;
 ?>
 
 <?= ExportWidget::widget([
-    'models' => $dataProvider->getModels(),
+    //'models' => $dataProvider->getModels(),
+    'dataProvider' => $dataProvider,
     'columns' => [
         'id',
         'distretto.nome',
-        'anagraficaDisabile.codice_fiscale',
-        'anagraficaDisabile.cognome',
-        'anagraficaDisabile.nome',
-        'gruppo.descrizione_gruppo',
-        'distretto.nome',
+        [
+            'label' => 'Nominativo',
+            'attribute' => 'cognomeNome',
+            'value' => function ($model) {
+                return $model->getNominativoDisabile();
+            }
+        ],
         'data_decesso:date',
     ],
 ]) ?>
@@ -78,9 +81,19 @@ $formatter = \Yii::$app->formatter;
                             },
                         ],
                         'id',
-                        'distretto.nome',
+                        [
+                            'attribute' => 'distretto',
+                            'value' => function ($model) {
+                                return $model->distretto->nome;
+                            }
+                        ],
                         'data_decesso:date',
-                        'gruppo.descrizione_gruppo',
+                        [
+                                'attribute' => 'descrizione_gruppo',
+                                'value' => function ($model) {
+                                    return $model->gruppo->descrizione_gruppo;
+                                }
+                        ],
                         [
                             'label' => 'Data Ultimo pagamento',
                             'value' => function ($model) {
@@ -92,6 +105,7 @@ $formatter = \Yii::$app->formatter;
                         ],
                         [
                             'label' => 'Nominativo',
+                            'attribute' => 'cognomeNome',
                             'value' => function ($model) {
                                 return $model->getNominativoDisabile();
                             }

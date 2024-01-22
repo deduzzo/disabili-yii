@@ -16,15 +16,16 @@ use yii2tech\spreadsheet\Spreadsheet;
 class ExportWidget extends Widget
 {
     public $models;
+    public $dataProvider;
     public $columns;
     public $query;
 
     public function init()
     {
         parent::init();
-        if ($this->models === null) {
+        if ($this->models === null && $this->dataProvider === null) {
             // call the exception
-            throw new InvalidConfigException('Specificare il modello da esportare.');
+            throw new InvalidConfigException('Specificare il modello da esportare o il data provider');
         }
         if ($this->columns === null) {
             // retrive the columns from the model
@@ -45,9 +46,9 @@ class ExportWidget extends Widget
                     $columns = $columns['default'];
             }
             $exporter = new Spreadsheet([
-                'dataProvider' => new ArrayDataProvider([
+                'dataProvider' => $this->dataProvider ?? (new ArrayDataProvider([
                     'allModels' => $this->models
-                ]),
+                ])),
                 'columns' => $columns,
                 //'headerColumnUnions' => $initArray['headerColumnUnions']
             ]);

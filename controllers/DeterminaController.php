@@ -181,20 +181,15 @@ class DeterminaController extends \yii\web\Controller
     }
 
     public function actionLiquidazioneDeceduti() {
-
+        $vars = [];
         if ($this->request->isPost) {
             $vars = $this->request->post();
         }
-        $decedutiAttivi = Istanza::find()->where(['chiuso' => false])->andWhere(['not', ['data_decesso' => null]])->all();
-        // get data provider from deceduti attivi
-        $dataProvider = new ArrayDataProvider([
-            'allModels' => $decedutiAttivi,
-            'pagination' => [
-                'pageSize' => 100,
-            ],
-        ]);
         $searchModel = new IstanzaSearch();
-        $searchModel = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,array_key_exists('ExportWDG',$vars));
+
+        $dataProvider->query->where(['chiuso' => false])
+            ->andWhere(['not', ['data_decesso' => null]]);
 
         return $this->render('liquidazione-deceduti', [
             "dataProvider" => $dataProvider,
