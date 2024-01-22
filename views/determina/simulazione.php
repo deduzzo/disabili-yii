@@ -7,6 +7,7 @@ use app\models\Gruppo;
 use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
+use yii\data\ArrayDataProvider;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -319,7 +320,9 @@ if (!isset($soloVariazioni)) {
         </div>
         <?= Html::endForm() ?>
         <div class="col-md-8"><?= ExportWidget::widget([
-                'models' => $istanzeArray,
+                'dataProvider' => new ArrayDataProvider([
+                    'allModels' => $istanzeArray
+                ]),
                 'columns' => ['distretto', 'cognome', 'nome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'],
             ]) ?></div>
         <div class="col-md-4">
