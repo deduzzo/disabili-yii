@@ -43,29 +43,50 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <div class="row">
             <div class="col-md-3">
-                <?= ExportWidget::widget([
-                    'models' => $dataProvider->getModels(),
+                <?php
+                $istanzeCol = [
+                    [
+                        'attribute' => 'attivo',
+                        'content' => function ($model) {
+                            return $model->attivo ? 'Attivo' : 'Non attivo';
+                        }
+                    ],
+                    'distretto.nome',
+                    'gruppo.descrizione_gruppo',
+                    'anagraficaDisabile.codice_fiscale',
+                    [
+                        'attribute' => 'cognomeNome',
+                        'label' => "Nominativo",
+                        'value' => function ($model) {
+                            return $model->getNominativoDisabile();
+                        },
+                    ],
+                    [
+                        'attribute' => 'isee',
+                        'value' => function ($model) {
+                            return $model->getLastIseeType();
+                        },
+                    ],
+                    [
+                        'attribute' => 'eta',
+                        'label' => "Età",
+                        'value' => function ($model) {
+                            return $model->anagraficaDisabile->getEta();
+                        },
+                    ],
+                ];
+
+
+               echo ExportWidget::widget([
+                    'dataProvider' => $dataProvider,
                     'query' => [
                         'sil' => 'Elenco codici fiscali per SIL',
                         'istanze' => 'Elenco istanze'
                     ],
                     'columns' => [
                         'sil' => ['anagraficaDisabile.codice_fiscale'],
-                        'istanze' => [
-                            'attivo',
-                            'anagraficaDisabile.codice_fiscale',
-                            'anagraficaDisabile.nome',
-                            'anagraficaDisabile.cognome',
-                            'gruppo.descrizione_gruppo',
-                            'distretto.nome',
-                        ],
-                        'default' => [
-                            'attivo',
-                            'nome',
-                            'cognome',
-                            'gruppo.descrizione_gruppo',
-                            'distretto.nome',
-                        ],
+                        'istanze' => $istanzeCol,
+                        'default' => $istanzeCol,
                     ],
                 ]) ?>
             </div>

@@ -22,12 +22,6 @@ $formatter = \Yii::$app->formatter;
 
 
 $cols = [
-    [
-        'class' => CheckboxColumn::class,
-        'checkboxOptions' => function ($model) {
-            return ['value' => $model->id];
-        },
-    ],
     'id',
     [
         'attribute' => 'distretto',
@@ -100,8 +94,14 @@ $cols = [
     ]
 ];
 
-
-
+$checkboxColumn = [
+    [
+        'class' => CheckboxColumn::class,
+        'checkboxOptions' => function ($model) {
+            return ['value' => $model->id];
+        },
+    ]
+];
 
 ?>
 
@@ -146,7 +146,7 @@ $cols = [
                     'tableOptions' => [
                         'class' => 'table table-striped dataTable-table',
                     ],
-                    'columns' => $cols
+                    'columns' => array_merge($checkboxColumn,$cols)
                 ]); ?>
             </div>
         </div>

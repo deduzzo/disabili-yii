@@ -15,7 +15,6 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class ExportWidget extends Widget
 {
-    public $models;
     public $dataProvider;
     public $columns;
     public $query;
@@ -23,18 +22,22 @@ class ExportWidget extends Widget
     public function init()
     {
         parent::init();
-        if ($this->models === null && $this->dataProvider === null) {
+        if ($this->dataProvider === null) {
             // call the exception
-            throw new InvalidConfigException('Specificare il modello da esportare o il data provider');
+            throw new InvalidConfigException('Specificare il data provider');
         }
         if ($this->columns === null) {
-            // retrive the columns from the model
-            $this->columns = array_keys($this->models[0]);
+            // retrive the columns from the data provider
+            $this->columns = $this->dataProvider->getModels();
         }
     }
 
     public function run()
     {
+        // no timeout
+        set_time_limit(0);
+        // no memory limit
+        ini_set('memory_limit', '-1');
         if (Yii::$app->request->isPost && isset(Yii::$app->request->post()['exportWDG']) && Yii::$app->request->post()['exportWDG'] == 'true') {
             $query = Yii::$app->request->post()['query'] ?? '';
             $columns = $this->columns;
@@ -46,9 +49,9 @@ class ExportWidget extends Widget
                     $columns = $columns['default'];
             }
             $exporter = new Spreadsheet([
-                'dataProvider' => $this->dataProvider ?? (new ArrayDataProvider([
+                'dataProvider' => $this->dataProvider/* ?? (new ArrayDataProvider([
                     'allModels' => $this->models
-                ])),
+                ]))*/,
                 'columns' => $columns,
                 //'headerColumnUnions' => $initArray['headerColumnUnions']
             ]);
