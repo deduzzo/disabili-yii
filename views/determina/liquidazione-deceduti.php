@@ -82,16 +82,6 @@ $cols = [
             return $model->getLastIseeType();
         }
     ],
-    [
-        'label' => 'Importo a conguaglio',
-        'value' => function ($model) {
-            $giorniResiduo = $model->getGiorniResiduoDecesso();
-            if ($giorniResiduo === null)
-                return "-";
-            else
-                return $model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
-        }
-    ]
 ];
 
 $checkboxColumn = [
@@ -108,7 +98,16 @@ $checkboxColumn = [
 <?= ExportWidget::widget([
     //'models' => $dataProvider->getModels(),
     'dataProvider' => $dataProvider,
-    'columns' => $cols,
+    'columns' => array_merge($cols,    [
+        'label' => 'Importo a conguaglio',
+        'value' => function ($model) {
+            $giorniResiduo = $model->getGiorniResiduoDecesso();
+            if ($giorniResiduo === null)
+                return "-";
+            else
+                return $model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
+        }
+    ])
 ]) ?>
 
 <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
@@ -146,7 +145,16 @@ $checkboxColumn = [
                     'tableOptions' => [
                         'class' => 'table table-striped dataTable-table',
                     ],
-                    'columns' => array_merge($checkboxColumn,$cols)
+                    'columns' => array_merge($checkboxColumn,$cols,    [
+                        'label' => 'Importo a conguaglio',
+                        'value' => function ($model) {
+                            $giorniResiduo = $model->getGiorniResiduoDecesso();
+                            if ($giorniResiduo === null)
+                                return "-";
+                            else
+                                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                        }
+                    ])
                 ]); ?>
             </div>
         </div>
