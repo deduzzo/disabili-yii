@@ -124,7 +124,7 @@ $formatter = \Yii::$app->formatter;
                         <?php
                         // arraydata provider from $result['cfs']
                         $dataProvider = new ArrayDataProvider([
-                            'allModels' => $result['cfs'] ?? [],
+                            'allModels' => isset($result['cfs']) ? $result['cfs'] : [],
                             'pagination' => [
                                 'pageSize' => 10,
                             ],
@@ -134,7 +134,7 @@ $formatter = \Yii::$app->formatter;
                         ]);
                         if ($result !== null): ?>
                             <?= ExportWidget::widget([
-                                'dataProvider' => $dataProvider,
+                                'dataProvider' => isset($result['cfs']) ? $result['cfs'] : [],
                                 'columns' => ['distretto', 'cf'],
                             ]) ?>
                         <?php endif; ?>
