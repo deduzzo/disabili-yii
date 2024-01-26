@@ -6,6 +6,7 @@ use app\models\enums\IseeType;
 use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
+use yii\data\ArrayDataProvider;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -120,9 +121,20 @@ $formatter = \Yii::$app->formatter;
                     </div>
                     <?= Html::endForm() ?>
                     <div class="col-md-3" style="margin-top: 30px">
-                        <?php if ($result !== null): ?>
+                        <?php
+                        // arraydata provider from $result['cfs']
+                        $dataProvider = new ArrayDataProvider([
+                            'allModels' => $result['cfs'],
+                            'pagination' => [
+                                'pageSize' => 10,
+                            ],
+                            'sort' => [
+                                'attributes' => ['distretto', 'cf'],
+                            ],
+                        ]);
+                        if ($result !== null): ?>
                             <?= ExportWidget::widget([
-                                'models' => $result['cfs'],
+                                'dataProvider' => $dataProvider,
                                 'columns' => ['distretto', 'cf'],
                             ]) ?>
                         <?php endif; ?>
