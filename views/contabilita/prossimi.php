@@ -124,7 +124,7 @@ $formatter = \Yii::$app->formatter;
                         <?php
                         // arraydata provider from $result['cfs']
                         $dataProvider = new ArrayDataProvider([
-                            'allModels' => $result['cfs'],
+                            'allModels' => $result['cfs'] ?? [],
                             'pagination' => [
                                 'pageSize' => 10,
                             ],
