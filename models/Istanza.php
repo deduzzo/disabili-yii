@@ -351,11 +351,10 @@ class Istanza extends \yii\db\ActiveRecord
         $dataInizioDovuta = $dataUltimoMovimentoBancario ?? $this->gruppo->data_inizio_beneficio;
         $movimentiTornatiIndietro = $this->getPagamentiTornatiIndietro($dataUltimoMovimentoBancario);
         $restituire = false;
-        $giornoDopoDataDecesso = Carbon::createFromFormat('Y-m-d', $this->data_decesso)->subDay()->format('Y-m-d');
-        if (Carbon::createFromFormat('Y-m-d', $dataInizioDovuta)->isAfter(Carbon::createFromFormat('Y-m-d', $giornoDopoDataDecesso)) && $dataUltimoMovimentoBancario)
+        if (Carbon::createFromFormat('Y-m-d', $dataInizioDovuta)->isAfter(Carbon::createFromFormat('Y-m-d', $this->data_decesso)) && $dataUltimoMovimentoBancario)
             $restituire = true;
         // add une day to $this->data_decesso
-        $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : $giornoDopoDataDecesso,!$restituire? $giornoDopoDataDecesso: $dataInizioDovuta);
+        $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : $this->data_decesso,!$restituire? Carbon::createFromFormat('Y-m-d', $this->data_decesso)->addDay()->format('Y-m-d'): $dataInizioDovuta);
         if ($totaleGiorniDovuti === null)
             return 0;
         $totale =  ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
