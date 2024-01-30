@@ -676,7 +676,10 @@ class Istanza extends \yii\db\ActiveRecord
             if ($firstIsee)
                 return $firstIsee->maggiore_25mila ? IseeType::MAGGIORE_25K : IseeType::MINORE_25K;
             else
-                return IseeType::NO_ISEE;
+                if ($this->anagraficaDisabile->getEta() < 18)
+                    return IseeType::MINORE_25K;
+                else
+                    return  IseeType::NO_ISEE;
         }
     }
 
