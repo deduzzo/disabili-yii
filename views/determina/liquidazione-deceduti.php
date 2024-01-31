@@ -36,7 +36,7 @@ $cols = [
             return $model->getNominativoDisabile();
         }
     ],
-    'codice_fiscale',
+    'anagrafica.codice_fiscale',
     'data_decesso:date',
     [
         'attribute' => 'descrizione_gruppo',
