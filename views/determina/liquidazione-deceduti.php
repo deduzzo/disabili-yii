@@ -29,6 +29,14 @@ $cols = [
             return $model->distretto->nome;
         }
     ],
+    [
+        'label' => 'Nominativo',
+        'attribute' => 'cognomeNome',
+        'value' => function ($model) {
+            return $model->getNominativoDisabile();
+        }
+    ],
+    'codice_fiscale',
     'data_decesso:date',
     [
         'attribute' => 'descrizione_gruppo',
@@ -43,13 +51,6 @@ $cols = [
             if (!$last)
                 return "-";
             return Yii::$app->formatter->asDate($last->data);
-        }
-    ],
-    [
-        'label' => 'Nominativo',
-        'attribute' => 'cognomeNome',
-        'value' => function ($model) {
-            return $model->getNominativoDisabile();
         }
     ],
     [
