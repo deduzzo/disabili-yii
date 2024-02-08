@@ -111,15 +111,14 @@ class Utils
         }
     }
 
-    public static function getEtaFromCf($cf,$dataRiferimento= null)
+    public static function getEtaFromCf($cf, $dataRiferimento = null)
     {
         $inverseCalculator = new InverseCalculator($cf);
         if ((new Validator($cf))->isFormallyValid()) {
             $birthDate = $inverseCalculator->getSubject()->getBirthDate();
             $referenceDate = $dataRiferimento ? Carbon::parse($dataRiferimento) : Carbon::now();
             return Carbon::parse($birthDate)->diffInYears($referenceDate);
-        }
-        else return null;
+        } else return null;
     }
 
     public static function getDataNascitaFromCf($cf)
@@ -128,20 +127,18 @@ class Utils
         if ((new Validator($cf))->isFormallyValid()) {
             $birthDate = $inverseCalculator->getSubject()->getBirthDate();
             return Carbon::parse($birthDate)->format('d/m/Y');
-        }
-        else return null;
+        } else return null;
     }
 
     public static function getNumGiorni($da, $a = null): ?array
     {
         $out = ['giorni' => 0, 'mesi' => 0];
         $da = Carbon::createFromFormat('Y-m-d', $da);
-        list($daAnno, $daMese, $daGiorno) = explode('-',$da);
+        list($daAnno, $daMese, $daGiorno) = explode('-', $da);
         if (!$a) {
             $a = Carbon::now();
             list($aAnno, $aMese, $aGiorno) = explode('-', $a->toDateString());
-        }
-        else if (!$da) return null;
+        } else if (!$da) return null;
         else {
             $a = Carbon::createFromFormat('Y-m-d', $a);
             // id $da and $a are in different months
@@ -150,22 +147,17 @@ class Utils
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
-            if ($da->month !== $a->month) {
-                if ($da->day !== 1)
-                    $out['giorni'] += $da->daysInMonth - $da->day + 1;
+            if ($da->month !== $a->month)
                 $out['mesi'] += $a->diffInMonths($da);
-                if ($a->day !== $a->daysInMonth)
-                    $out['giorni'] += $a->day;
+            if ($a->day !== $da->day) {
+                $quantiGiorni = $da->daysInMonth >30 ? 30 : ($da->daysInMonth  <30 ? 30 : $da->daysInMonth);
+                if ($da->day < $a->day)
+                    $out['giorni'] += $a->day - $da->day;
                 else
-                    $out['mesi'] += 1;
-            } else {
-                if ($da->day === 1 && $a->day === $a->daysInMonth)
-                    $out['mesi'] += 1;
-                else
-                    $out['giorni'] += $a->diffInDays($da) + 1;
+                    $out['giorni'] += $quantiGiorni - $da->day + $a->day;
             }
-            return $out;
         }
+        return $out;
     }
 
 }

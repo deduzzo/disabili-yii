@@ -42,7 +42,7 @@ echo GridView::widget([
             'value' => function ($model) {
                 $numGiorni = $model->getNumGiorni();
                 if ($numGiorni)
-                    return "<b>" . ($numGiorni['mesi'] > 0 ? $numGiorni["mesi"] . " mes" . ($numGiorni["mesi"] === 1 ? "e e " : "i e ") : "") . $numGiorni["giorni"] . " giorni" . "</b>";
+                    return "<b>" . ($numGiorni['mesi'] > 0 ? $numGiorni["mesi"] . " mes" . ($numGiorni["mesi"] === 1 ? "e " : "i") : "") . ($numGiorni["giorni"] >0 ? (($numGiorni["mesi"] >0 ? " e " : "").$numGiorni["giorni"] . " giorn" . ($numGiorni["giorni"] === 1 ? "o" : "i")) : "") . "</b>";
                 else
                     return "-";
             },
