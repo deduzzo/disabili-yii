@@ -221,7 +221,7 @@ class GdriveHelper
                             if (!$validator->isFormallyValid())
                                 $out['errors'][] = "CF non valido in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         } else
-                            $out['errors'][] = "CF non presente in riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "CF non presente in riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
                             $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         else {
