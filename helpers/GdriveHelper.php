@@ -222,22 +222,26 @@ class GdriveHelper
                                 $out['errors'][] = "CF non valido in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         } else
                             $out['errors'][] = "CF non presente in riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
-                        if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
-                            $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                        if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
+                            $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         else {
-                            $iban = (isset($row[FileGruppiGoogle::IBAN_DISABILE]) && $row[FileGruppiGoogle::IBAN_DISABILE] !== "") ? $row[FileGruppiGoogle::IBAN_DISABILE] : $row[FileGruppiGoogle::IBAN_CESSIONARIO];
-                            if (!Utils::verificaIban(trim(strtoupper($iban))))
-                                $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
-                        }
-                        $tipoOk = isset($row[FileGruppiGoogle::ISEE]) && (str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore"));
-                        $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE] ?? null);
-                        if ((!$tipoOk && ($eta && $eta >= 18)) || ($eta && $eta > 18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
-                            $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
+                                $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                            else {
+                                $iban = (isset($row[FileGruppiGoogle::IBAN_DISABILE]) && $row[FileGruppiGoogle::IBAN_DISABILE] !== "") ? $row[FileGruppiGoogle::IBAN_DISABILE] : $row[FileGruppiGoogle::IBAN_CESSIONARIO];
+                                if (!Utils::verificaIban(trim(strtoupper($iban))))
+                                    $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            }
+                            $tipoOk = isset($row[FileGruppiGoogle::ISEE]) && (str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore"));
+                            $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE] ?? null);
+                            if ((!$tipoOk && ($eta && $eta >= 18)) || ($eta && $eta > 18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
+                                $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
 
-                        $tipo = (!isset($row[FileGruppiGoogle::ISEE]) || $row[FileGruppiGoogle::ISEE] == "" || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")) ? "inferiore" : "superiore";
-                        $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
-                        if ($tipo === "inferiore") $inferiori++;
-                        else $superiori++;
+                            $tipo = (!isset($row[FileGruppiGoogle::ISEE]) || $row[FileGruppiGoogle::ISEE] == "" || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")) ? "inferiore" : "superiore";
+                            $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
+                            if ($tipo === "inferiore") $inferiori++;
+                            else $superiori++;
+                        }
                     } else
                         if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" &&
                             str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) &&
