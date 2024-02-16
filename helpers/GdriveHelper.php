@@ -214,7 +214,7 @@ class GdriveHelper
                         if ($istanza)
                             $out['errors'][] = "Disabile già presente in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                     }
-                    if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) && (str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "positiv") || trim($row[FileGruppiGoogle::ESITO]) === "")) {
+                    if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) && (str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "positiv"))) {
                         $count++;
                         if (isset($row[FileGruppiGoogle::CODICE_FISCALE]) && $row[FileGruppiGoogle::CODICE_FISCALE] !== "") {
                             $validator = new Validator(trim(strtoupper($row[FileGruppiGoogle::CODICE_FISCALE])));
