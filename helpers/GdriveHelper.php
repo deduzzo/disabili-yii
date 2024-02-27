@@ -335,6 +335,7 @@ class GdriveHelper
                             $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA] ?? null;
                             $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
                             $istanza->id_anagrafica_disabile = $disabile->id;
+                            $istanza->data_firma_patto = (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) : null;
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
