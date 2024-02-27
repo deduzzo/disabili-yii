@@ -47,7 +47,7 @@ $formatter = \Yii::$app->formatter;
                     <div class="row">
                         <?php if (isset($_GET['soloNuovi']) && $_GET['soloNuovi'] == "1"): ?>
                             <div class="col-md-12">
-                                <b>Nome gruppo:</b>: da colonna AD
+                                <b>Nome gruppo:</b>: da colonna AC
                                 <?= Html::hiddenInput('nomeGruppo', "*") ?>
                             </div>
                         <?php else: ?>
@@ -113,7 +113,7 @@ $formatter = \Yii::$app->formatter;
                             <?php endforeach; ?>
                         </select>
                         <!-- add checkbox named "solo nuovi (colonna AC)" -->
-                        <?= Html::checkbox('soloNuovi', isset($_GET['soloNuovi']) ? true : false, ['label' => 'Solo nuovi']) ?>
+                        <?= Html::checkbox('soloNuovi', isset($_GET['soloNuovi']) ? true : false, ['label' => 'Considera Gruppo dal File']) ?>
                     </div>
                     <div class="col-md-1">
                         <!-- button submit -->

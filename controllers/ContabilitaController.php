@@ -52,7 +52,7 @@ class ContabilitaController extends Controller
             $allNewGroupMaps[$groupName->getName()] = $groupName->getId();
         }
         if (isset($_GET['nomeGruppo'])) {
-            $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']],isset($_GET['soloNuovi'])  && $_GET['soloNuovi'] === '1');
+            $out = $gdrive->verificaDatiNuoviDisabiliFiles($allNewGroupMaps[$_GET['nomeGruppo']]);
         }
         return $this->render('prossimi', [
             'result' => $out,

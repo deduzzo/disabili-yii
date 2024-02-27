@@ -193,7 +193,7 @@ class GdriveHelper
         foreach ($sheets as $sheet) {
             $sheetTitle = $sheet->getProperties()->getTitle();
 
-            $range = $sheetTitle . '!A:AD';
+            $range = $sheetTitle . '!A:AC';
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
 
             $count = 0;
@@ -291,7 +291,7 @@ class GdriveHelper
         $transaction = Yii::$app->db->beginTransaction();
         foreach ($sheets as $sheet) {
             $sheetTitle = $sheet->getProperties()->getTitle();
-            $range = $sheetTitle . '!A:AD';
+            $range = $sheetTitle . '!A:AC';
             $distretto = Distretto::find()->where(['like', 'nome', '%' . strtoupper(substr($sheetTitle, 0, 4)) . '%', false])->one();
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
             foreach ($values as $index => $row) {
