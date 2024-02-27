@@ -420,25 +420,32 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getDifferenzaUltimoImportoArray()
     {
-        $op = $this->isInAlert();
         $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
         $prossimoImporto = $this->getProssimoImporto();
         $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0.0);
         $hacambioiban = $this->haCambioIbanInCorso();
         $haOmonimi = $this->haOmonimi();
+        $op = $this->isInAlert() ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
+            : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) .
+        ($hacambioiban ? ("<br />VERIFICARE CAMBIO IBAN finale ". $this->finaleContoDaValidare()) : "") ;
+        if ($op !== null && $haOmonimi)
+            $op .= "<br />ATTENZIONE! OMONIMI NEL DISTRETTO";
         return [
             'alert' => $op != null,
             'presenteScorsoMese' => $lastMovimento !== null,
             'importo' => ($prossimoImporto <= 0.0 || !$this->attivo) ? 0.0 : $prossimoImporto,
             'importoPrecedente' => ($lastMovimento ? $lastMovimento->importo : 0),
             'differenza' => $differenza,
-            'op' => $op ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
-                    : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) .
-                ($hacambioiban ? "<br />VERIFICARE CAMBIO IBAN" : "") .
-                ($haOmonimi ? "<br />ATTENZIONE! OMONIMI NEL DISTRETTO" : ""),
+            'op' => $op,
             'recupero' => $this->haRecuperiInCorso(),
             'color' => $op ? 'danger' : ($differenza != 0.0 ? 'warning' : 'success')
         ];
+    }
+
+    public function finaleContoDaValidare() {
+        $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->one();
+        // if exist return the latest 6 digit of $conto->iban
+        return $conto ? substr($conto->iban, -6) : null;
     }
 
     public function isInAlert()

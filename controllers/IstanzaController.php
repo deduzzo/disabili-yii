@@ -173,6 +173,16 @@ class IstanzaController extends Controller
         ]);
     }
 
+    public function invalidaContiNonValidati() {
+        $conti = Istanza::find()->where(['id_istanza' => $this->id,'attivo' => true, 'validato' => false])->all();
+        foreach ($conti as $conto) {
+            $conto->attivo = false;
+            $conto->data_disattivazione = date('Y-m-d');
+            $conto->note = "Conto non validato, disattivato da sistema";
+            $conto->save();
+        }
+    }
+
     public function actionModifica()
     {
         if ($this->request->isPost) {

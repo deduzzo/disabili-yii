@@ -320,6 +320,7 @@ class SiteController extends Controller
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
+                        $istanza->invalidaContiNonValidati();
                         $movimento = new Movimento();
                         $movimento->id_conto = $conto->id;
                         $movimento->is_movimento_bancario = true;
