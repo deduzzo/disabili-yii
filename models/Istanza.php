@@ -428,7 +428,7 @@ class Istanza extends \yii\db\ActiveRecord
         $op = $this->isInAlert() ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
             : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) .
         ($hacambioiban ? ("<br />VERIFICARE CAMBIO IBAN finale ". $this->finaleContoDaValidare()) : "") ;
-        if ($op !== null && $haOmonimi)
+        if ($op !== null && $op !== "" && $haOmonimi)
             $op .= "<br />ATTENZIONE! OMONIMI NEL DISTRETTO";
         return [
             'alert' => $op != null,
