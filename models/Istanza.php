@@ -357,9 +357,10 @@ class Istanza extends \yii\db\ActiveRecord
             $restituire = true;
         // add une day to $this->data_decesso
         $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : Carbon::createFromFormat('Y-m-d', $this->data_decesso)->addDay()->format('Y-m-d'),!$restituire? $this->data_decesso: $dataInizioDovuta);
-        $totaleGiorniDovuti++;
         if ($totaleGiorniDovuti === null)
             return 0;
+        else
+            $totaleGiorniDovuti++;
         $totale =  ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
         return ($restituire ? -$totale : $totale);
     }
