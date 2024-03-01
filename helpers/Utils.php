@@ -132,7 +132,7 @@ class Utils
         } else return null;
     }
 
-    public static function getNumGiorni($da, $a = null): ?array
+    public static function getNumGiorni($da, $a = null, $consideraUltimoGiorno = false): ?array
     {
         $out = ['giorni' => 0, 'mesi' => 0];
         $da = Carbon::createFromFormat('Y-m-d', $da);
@@ -146,6 +146,8 @@ class Utils
             // id $da and $a are in different months
             list($aAnno, $aMese, $aGiorno) = explode('-', $a);
         }
+        if ($consideraUltimoGiorno)
+            $a->addDay();
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
