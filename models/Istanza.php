@@ -360,7 +360,7 @@ class Istanza extends \yii\db\ActiveRecord
         if ($totaleGiorniDovuti === null)
             return 0;
         else
-            $totaleGiorniDovuti++;
+            $totaleGiorniDovuti = $totaleGiorniDovuti + 1;
         $totale =  ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
         return ($restituire ? -$totale : $totale);
     }
