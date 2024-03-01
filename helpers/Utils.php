@@ -4,6 +4,8 @@ namespace app\helpers;
 
 
 use app\models\Istanza;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Box\Spout\Reader\XLSX\Sheet;
 use Carbon\Carbon;
 use CodiceFiscale\InverseCalculator;
 use CodiceFiscale\Validator;
@@ -158,6 +160,38 @@ class Utils
             }
         }
         return $out;
+    }
+
+    public static function getObjectFromFileExcel($path)
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $reader = ReaderEntityFactory::createReaderFromFile($path);
+        $reader->open($path);
+        $header = [];
+        $rowIndex = 0;
+        $out = [];
+        foreach ($reader->getSheetIterator() as $sheet) {
+            /* @var Sheet $sheet */
+            $out[$sheet->getName()] = [];
+            foreach ($sheet->getRowIterator() as $row) {
+                $newRow = [];
+                foreach ($row->getCells() as $idxcel => $cel) {
+                    $newRow[$idxcel] = $cel->getValue();
+                }
+                if ($rowIndex === 0) {
+                    foreach ($newRow as $idx => $cell)
+                        $header[$idx] = $cell;
+                } else {
+                    $out[$sheet->getName()][$rowIndex] = [];
+                    foreach ($newRow as $idxCol => $col) {
+                        $out[$sheet->getName()][$rowIndex][$header[$idxCol]] = $col;
+                    }
+                }
+                $rowIndex++;
+            }
+        }
+        return ['header' => $header, 'data' => $out];
     }
 
 }

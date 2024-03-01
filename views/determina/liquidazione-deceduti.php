@@ -73,9 +73,8 @@ $cols = [
         'label' => 'Pagamenti Tornati indietro?',
         'value' => function ($model) {
             $last = $model->getLastMovimentoBancario();
-            if (!$last)
-                return "NO";
-            return $last->tornato_indietro ? "SI" : "NO";
+            $tornatiIndietro = $model->getPagamentiTornatiIndietro(!$last ? null : $last->data);
+            return (count($tornatiIndietro) === 0) ? "NO" :  "SI";
         }
     ],
     [
