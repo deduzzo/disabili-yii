@@ -20,25 +20,28 @@ use yii\bootstrap5\Html;
 use yii\data\ArrayDataProvider;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\helpers\Url;
 use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null,$distretti = null,$gruppi = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
         Utils::verificaChiusuraAutomaticaIstanze();
         $searchModel = new SimulazioneDeterminaSearch();
-        $getVars = $idDeterminaFinalizzare === null ? $this->request->post() : [];
-        $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
+        $getVars = $this->request->post();
+        if ($distretti === null)
+            $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
+        if ($gruppi === null)
+            $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        $soloProblematici = isset($getVars['soloProblematici']) ? $getVars['soloProblematici'] : 'off';
-        $soloVariazioni = isset($getVars['soloVariazioni']) ? $getVars['soloVariazioni'] : 'off';
-        $soloRecuperi = isset($getVars['soloRecuperi']) ? $getVars['soloRecuperi'] : 'off';
+        $soloProblematici = isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare ? $getVars['soloProblematici'] : 'off';
+        $soloVariazioni = isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare ? $getVars['soloVariazioni'] : 'off';
+        $soloRecuperi = isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare ? $getVars['soloRecuperi'] : 'off';
         if ($escludiNuovoMese === null)
             $escludiNuovoMese = isset($getVars['escludiNuovoMese']) ? $getVars['escludiNuovoMese'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
@@ -291,7 +294,7 @@ class DeterminaController extends \yii\web\Controller
                 $determina->data = $vars['data_determina'];
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
-                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese']  ?? null);
+                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese']  ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null);
             } else {
                 Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
                 return $this->redirect(['contabilita/conti-validi']);
