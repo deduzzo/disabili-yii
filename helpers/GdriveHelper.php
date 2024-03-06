@@ -295,7 +295,7 @@ class GdriveHelper
             $distretto = Distretto::find()->where(['like', 'nome', '%' . strtoupper(substr($sheetTitle, 0, 4)) . '%', false])->one();
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
             foreach ($values as $index => $row) {
-                if ($index > 1 && isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "") {
+                if ($index > 1 && isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] !== "") {
                     if ($gruppoOriginale == "*")
                         $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $row[FileGruppiGoogle::GRUPPO]])->one();
                     else

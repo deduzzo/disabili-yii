@@ -392,7 +392,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-2">
-                                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#rowdata"
+                                    <a class="btn btn-primary  <?= !$istanza->rawdata_json ? "disabled" : "" ?>" data-bs-toggle="collapse" href="#rowdata"
                                        role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Mostra
                                         dati
                                         originali</a>
@@ -411,8 +411,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class="collapse multi-collapse" id="rowdata">
                                         <div class="card card-body">
                                             <?php
-                                            $json_pretty = json_decode($istanza->rawdata_json, true);
-                                            echo "<pre>" . json_encode($json_pretty, JSON_PRETTY_PRINT) . "<pre/>";
+                                            if ($istanza->rawdata_json) {
+                                                $json_pretty = json_decode($istanza->rawdata_json, true);
+                                                echo "<pre>" . json_encode($json_pretty, JSON_PRETTY_PRINT) . "<pre/>";
+                                            }
                                             ?>
                                         </div>
                                     </div>

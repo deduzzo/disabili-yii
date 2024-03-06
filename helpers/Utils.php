@@ -37,9 +37,9 @@ class Utils
         } else if (is_int($date)) {
             $date = DateTime::createFromFormat('dmY', $date);
         }
-        if ($date === false || get_class($date) != "DateTime") {
+        if (!is_object($date) || get_class($date) != "DateTime")
             return null;
-        } else return $date->format($destFormat);
+        else return $date->format($destFormat);
     }
 
     static function jsonToHtml($jsonString)
