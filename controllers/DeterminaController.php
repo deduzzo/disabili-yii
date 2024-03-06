@@ -25,7 +25,7 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false, $idDeterminaFinalizzare = null)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -39,6 +39,8 @@ class DeterminaController extends \yii\web\Controller
         $soloProblematici = isset($getVars['soloProblematici']) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = isset($getVars['soloVariazioni']) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = isset($getVars['soloRecuperi']) ? $getVars['soloRecuperi'] : 'off';
+        if ($escludiNuovoMese === null)
+            $escludiNuovoMese = isset($getVars['escludiNuovoMese']) ? $getVars['escludiNuovoMese'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = Movimento::getDataUltimoPagamento();
@@ -73,8 +75,9 @@ class DeterminaController extends \yii\web\Controller
         foreach ($allIstanzeAttive as $istanza) {
             /* @var $istanza Istanza */
             $istanza = Istanza::findOne($istanza['id']);
-            $differenza = $istanza->getDifferenzaUltimoImportoArray();
-            if (!$differenza['alert'] && $istanza->getProssimoImporto() > 0) {
+            $differenza = $istanza->getDifferenzaUltimoImportoArray($escludiNuovoMese !== "on");
+            $prossimoImporto = $istanza->getProssimoImporto($escludiNuovoMese !== "on");
+            if (!$differenza['alert'] && $prossimoImporto > 0) {
                 if ($soloProblematici === "off" || ($soloProblematici == "on" && $differenza['op'] !== "")) {
                     $istVal = [
                         'id' => $istanza->id,
@@ -87,16 +90,15 @@ class DeterminaController extends \yii\web\Controller
                         'eta' => $istanza->anagraficaDisabile->getEta(),
                         'gruppo' => $istanza->gruppo->descrizione_gruppo,
                         'importoPrecedente' => $differenza['importoPrecedente'],
-                        'importo' => $istanza->getProssimoImporto(),
+                        'importo' => $prossimoImporto,
                         'opArray' => $differenza,
                         'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
                     ];
                     if ($differenza['alert'] === true)
                         $alert[$istanza->distretto->id] = $istVal;
                     else {
-                        if ($istanza->getProssimoImporto() > 0)
-                            $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
-                        $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
+                        $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
+                        $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $prossimoImporto;
                         if ($differenza['recupero'] === true)
                             $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
                         if ($differenza['op'] !== "")
@@ -108,16 +110,19 @@ class DeterminaController extends \yii\web\Controller
                 $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
                 $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
             }
-            if ($idDeterminaFinalizzare !== null)
-                $istanza->finalizzaMensilita($idDeterminaFinalizzare);
+            if ($idDeterminaFinalizzare !== null && ($escludiNuovoMese !== "on" || $prossimoImporto > 0))
+                $istanza->finalizzaMensilita($idDeterminaFinalizzare, $escludiNuovoMese !== "on");
         }
         $nonPagati = [];
-        foreach ($distretti as $disPag) {
-            $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id] ?? []);
+        if ($escludiNuovoMese !== "on") {
+            foreach ($distretti as $disPag) {
+                $nonPagati = array_merge($nonPagati, $pagamentiPrecedentiPerDistretti[$disPag->id] ?? []);
+            }
         }
         foreach ($nonPagati as $idPagato) {
             $istanza = Istanza::findOne($idPagato);
-            $differenza = $istanza->getDifferenzaUltimoImportoArray();
+            $differenza = $istanza->getDifferenzaUltimoImportoArray($escludiNuovoMese !== "on");
+            $prossimoImporto = $istanza->getProssimoImporto($escludiNuovoMese !== "on");
             $istVal = [
                 'id' => $istanza->id,
                 'cf' => $istanza->anagraficaDisabile->codice_fiscale,
@@ -129,15 +134,15 @@ class DeterminaController extends \yii\web\Controller
                 'eta' => $istanza->anagraficaDisabile->getEta(),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo,
                 'importoPrecedente' => $differenza['importoPrecedente'],
-                'importo' => $istanza->getProssimoImporto(),
+                'importo' => $prossimoImporto,
                 'opArray' => $differenza,
                 'operazione' => $soloRecuperi === "off" ? $differenza['op'] : $istanza->getStatoRecupero(),
             ];
             if ($differenza['alert'] === true)
                 $alert[$istanza->distretto->id][] = $istVal;
             else {
-                $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $istanza->getProssimoImporto();
-                if ($istanza->getProssimoImporto() > 0)
+                $importiTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += $prossimoImporto;
+                if ($prossimoImporto > 0)
                     $numeriTotali[$istanza->distretto->id][$istanza->getLastIseeType()] += 1;
                 if ($differenza['recupero'] === true)
                     $recuperiPerDistretto[$istanza->distretto->id][] = $istVal;
@@ -165,6 +170,7 @@ class DeterminaController extends \yii\web\Controller
                 'soloProblematici' => $soloProblematici,
                 'soloVariazioni' => $soloVariazioni,
                 'soloRecuperi' => $soloRecuperi,
+                'escludiNuovoMese' => $escludiNuovoMese,
                 'distretti' => $distretti,
                 'gruppi' => $gruppi,
                 'title' => "Simulazione prossima determina",
@@ -180,13 +186,14 @@ class DeterminaController extends \yii\web\Controller
         }
     }
 
-    public function actionLiquidazioneDeceduti() {
+    public function actionLiquidazioneDeceduti()
+    {
         $vars = [];
         if ($this->request->isPost) {
             $vars = $this->request->post();
         }
         $searchModel = new IstanzaSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,array_key_exists('ExportWDG',$vars));
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, array_key_exists('ExportWDG', $vars));
 
         $dataProvider->query->where(['chiuso' => false])
             ->andWhere(['not', ['data_decesso' => null]]);
@@ -271,8 +278,7 @@ class DeterminaController extends \yii\web\Controller
         ]);
     }
 
-    public
-    function actionFinalizza()
+    public function actionFinalizza()
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -283,16 +289,14 @@ class DeterminaController extends \yii\web\Controller
                 $determina = new Determina();
                 $determina->numero = $vars['numero_determina'];
                 $determina->data = $vars['data_determina'];
-                $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'];
+                $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
-                $this->actionIndex(false, $determina->id);
-            }
-            else {
+                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese']  ?? null);
+            } else {
                 Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
                 return $this->redirect(['contabilita/conti-validi']);
             }
-        }
-        else {
+        } else {
             Yii::$app->session->setFlash('error', 'Errore durante la creazione della determina, manca numero');
             return $this->redirect(['istanza/index']);
         }

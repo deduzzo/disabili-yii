@@ -18,6 +18,7 @@ use yii\helpers\Url;
 /** @var string $soloRecuperi */
 /** @var string $soloVariazioni */
 /** @var string $soloProblematici */
+/** @var string $escludiNuovoMese */
 /** @var array $distretti */
 /** @var array $gruppi */
 /** @var array $stats */
@@ -61,10 +62,40 @@ if (!isset($soloVariazioni)) {
             </div>
             <div class="modal-body">
                 <?= Html::beginForm(['/determina/finalizza'], 'post', ['id' => 'finalizza-determina', 'class' => 'form-horizontal']) ?>
-                <div class="divider">
-                    <div class="divider-text">Dati Determina</div>
-                </div>
                 <div class="row">
+                    <div class="col-md-12">
+                        <div class="divider">
+                            <div class="divider-text">Distretti</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <?php
+                        foreach ($distretti as $di) {
+                            echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . $di->nome . "</span>";
+                        }
+                        // input type hidden of $distretti
+                        echo Html::hiddenInput('distretti', json_encode(ArrayHelper::getColumn($distretti, 'id')));
+                        ?>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="divider">
+                            <div class="divider-text">Gruppi</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <?php
+                        foreach ($gruppi as $gr) {
+                            echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . $gr->descrizione_gruppo . "</span>";
+                        }
+                        // input type hidden of $gruppi
+                        echo Html::hiddenInput('gruppi', json_encode(ArrayHelper::getColumn($gruppi, 'id')));
+                        ?>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="divider">
+                            <div class="divider-text">Dati Determina</div>
+                        </div>
+                    </div>
                     <!-- attributes: numero determina, data determina, data inizio, data fine -->
                     <div class="col-md-6">
                         <label for="numero_determina">Numero Determina</label>
@@ -73,7 +104,9 @@ if (!isset($soloVariazioni)) {
                     </div>
                     <div class="col-md-6">
                         <label for="data_determina">Data Determina</label>
-                        <input class="form-control" type="date" name="data_determina" id="data_determina"/>
+                        <!-- data_determina of value now -->
+                        <input class="form-control" type="date" name="data_determina" id="data_determina"
+                               value="<?= date('Y-m-d') ?>"/>
                     </div>
                     <div class="col-md-6">
                         <label for="data_inizio">Data Inizio Pagamento</label>
@@ -83,6 +116,15 @@ if (!isset($soloVariazioni)) {
                         <label for="data_fine">Data Fine Pagamento</label>
                         <input class="form-control" type="date" name="data_fine" id="data_fine"/>
                     </div>
+                    <div class="col-md-12">
+                        <!-- note -->
+                        <label for="descrizione">Descrizione</label>
+                        <textarea class="form-control" name="descrizione" id="descrizione" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-12" style="margin-top: 5px">
+                        <input type="hidden" name="escludiNuovoMese" value="<?= $escludiNuovoMese ?>">
+                        <?= "Escludi mese corrente (paga solo positivi) :<b> ".($escludiNuovoMese === "on" ? "SI" : "NO")."</b>" ?>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -90,7 +132,6 @@ if (!isset($soloVariazioni)) {
                     <i class="bx bx-x d-block d-sm-none"></i>
                     <span class="d-none d-sm-block">Annulla</span>
                 </button>
-
                 <button type="submit" class="btn btn-warning ms-1">
                     <i class="bx bx-check d-block d-sm-none"></i>
                     <span class="d-none d-sm-block">Finalizza determina</span>
@@ -188,7 +229,8 @@ if (!isset($soloVariazioni)) {
                     <div class="col-6 col-sm-12 col-md-8 mt-1">
                         <div class="tab-content text-justify" id="nav-tabContent">
                             <?php foreach ($distretti as $di2): ?>
-                                <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>" style="text-align:center"
+                                <div class="tab-pane show" id="<?= "dettagli_" . $di2->id ?>"
+                                     style="text-align:center"
                                      role="tabpanel"
                                      aria-labelledby="<?= "dettagli_" . $di2->id . "_list" ?>">
                                     <?php
@@ -261,7 +303,7 @@ if (!isset($soloVariazioni)) {
                 <div class="divider-text">Filtri</div>
             </div>
             <div class="col-md-12">
-                <?= Html::beginForm('', 'post',['name' => 'filterForm', 'id' => 'filterForm']) ?>
+                <?= Html::beginForm('', 'post', ['name' => 'filterForm', 'id' => 'filterForm']) ?>
                 <?= Select2::widget([
                     'name' => 'distrettiPost',
                     'data' => ArrayHelper::map(Distretto::find()->all(), 'id', 'nome'),
@@ -292,7 +334,8 @@ if (!isset($soloVariazioni)) {
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" role="switch" name="soloProblematici"
                                id="soloProblematici" <?= $soloProblematici == "on" ? "checked" : "" ?>>
-                        <label class="form-check-label text-danger bold" for="soloProblematici">Solo ist. con Errori
+                        <label class="form-check-label text-danger bold" for="soloProblematici">Solo ist. con
+                            Errori
                             (ALERT)</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -304,15 +347,24 @@ if (!isset($soloVariazioni)) {
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
                                id="soloRecuperi" <?= $soloRecuperi == "on" ? "checked" : "" ?>>
-                        <label class="form-check-label text-danger bold" for="soloRecuperi">Solo ist. con Recuperi in
+                        <label class="form-check-label text-danger bold" for="soloRecuperi">Solo ist. con
+                            Recuperi in
                             corso</label>
                     </div>
                 </div>
             <?php else: ?>
                 <div class="col-md-12"></div>
             <?php endif; ?>
+            <div class="col-md-12 text-center">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" role="switch" name="escludiNuovoMese"
+                           id="escludiNuovoMese" <?= $escludiNuovoMese == "on" ? "checked" : "" ?>>
+                    <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente (paga solo positivi)</b></label>
+                </div>
+            </div>
             <div class="col-md-12" style="text-align: center;">
-                <button type="submit" class="btn btn-primary" style="margin-top:10px; width: 100px">Filtra</button>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px; width: 100px">Filtra
+                </button>
             </div>
         </div>
         <div class="divider">

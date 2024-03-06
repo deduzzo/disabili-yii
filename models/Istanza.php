@@ -387,13 +387,13 @@ class Istanza extends \yii\db\ActiveRecord
         }
     }
 
-    public function getProssimoImporto()
+    public function getProssimoImporto($includiNuovoMese = true)
     {
         if ($this->isInAlert())
             return null;
         else {
             /* @var $lastIsee Isee */
-            $totale = ($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1;
+            $totale = $includiNuovoMese ? (($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) : 0;
             foreach ($this->recuperos as $recupero) {
                 if (!$recupero->chiuso && !$recupero->annullato) {
                     if ($recupero->importo > 0)
@@ -418,11 +418,11 @@ class Istanza extends \yii\db\ActiveRecord
         return $totale;
     }
 
-    public function getDifferenzaUltimoImportoArray()
+    public function getDifferenzaUltimoImportoArray($includiNuovoMese = true)
     {
         $lastMovimento = $this->getLastMovimentoBancario(Movimento::getDataUltimoPagamento());
-        $prossimoImporto = $this->getProssimoImporto();
-        $differenza = $this->getProssimoImporto() - ($lastMovimento ? $lastMovimento->importo : 0.0);
+        $prossimoImporto = $this->getProssimoImporto($includiNuovoMese);
+        $differenza = $prossimoImporto - ($lastMovimento ? $lastMovimento->importo : 0.0);
         $hacambioiban = $this->haCambioIbanInCorso();
         $alert = $this->isInAlert();
         $haOmonimi = $this->haOmonimi();
@@ -532,7 +532,7 @@ class Istanza extends \yii\db\ActiveRecord
         return $reale - $logico;
     }
 
-    public function finalizzaMensilita($idDetermina)
+    public function finalizzaMensilita($idDetermina,$pagaMeseCorrente = true)
     {
         $errors = [];
         if (!$this->haRicoveriInCorso()) {
@@ -541,20 +541,22 @@ class Istanza extends \yii\db\ActiveRecord
             $lastIseeType = $this->getLastIseeType();
             $determina = Determina::findOne($idDetermina);
             $importoSurplus = 0;
-            // caricamento importo base
-            $movimento = new Movimento();
-            $movimento->id_conto = $contoValido->id;
-            $movimento->contabilizzare = false;
-            $movimento->is_movimento_bancario = false;
-            $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
-            $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($movimento->data)->startOfMonth())->format('Y-m-d');
-            $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($movimento->data)->endOfMonth())->format('Y-m-d');
-            $movimento->id_determina = $idDetermina;
-            $movimento->note = "Beneficio contabile di " . Carbon::parse($movimento->data)->locale('it')->monthName . ' ' . Carbon::parse($movimento->data)->year;
-            $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
-            $movimento->save();
-            if ($movimento->errors)
-                $errors = array_merge($movimento->errors, $errors);
+            if ($pagaMeseCorrente) {
+                // caricamento importo base
+                $movimento = new Movimento();
+                $movimento->id_conto = $contoValido->id;
+                $movimento->contabilizzare = false;
+                $movimento->is_movimento_bancario = false;
+                $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+                $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($movimento->data)->startOfMonth())->format('Y-m-d');
+                $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($movimento->data)->endOfMonth())->format('Y-m-d');
+                $movimento->id_determina = $idDetermina;
+                $movimento->note = "Beneficio contabile di " . Carbon::parse($movimento->data)->locale('it')->monthName . ' ' . Carbon::parse($movimento->data)->year;
+                $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+                $movimento->save();
+                if ($movimento->errors)
+                    $errors = array_merge($movimento->errors, $errors);
+            }
             foreach ($recuperiPositivi as $recuperPos) {
                 $movimento = new Movimento();
                 $movimento->id_conto = $contoValido->id;
@@ -586,7 +588,8 @@ class Istanza extends \yii\db\ActiveRecord
                 if ($movimento->errors)
                     $errors = array_merge($movimento->errors, $errors);
             }
-            $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+            if ($pagaMeseCorrente)
+                $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
             // priorità i recuperi negativi rateizzati
             $ricoveri = $this->getRicoveriDaContabilizzare();
             foreach ($ricoveri as $ricoveroDaCont) {
