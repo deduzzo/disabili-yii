@@ -39,9 +39,9 @@ class DeterminaController extends \yii\web\Controller
         if ($gruppi === null)
             $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        $soloProblematici = isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare ? $getVars['soloProblematici'] : 'off';
-        $soloVariazioni = isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare ? $getVars['soloVariazioni'] : 'off';
-        $soloRecuperi = isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare ? $getVars['soloRecuperi'] : 'off';
+        $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
+        $soloVariazioni = (isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare) ? $getVars['soloVariazioni'] : 'off';
+        $soloRecuperi = (isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare) ? $getVars['soloRecuperi'] : 'off';
         if ($escludiNuovoMese === null)
             $escludiNuovoMese = isset($getVars['escludiNuovoMese']) ? $getVars['escludiNuovoMese'] : 'off';
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
@@ -109,6 +109,8 @@ class DeterminaController extends \yii\web\Controller
                     }
                     $istanzeArray[] = $istVal;
                 }
+                if (!array_key_exists($istanza->distretto->id,$pagamentiPrecedentiPerDistretti))
+                    $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = [];
                 $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
                 $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
                 $allIdPagatiMeseScorso = array_diff($allIdPagatiMeseScorso, [$istanza->id]);
