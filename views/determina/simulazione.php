@@ -123,7 +123,7 @@ if (!isset($soloVariazioni)) {
                     </div>
                     <div class="col-md-12" style="margin-top: 5px">
                         <input type="hidden" name="escludiNuovoMese" value="<?= $escludiNuovoMese ?>">
-                        <?= "Escludi mese corrente (paga solo positivi) :<b> ".($escludiNuovoMese === "on" ? "SI" : "NO")."</b>" ?>
+                        <?= "Escludi mese corrente (paga solo positivi) :<b> " . ($escludiNuovoMese === "on" ? "SI" : "NO") . "</b>" ?>
                     </div>
                 </div>
             </div>
@@ -359,7 +359,8 @@ if (!isset($soloVariazioni)) {
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" role="switch" name="escludiNuovoMese"
                            id="escludiNuovoMese" <?= $escludiNuovoMese == "on" ? "checked" : "" ?>>
-                    <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente (paga solo positivi)</b></label>
+                    <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente
+                            (paga solo positivi)</b></label>
                 </div>
             </div>
             <div class="col-md-12" style="text-align: center;">
@@ -374,7 +375,7 @@ if (!isset($soloVariazioni)) {
         <div class="col-md-8"><?= ExportWidget::widget([
                 // get into data provider using searchmodel and get the data
                 'dataProvider' => new ArrayDataProvider([
-                    'allModels' => $searchModel,
+                    'allModels' => $searchModel->search(Yii::$app->request->queryParams, $istanzeArray)->getModels(),
                     'pagination' => false,
                 ]),
                 'columns' => ['distretto', 'cognome', 'nome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'],
