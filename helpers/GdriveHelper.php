@@ -378,7 +378,7 @@ class GdriveHelper
                                     $isee = new Isee();
                                     $isee->id_istanza = $istanza->id;
                                     $isee->data_presentazione = Carbon::now()->format("Y-m-d");
-                                    $isee->maggiore_25mila = !((strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE" || $eta<= 18)));
+                                    $isee->maggiore_25mila = !($eta<= 18 || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE")));
                                     $isee->valido = true;
                                     $isee->save();
                                     if ($isee->errors)
