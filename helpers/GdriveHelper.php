@@ -372,7 +372,7 @@ class GdriveHelper
                             }
                             if ((isset($row[FileGruppiGoogle::ISEE]) && $row[FileGruppiGoogle::ISEE] !== null && $row[FileGruppiGoogle::ISEE] != "") || $eta <= 18) {
                                 if (isset($row[FileGruppiGoogle::ISEE]) && !str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") && !str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore") && $eta >= 18) {
-                                    $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => ['ISEE non valido']]);
+                                    $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => ['ISEE non valido, eta '.$eta.' anni'. ' isee:'.$row[FileGruppiGoogle::ISEE]]]);
                                 }
                                 else {
                                     $isee = new Isee();
