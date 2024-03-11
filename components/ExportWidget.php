@@ -18,6 +18,7 @@ class ExportWidget extends Widget
     public $dataProvider;
     public $columns;
     public $query;
+    public $postVars;
 
     public function init()
     {
@@ -29,6 +30,10 @@ class ExportWidget extends Widget
         if ($this->columns === null) {
             // retrive the columns from the data provider
             $this->columns = $this->dataProvider->getModels();
+        }
+        if ($this->postVars === null) {
+            // retrive the columns from the data provider
+            $this->postVars = [];
         }
     }
 
@@ -89,8 +94,23 @@ class ExportWidget extends Widget
             $exporter->render();
             $exporter->send('export.xlsx');
         }
+        $postVarsHtml = "";
+        foreach ($this->postVars as $key => $value) {
+            if (is_array($value)) {
+                // Gestisci il caso in cui $value è un array
+                foreach ($value as $arrayKey => $arrayValue) {
+                    // Utilizza la sintassi per gli array nei nomi degli input
+                    // Ad esempio, il nome diventerà 'key[arrayKey]'
+                    $postVarsHtml .= Html::hiddenInput($key . "[$arrayKey]", $arrayValue);
+                }
+            } else {
+                // Il caso predefinito, dove $value non è un array
+                $postVarsHtml .= Html::hiddenInput($key, $value);
+            }
+        }
         return Html::beginForm('', 'POST', ['id' => "formExport", 'class' => 'd-flex align-items-center']) .
             Html::hiddenInput('exportWDG', 'true') .
+            $postVarsHtml.
             ($this->query !== null
                 ? (
                     Html::dropDownList(
