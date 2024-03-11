@@ -373,7 +373,6 @@ if (!isset($soloVariazioni)) {
         <?= Html::endForm() ?>
         <div class="col-md-8"><?= ExportWidget::widget([
                 'dataProvider' => $dataProvider,
-                'searchModel' => $searchModel,
                 'columns' => ['distretto', 'cognome', 'nome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'],
             ]) ?></div>
         <div class="col-md-4">
