@@ -302,8 +302,10 @@ class GdriveHelper
                         $gruppo = $gruppoOriginale;
                     $istanza = Istanza::find()->innerJoin('anagrafica', 'anagrafica.id = istanza.id_anagrafica_disabile')->where(['codice_fiscale' => strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])), 'chiuso' => false])->one();
                     if (!$istanza && !in_array(strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])), $cfs)) {
+                        $eta = null;
                         $cfs[] = $row[FileGruppiGoogle::CODICE_FISCALE];
                         $disabile = Anagrafica::findOne(['codice_fiscale' => strtoupper($row[FileGruppiGoogle::CODICE_FISCALE])]);
+                        $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE]);
                         if (!$disabile) {
                             $disabile = new Anagrafica();
                             $disabile->codice_fiscale = strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE]));
@@ -368,23 +370,28 @@ class GdriveHelper
                                     }
                                 }
                             }
-                            if (isset($row[FileGruppiGoogle::ISEE])) {
-                                $isee = new Isee();
-                                $isee->id_istanza = $istanza->id;
-                                $isee->data_presentazione = Carbon::now()->format("Y-m-d");
-                                $isee->maggiore_25mila = !((strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE"));
-                                $isee->valido = true;
-                                $isee->save();
-                                if ($isee->errors)
-                                    $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
-                                if ($numMesiDaCaricare > 0) {
-                                    $recupero = new Recupero();
-                                    $recupero->id_istanza = $istanza->id;
-                                    $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
-                                    $recupero->note = $noteRecupero ?? ("Recupero automatico per " . $numMesiDaCaricare . " mesi");
-                                    $recupero->save();
-                                    if ($recupero->errors)
-                                        $errors = array_merge($errors, ['recupero-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $recupero->errors]);
+                            if ((isset($row[FileGruppiGoogle::ISEE]) && $row[FileGruppiGoogle::ISEE] !== null && $row[FileGruppiGoogle::ISEE] != "") || $eta <= 18) {
+                                if (!str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") && !str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore") && $eta > 18) {
+                                    $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => ['ISEE non valido']]);
+                                }
+                                else {
+                                    $isee = new Isee();
+                                    $isee->id_istanza = $istanza->id;
+                                    $isee->data_presentazione = Carbon::now()->format("Y-m-d");
+                                    $isee->maggiore_25mila = !((strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE" || $eta<= 18)));
+                                    $isee->valido = true;
+                                    $isee->save();
+                                    if ($isee->errors)
+                                        $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
+                                    if ($numMesiDaCaricare > 0) {
+                                        $recupero = new Recupero();
+                                        $recupero->id_istanza = $istanza->id;
+                                        $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
+                                        $recupero->note = $noteRecupero ?? ("Recupero automatico per " . $numMesiDaCaricare . " mesi");
+                                        $recupero->save();
+                                        if ($recupero->errors)
+                                            $errors = array_merge($errors, ['recupero-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $recupero->errors]);
+                                    }
                                 }
                             }
                         }
