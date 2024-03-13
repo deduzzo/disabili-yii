@@ -28,27 +28,23 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null,$singoleIstanze = null)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null, $singoleIstanze = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
         Utils::verificaChiusuraAutomaticaIstanze();
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $this->request->post();
-        if ($distretti !== null && $getVars['distrettiPost'])
-            $distretti = $getVars['distrettiPost'];
-        else
-            $distretti = Distretto::getAllIds();
+        if ($distretti === null)
+            $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        if ($gruppi !== null && $getVars['gruppiPost'])
-            $gruppi = $getVars['gruppiPost'];
-        else
-                $gruppi = Gruppo::getAllIds();
+        if ($gruppi === null)
+            $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        if (($singoleIstanze === null && isset($getVars['singoleIstanze']) && count($getVars['singoleIstanze']) >0) || $singoleIstanze !== null)
-            $singoleIstanze = Istanza::find()->where(['id' => $getVars['singoleIstanze']])->all();
-        else
-            $singoleIstanze = [];
+        if ($singoleIstanze === null)
+            $singoleIstanze = $getVars['singoleIstanze'] ?? [];
+        $singoleIstanze = Istanza::find()->where(['id' => $singoleIstanze])->all();
+
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = (isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = (isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare) ? $getVars['soloRecuperi'] : 'off';
@@ -85,7 +81,7 @@ class DeterminaController extends \yii\web\Controller
         $allIstanzeAttive = $allIstanzeAttive->all();
         // get all id only of $singoleIstanze
         $singoleIstanzeIds = array_map(function ($el) {
-            return $el->id;
+            return ['id' => $el->id];
         }, $singoleIstanze);
         $allIstanzeAttive = array_merge($allIstanzeAttive, $singoleIstanzeIds);
         $istanzeArray = [];
@@ -315,7 +311,7 @@ class DeterminaController extends \yii\web\Controller
                 $determina->non_ordinaria = isset($getVars['escludiNuovoMese']);
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
-                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null,Json::decode($vars['singoleIstanze']) ?? null);
+                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null, Json::decode($vars['singoleIstanze']) ?? null);
             } else {
                 Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
                 return $this->redirect(['contabilita/conti-validi']);
