@@ -351,7 +351,7 @@ if (!isset($soloVariazioni)) {
             </div>
             <div class="col-md-12">
                 <?= Select2::widget([
-                    'name' => 'gruppiPost',
+                    'name' => 'singoleIstanze',
                     'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo() , 'id', 'nominativo'),
                     'value' => ArrayHelper::getColumn($singoleIstanze, 'id'),
                     'options' => ['placeholder' => 'Singole istanze ...'],
