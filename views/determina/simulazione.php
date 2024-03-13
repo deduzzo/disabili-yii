@@ -359,7 +359,7 @@ if (!isset($soloVariazioni)) {
             <?php else: ?>
                 <div class="col-md-12"></div>
             <?php endif; ?>
-            <?php if ($soloVisualizzazione): ?>
+            <?php if (!$soloVisualizzazione): ?>
             <div class="col-md-12 text-center">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" role="switch" name="escludiNuovoMese"
