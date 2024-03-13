@@ -365,8 +365,9 @@ class DeterminaController extends \yii\web\Controller
                     ->all();
 
                 $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
+                // remove duplicates from $allIstanze
             }
-
+            $allIstanze = array_map("unserialize", array_unique(array_map("serialize", $allIstanze)));
             $errori = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
