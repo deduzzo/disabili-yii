@@ -35,14 +35,16 @@ class DeterminaController extends \yii\web\Controller
         Utils::verificaChiusuraAutomaticaIstanze();
         $searchModel = new SimulazioneDeterminaSearch();
         $getVars = $this->request->post();
-        if ($distretti === null)
+        if ($distretti !== null)
             $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
-        if ($gruppi === null)
+        if ($gruppi !== null)
             $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        if (isset($getVars['gruppiPost']) && count($getVars['gruppiPost']) >0)
+        if (!$singoleIstanze && isset($getVars['gruppiPost']) && count($getVars['gruppiPost']) >0)
             $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['gruppiPost']])->asArray()->all();
+        else
+            $singoleIstanze = [];
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = (isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = (isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare) ? $getVars['soloRecuperi'] : 'off';
