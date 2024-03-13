@@ -28,6 +28,11 @@ class Determina extends \yii\db\ActiveRecord
         return 'determina';
     }
 
+    public static function getAllDetermineMap()
+    {
+        return array_column(self::find()->select(['id','desc' => 'CONCAT(numero," - ", descrizione)'])->where(['storico' => false])->orderBy('data desc')->asArray()->all(),'desc', 'id');
+    }
+
     /**
      * {@inheritdoc}
      */

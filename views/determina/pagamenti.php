@@ -1,6 +1,7 @@
 <?php
 
 use app\components\ExportWidget;
+use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use kartik\select2\Select2;
@@ -16,6 +17,7 @@ use yii\helpers\Url;
 /** @var string $anno */
 /** @var string $result */
 /** @var array $ibanRipetuti */
+/** @var int $idDetermina */
 
 
 $this->title = 'Verifica pagamenti';
@@ -33,7 +35,7 @@ $formatter = \Yii::$app->formatter;
                             <div class="divider-text">Pagamenti Mensili</div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="mese" class="form-label">Seleziona Mese</label>
                                 <select class="form-select" id="mese" name="mese">
                                     <?php
@@ -59,7 +61,7 @@ $formatter = \Yii::$app->formatter;
                                     ?>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="anno" class="form-label">Seleziona Anno</label>
                                 <select class="form-select" id="anno" name="anno">
                                     <option selected>Scegli...</option>
@@ -69,14 +71,22 @@ $formatter = \Yii::$app->formatter;
                                     ?>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-12">
+                               <?= Html::dropDownList(
+                                'idDetermina',
+                                null,
+                                Determina::getAllDetermineMap(),
+                                ['prompt' => 'Selezionare la determina..','class' => 'form-select', 'style' => 'margin-top: 30px']
+                                ); ?>
+                            </div>
+                            <div class="col-md-12" style="text-align: center">
                                 <!-- button submit -->
                                 <?= Html::submitButton('Verifica', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
                             </div>
                             <?= Html::endForm() ?>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="text-align: center;">
                         <div class="divider">
                             <div class="divider-text">Verifica Iban</div>
                         </div>

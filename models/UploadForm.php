@@ -18,12 +18,15 @@ use yii\web\UploadedFile;
 
 class UploadForm extends Model
 {
+    public const SCENARIO_IMPORT_PAGAMENTI = 'importPagamenti';
+
     /**
      * @var UploadedFile[]
      */
     public $files;
     public $tipo;
     public $simulazione;
+    public $idDetermina;
 
     public function rules()
     {
@@ -31,6 +34,18 @@ class UploadForm extends Model
             [['files'], 'file', 'skipOnEmpty' => false, 'extensions' => 'xlsx, xls, xml', 'maxFiles' => 10],
             [['tipo'], 'string'],
             [['simulazione'], 'boolean'],
+            [['idDetermina'], 'integer'],
+            // idDetermina required on importPagamenti scenario
+            [['idDetermina'], 'required', 'on' => self::SCENARIO_IMPORT_PAGAMENTI],
+        ];
+    }
+
+    public function attributeLabels() {
+        return [
+            'files' => 'Files',
+            'tipo' => 'Tipo',
+            'simulazione' => 'Simulazione',
+            'idDetermina' => 'Determina',
         ];
     }
 
@@ -105,6 +120,7 @@ class UploadForm extends Model
         $istanze = null;
         $lastCf = null;
         $transaction = Yii::$app->db->beginTransaction();
+        $idDetermina = Determina::find()->where(['id' => $this->idDetermina])->one();
         foreach ($gruppiPagamento as $gruppo) {
             $gruppiPagamentoMap[$gruppo->progressivo] = $gruppo;
         }
@@ -166,6 +182,7 @@ class UploadForm extends Model
                         $movimento->note = "Bonifico di ". Carbon::parse($movimento->periodo_da)->locale('it')->monthName. ' ' . Carbon::parse($movimento->periodo_da)->year;
                         $movimento->data = $movimento->periodo_a;
                         $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
+                        $movimento->id_determina = $idDetermina->id;
                         $movimento->escludi_contabilita = true;
                         $movimento->id_gruppo_pagamento = isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) ? $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->id : null;
                         if ($movimento->id_gruppo_pagamento === null) {
@@ -176,6 +193,10 @@ class UploadForm extends Model
                             $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]] = $gruppoPagamento;
                             if ($gruppoPagamento->errors)
                                 $errors = array_merge($errors, ['gruppoPagamento-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $gruppoPagamento->errors]);
+                            $determinaGruppoPagamento = new DeterminaGruppoPagamento();
+                            $determinaGruppoPagamento->id_determina = $idDetermina->id;
+                            $determinaGruppoPagamento->id_gruppo = $gruppoPagamento->id;
+                            $determinaGruppoPagamento->save();
                         }
                         if (isset($gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]) && !$gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data) {
                             $gruppiPagamentoMap[$newRow[$header[PagamentiConIban::ID_ELENCO]]]->data = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);

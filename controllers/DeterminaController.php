@@ -5,9 +5,11 @@ namespace app\controllers;
 use app\helpers\Utils;
 use app\models\Conto;
 use app\models\Determina;
+use app\models\DeterminaGruppoPagamento;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
+use app\models\GruppoPagamento;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\IstanzaSearch;
@@ -26,7 +28,7 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null,$distretti = null,$gruppi = null)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -109,7 +111,7 @@ class DeterminaController extends \yii\web\Controller
                     }
                     $istanzeArray[] = $istVal;
                 }
-                if (!array_key_exists($istanza->distretto->id,$pagamentiPrecedentiPerDistretti))
+                if (!array_key_exists($istanza->distretto->id, $pagamentiPrecedentiPerDistretti))
                     $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = [];
                 $pagamentiPrecedentiPerDistretti[$istanza->distretto->id] = array_diff($pagamentiPrecedentiPerDistretti[$istanza->distretto->id], [$istanza->id]);
                 $pagamentiAttualiPerDistretti[$istanza->distretto->id][] = $istanza->id;
@@ -296,7 +298,7 @@ class DeterminaController extends \yii\web\Controller
                 $determina->data = $vars['data_determina'];
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
-                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese']  ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null);
+                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null);
             } else {
                 Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
                 return $this->redirect(['contabilita/conti-validi']);
@@ -315,30 +317,65 @@ class DeterminaController extends \yii\web\Controller
         $result = null;
         $vars = $this->request->get();
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
-        $mese = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
-        $anno = Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
-        if (isset($vars['mese']) && isset($vars['anno']) && isset($vars['submit'])) {
+        $mese = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
+        $anno = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
+        $idDetermina = null;
+        if (((isset($vars['mese']) && isset($vars['anno'])) || isset($vars['idDetermina'])) && isset($vars['submit'])) {
             $mese = $vars['mese'];
             $anno = $vars['anno'];
+            $idDetermina = $vars['idDetermina'];
             $result = "<div class='row'>";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
-            $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
-            $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true]);
-            $istanzePagate = $istanzePagate->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
-            //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
-            $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])->andWhere(['not in', 'i.id', (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')->andWhere(['>=', 'm2.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->all()])->all();
-            $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
+            if ($idDetermina)
+                $idDetermina = Determina::findOne($idDetermina);
+            if (!$idDetermina) {
+                $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
+                $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true]);
+                $istanzePagate = $istanzePagate->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
+                //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
+                $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
+                    ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
+                    ->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])
+                    ->andWhere(['not in', 'i.id',
+                        (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')
+                            ->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')
+                            ->andWhere(['>=', 'm2.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->all()])
+                    ->all();
+
+                $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
+            } else {
+                $istanzePagate = [];
+                $allGruppiPagati = DeterminaGruppoPagamento::find()->where(['id_determina' => $idDetermina->id])->all();
+                $minGruppoPagato = 0;
+                foreach ($allGruppiPagati as $gruppo) {
+                    if ($gruppo->id < $minGruppoPagato || $minGruppoPagato === 0)
+                        $minGruppoPagato = $gruppo->id;
+                    $allIstanzeGruppo = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')
+                        ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
+                        ->andWhere(['m.is_movimento_bancario' => true])->andWhere(['m.id_gruppo_pagamento' => $gruppo->id_gruppo])->all();
+                    $istanzePagate = array_merge($istanzePagate, $allIstanzeGruppo);
+                }
+                $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
+                    ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
+                    ->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])
+                    ->andWhere(['not in', 'i.id',
+                        (new Query())->select('c2.id_istanza')->distinct()->from('movimento m2, conto c2')
+                            ->where('m2.escludi_contabilita = true')->andWhere('c2.id = m2.id_conto')
+                            ->andWhere(['>=', 'm2.id_gruppo_pagamento', $minGruppoPagato])->all()])
+                    ->all();
+
+                $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
+            }
+
             $errori = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
                 if ($tempResult != 0.0) {
                     $errori = true;
-                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), [
-                            'title' => Yii::t('yii', 'Vai alla scheda'),
+                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), ['title' => Yii::t('yii', 'Vai alla scheda'),
                             'class' => 'btn btn-icon btn-sm btn-primary',
-                            'target' => '_blank',
-                        ])
+                            'target' => '_blank',])
                         . "</div><div class='col-md-3'>" . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
                         . "</div><div class='col-md-1'>" . $istanza->distretto->nome

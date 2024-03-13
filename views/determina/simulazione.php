@@ -121,10 +121,14 @@ if (!isset($soloVariazioni)) {
                         <label for="descrizione">Descrizione</label>
                         <textarea class="form-control" name="descrizione" id="descrizione" rows="3"></textarea>
                     </div>
+                    <?php if (!$soloVisualizzazione): ?>
                     <div class="col-md-12" style="margin-top: 5px">
                         <input type="hidden" name="escludiNuovoMese" value="<?= $escludiNuovoMese ?>">
                         <?= "Escludi mese corrente (paga solo positivi) :<b> ".($escludiNuovoMese === "on" ? "SI" : "NO")."</b>" ?>
                     </div>
+                    <?php else: ?>
+                        <div class="col-md-12" style="margin-top: 5px"></div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="modal-footer">

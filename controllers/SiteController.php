@@ -17,6 +17,7 @@ use app\models\enums\FileParisi;
 use app\models\enums\ImportoBase;
 use app\models\enums\PagamentiConElenchi;
 use app\models\enums\PagamentiConIban;
+use app\models\enums\TipologiaDatiCategoria;
 use app\models\Gruppo;
 use app\models\GruppoPagamento;
 use app\models\Isee;
@@ -378,8 +379,13 @@ class SiteController extends Controller
         $model = new UploadForm();
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
+            if ($model->tipo == TipologiaDatiCategoria::MOVIMENTI_CON_IBAN)
+                $model->setScenario(UploadForm::SCENARIO_IMPORT_PAGAMENTI);
             $model->files = UploadedFile::getInstances($model, 'files');
-            $model->upload();
+            if ($model->files && $model->validate())
+                $model->upload();
+            else
+                Yii::$app->session->setFlash('error', 'Verificare gli errori nel form di upload..');
         }
 
         return $this->render('upload', [
