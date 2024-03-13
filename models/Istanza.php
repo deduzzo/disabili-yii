@@ -513,11 +513,18 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
-    public function verificaContabilitaMese($mese, $anno)
+    public function verificaContabilitaMese($mese, $anno,$determina = null)
     {
-        $inizioMese = Carbon::createFromDate($anno, $mese, 1)->format('Y-m-d');
-        $fineMese = Carbon::create($inizioMese)->endOfMonth()->format('Y-m-d');
-        $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
+        if (!$determina) {
+            $inizioMese = Carbon::createFromDate($anno, $mese, 1)->format('Y-m-d');
+            $fineMese = Carbon::create($inizioMese)->endOfMonth()->format('Y-m-d');
+        }
+        else {
+            $dataDetermina = $determina->data;
+            $inizioMese = Carbon::createFromDate($dataDetermina)->startOfMonth()->format('Y-m-d');
+            $fineMese = Carbon::createFromDate($dataDetermina)->endOfMonth()->format('Y-m-d');
+        }
+            $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
         $logico = 0;
         $reale = 0;
         if ($this->attivo && count($movimentiIstanzaMese) === 0 && !$this->haRicoveriInCorso())

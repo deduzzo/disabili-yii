@@ -320,6 +320,7 @@ class DeterminaController extends \yii\web\Controller
         $mese = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
         $anno = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
         $idDetermina = null;
+        $minGruppoPagato = 0;
         if (((isset($vars['mese']) && isset($vars['anno'])) || isset($vars['idDetermina'])) && isset($vars['submit'])) {
             $mese = $vars['mese'];
             $anno = $vars['anno'];
@@ -346,7 +347,6 @@ class DeterminaController extends \yii\web\Controller
             } else {
                 $istanzePagate = [];
                 $allGruppiPagati = DeterminaGruppoPagamento::find()->where(['id_determina' => $idDetermina->id])->all();
-                $minGruppoPagato = 0;
                 foreach ($allGruppiPagati as $gruppo) {
                     if ($gruppo->id < $minGruppoPagato || $minGruppoPagato === 0)
                         $minGruppoPagato = $gruppo->id;
@@ -371,7 +371,7 @@ class DeterminaController extends \yii\web\Controller
             $errori = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
-                $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']));
+                $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']), $idDetermina);
                 if ($tempResult != 0.0) {
                     $errori = true;
                     $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), ['title' => Yii::t('yii', 'Vai alla scheda'),
