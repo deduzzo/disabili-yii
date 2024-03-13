@@ -359,6 +359,7 @@ if (!isset($soloVariazioni)) {
             <?php else: ?>
                 <div class="col-md-12"></div>
             <?php endif; ?>
+            <?php if ($soloVisualizzazione): ?>
             <div class="col-md-12 text-center">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" role="switch" name="escludiNuovoMese"
@@ -366,6 +367,9 @@ if (!isset($soloVariazioni)) {
                     <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente (paga solo positivi)</b></label>
                 </div>
             </div>
+            <?php else: ?>
+                <div class="col-md-12"></div>
+            <?php endif; ?>
             <div class="col-md-12" style="text-align: center;">
                 <button type="submit" class="btn btn-primary" style="margin-top:10px; width: 100px">Filtra
                 </button>
