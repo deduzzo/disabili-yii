@@ -38,7 +38,7 @@ class DeterminaController extends \yii\web\Controller
         if ($distretti !== null && $getVars['distrettiPost'])
             $distretti = $getVars['distrettiPost'];
         else
-            $distretti = Distretto::getAllIds();
+            $distretti = [5]; //Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         if ($gruppi !== null && $getVars['gruppiPost'])
             $gruppi = $getVars['gruppiPost'];
@@ -46,7 +46,7 @@ class DeterminaController extends \yii\web\Controller
                 $gruppi = Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         if (($singoleIstanze === null && isset($getVars['singoleIstanze']) && count($getVars['singoleIstanze']) >0) || $singoleIstanze !== null)
-            $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['singoleIstanze']])->asArray()->all();
+            $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['singoleIstanze']])->all();
         else
             $singoleIstanze = [];
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
