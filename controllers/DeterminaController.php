@@ -83,8 +83,11 @@ class DeterminaController extends \yii\web\Controller
         $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
         $allIstanzeAttive->andWhere(['id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')]);
         $allIstanzeAttive = $allIstanzeAttive->all();
-        // merge allIstanzeAttive with singoleIstanze
-        $allIstanzeAttive = array_merge($allIstanzeAttive, $singoleIstanze);
+        // get all id only of $singoleIstanze
+        $singoleIstanzeIds = array_map(function ($el) {
+            return $el->id;
+        }, $singoleIstanze);
+        $allIstanzeAttive = array_merge($allIstanzeAttive, $singoleIstanzeIds);
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
         foreach ($allIstanzeAttive as $istanza) {
