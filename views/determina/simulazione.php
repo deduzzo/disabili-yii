@@ -107,6 +107,7 @@ if (!isset($soloVariazioni)) {
                         // input type hidden of $singoleIstanze
                         echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze, 'id')));
                         ?>
+                    </div>
                     <div class="col-md-12">
                         <div class="divider">
                             <div class="divider-text">Dati Determina</div>
