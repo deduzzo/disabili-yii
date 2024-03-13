@@ -28,7 +28,7 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null)
+    public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null,$singoleIstanze = null)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -41,7 +41,6 @@ class DeterminaController extends \yii\web\Controller
         if ($gruppi === null)
             $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        $singoleIstanze = [];
         if (isset($getVars['gruppiPost']) && count($getVars['gruppiPost']) >0)
             $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['gruppiPost']])->asArray()->all();
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
@@ -307,7 +306,7 @@ class DeterminaController extends \yii\web\Controller
                 $determina->non_ordinaria = isset($getVars['escludiNuovoMese']);
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
-                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null);
+                $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null,Json::decode($vars['singoleIstanze']) ?? null);
             } else {
                 Yii::$app->session->setFlash('error', 'Impossibile finalizzare: ci sono conti correnti non validi');
                 return $this->redirect(['contabilita/conti-validi']);

@@ -93,6 +93,20 @@ if (!isset($soloVariazioni)) {
                         echo Html::hiddenInput('gruppi', json_encode(ArrayHelper::getColumn($gruppi, 'id')));
                         ?>
                     </div>
+                    <!-- same for singole istanze -->
+                    <div class="col-md-12">
+                        <div class="divider">
+                            <div class="divider-text">Istanze</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <?php
+                        foreach ($singoleIstanze as $si) {
+                            echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . $si->nominativo . "</span>";
+                        }
+                        // input type hidden of $singoleIstanze
+                        echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze, 'id')));
+                        ?>
                     <div class="col-md-12">
                         <div class="divider">
                             <div class="divider-text">Dati Determina</div>
