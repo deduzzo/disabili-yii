@@ -45,7 +45,7 @@ class DeterminaController extends \yii\web\Controller
         else
                 $gruppi = Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
-        if ($singoleIstanze !== null && isset($getVars['singoleIstanze']) && count($getVars['singoleIstanze']) >0)
+        if (($singoleIstanze === null && isset($getVars['singoleIstanze']) && count($getVars['singoleIstanze']) >0) || $singoleIstanze !== null)
             $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['singoleIstanze']])->asArray()->all();
         else
             $singoleIstanze = [];
