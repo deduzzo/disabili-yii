@@ -68,6 +68,19 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
+    public static function getAllIstanzeAttiveIdNominativo()
+    {
+        return Istanza::find()
+            ->select([
+                'istanza.id',
+                'nominativo' => 'CONCAT(istanza.id, " - ", a.cognome, " ", a.nome)'
+            ])
+            ->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')
+            ->where(['istanza.attivo' => true])
+            ->asArray()
+            ->all();
+    }
+
     /**
      * {@inheritdoc}
      */

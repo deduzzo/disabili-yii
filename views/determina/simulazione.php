@@ -4,6 +4,7 @@ use app\components\ExportWidget;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
+use app\models\Istanza;
 use kartik\select2\Select2;
 use richardfan\widget\JSRegister;
 use yii\bootstrap5\Html;
@@ -22,6 +23,7 @@ use yii\helpers\Url;
 /** @var array $distretti */
 /** @var array $gruppi */
 /** @var array $stats */
+/** @var array $singoleIstanze */
 /** @var array $istanzeArray */
 /** @var string $mese */
 /** @var string $anno */
@@ -326,6 +328,19 @@ if (!isset($soloVariazioni)) {
                     'data' => ArrayHelper::map(Gruppo::find()->orderBy('descrizione_gruppo')->all(), 'id', 'descrizione_gruppo'),
                     'value' => ArrayHelper::getColumn($gruppi, 'id'),
                     'options' => ['placeholder' => 'Seleziona un gruppo ...'],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'multiple' => true,
+                        'class' => 'form-control'
+                    ],
+                ]); ?>
+            </div>
+            <div class="col-md-12">
+                <?= Select2::widget([
+                    'name' => 'gruppiPost',
+                    'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo() , 'id', 'nominativo'),
+                    'value' => ArrayHelper::getColumn($singoleIstanze, 'id'),
+                    'options' => ['placeholder' => 'Singole istanze ...'],
                     'pluginOptions' => [
                         'allowClear' => true,
                         'multiple' => true,

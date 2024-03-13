@@ -41,6 +41,9 @@ class DeterminaController extends \yii\web\Controller
         if ($gruppi === null)
             $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
+        $singoleIstanze = [];
+        if (isset($getVars['gruppiPost']) && count($getVars['gruppiPost']) >0)
+            $singoleIstanze = Istanza::find()->select('id')->where(['id' => $getVars['gruppiPost']])->asArray()->all();
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = (isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = (isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare) ? $getVars['soloRecuperi'] : 'off';
@@ -75,6 +78,8 @@ class DeterminaController extends \yii\web\Controller
         $allIstanzeAttive->andWhere(['id_distretto' => ArrayHelper::getColumn($distretti, 'id')]);
         $allIstanzeAttive->andWhere(['id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')]);
         $allIstanzeAttive = $allIstanzeAttive->all();
+        // merge allIstanzeAttive with singoleIstanze
+        $allIstanzeAttive = array_merge($allIstanzeAttive, $singoleIstanze);
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
         foreach ($allIstanzeAttive as $istanza) {
@@ -179,6 +184,7 @@ class DeterminaController extends \yii\web\Controller
                 'soloRecuperi' => $soloRecuperi,
                 'escludiNuovoMese' => $escludiNuovoMese,
                 'distretti' => $distretti,
+                'singoleIstanze' => $singoleIstanze,
                 'gruppi' => $gruppi,
                 'title' => "Simulazione prossima determina",
                 'stats' => [
