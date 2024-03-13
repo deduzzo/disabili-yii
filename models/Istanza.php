@@ -527,7 +527,7 @@ class Istanza extends \yii\db\ActiveRecord
             $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
         $logico = 0;
         $reale = 0;
-        if ($this->attivo && count($movimentiIstanzaMese) === 0 && !$this->haRicoveriInCorso())
+        if ($this->attivo && count($movimentiIstanzaMese) === 0 && !$this->haRicoveriInCorso() && !$determina->non_ordinaria)
             $logico = ($this->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         foreach ($movimentiIstanzaMese as $movimento) {
             if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita) {

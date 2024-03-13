@@ -295,7 +295,10 @@ class DeterminaController extends \yii\web\Controller
             if ($contiOk === "") {
                 $determina = new Determina();
                 $determina->numero = $vars['numero_determina'];
+                $determina->pagamenti_da = $vars['data_inizio'];
+                $determina->pagamenti_a = $vars['data_fine'];
                 $determina->data = $vars['data_determina'];
+                $determina->non_ordinaria = isset($getVars['escludiNuovoMese']);
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
                 $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null);

@@ -9,9 +9,12 @@ use Yii;
  *
  * @property int $id
  * @property string|null $numero
+ * @property string|null $pagamenti_da
+ * @property string|null $pagamenti_a
  * @property string|null $data
  * @property float|null $importo
  * @property boolean $storico
+ * @property boolean $non_ordinaria
  * @property string|null $descrizione
  *
  * @property DeterminaGruppoPagamento[] $determinaGruppoPagamentos
@@ -39,9 +42,9 @@ class Determina extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['data'], 'safe'],
+            [['data','pagamenti_da','pagamenti_a'], 'safe'],
             [['descrizione'], 'string'],
-            [['storico'], 'boolean'],
+            [['storico','non_ordinaria'], 'boolean'],
             [['importo'], 'number'],
             [['numero'], 'string', 'max' => 10],
         ];
@@ -56,8 +59,11 @@ class Determina extends \yii\db\ActiveRecord
             'id' => 'ID',
             'numero' => 'Numero',
             'data' => 'Data',
+            'pagamenti_da' => 'Pagamenti Da',
+            'pagamenti_a' => 'Pagamenti A',
             'importo' => 'Importo',
             'storico' => 'Storico',
+            'non_ordinaria' => 'Non Ordinaria',
             'descrizione' => 'Descrizione',
         ];
     }
