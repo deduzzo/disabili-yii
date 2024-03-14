@@ -327,8 +327,8 @@ class SiteController extends Controller
                         {
                             $ultimoContoValidoAttivato->attivo = 0;
                             $ultimoContoValidoAttivato->data_disattivazione = date('Y-m-d');
-                            $conto->attivo = 1;
-                            $conto->data_validazione = 1;
+                            $conto->validato = 1;
+                            $conto->data_validazione = date('Y-m-d');
                             $conto->save();
                             $ultimoContoValidoAttivato->save();
                         }
