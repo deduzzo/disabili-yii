@@ -534,22 +534,28 @@ class Istanza extends \yii\db\ActiveRecord
         }
         else {
             $dataDetermina = $determina->data;
-            $inizioMese = Carbon::createFromDate($dataDetermina)->startOfMonth()->format('Y-m-d');
+            $inizioMese = $determina->pagamenti_da;
             $fineMese = Carbon::createFromDate($dataDetermina)->endOfMonth()->format('Y-m-d');
         }
             $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
         $logico = 0;
         $reale = 0;
+        $ibanLogico = null;
+        $ibanReale = null;
         if ($this->attivo && count($movimentiIstanzaMese) === 0 && !$this->haRicoveriInCorso() && !$determina->non_ordinaria)
             $logico = ($this->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         foreach ($movimentiIstanzaMese as $movimento) {
             if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita) {
-                if (!$movimento->tornato_indietro)
+                if (!$movimento->tornato_indietro) {
                     $reale += $movimento->importo;
-            } else
+                    $ibanReale = $movimento->conto->iban;
+                }
+            } else {
                 $logico += $movimento->importo;
+                $ibanLogico = $movimento->conto->iban;
+            }
         }
-        return $reale - $logico;
+        return ['contoOk' => ($ibanReale === $ibanLogico), 'tot' => (($reale >0 || $logico > $reale) ? ($reale - $logico) : 0)];
     }
 
     public function finalizzaMensilita($idDetermina,$pagaMeseCorrente = true)

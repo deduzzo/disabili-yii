@@ -368,6 +368,7 @@ class DeterminaController extends \yii\web\Controller
                         ->andWhere(['m.is_movimento_bancario' => true])->andWhere(['m.id_gruppo_pagamento' => $gruppo->id_gruppo])->all();
                     $istanzePagate = array_merge($istanzePagate, $allIstanzeGruppo);
                 }
+
                 $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
                     ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
                     ->andWhere(['i.attivo' => true])->andWhere(['not in', 'i.id', $istanzePagate])
@@ -380,12 +381,18 @@ class DeterminaController extends \yii\web\Controller
                 $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
                 // remove duplicates from $allIstanze
             }
+            $allIstanzeAttiveContoDaValidare = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
+                ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
+                ->andWhere(['i.attivo' => true])->andWhere(['c.validato' => false,'c.attivo' => true])->all();
+            $allIstanze = array_merge($allIstanze, $allIstanzeAttiveContoDaValidare);
+
             $allIstanze = array_map("unserialize", array_unique(array_map("serialize", $allIstanze)));
             $errori = false;
+            $warning = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']), $idDetermina);
-                if ($tempResult != 0.0) {
+                if ($tempResult['tot'] != 0.0) {
                     $errori = true;
                     $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), ['title' => Yii::t('yii', 'Vai alla scheda'),
                             'class' => 'btn btn-icon btn-sm btn-primary',
@@ -393,13 +400,26 @@ class DeterminaController extends \yii\web\Controller
                         . "</div><div class='col-md-3'>" . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
                         . "</div><div class='col-md-1'>" . $istanza->distretto->nome
-                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge " . ($tempResult > 0 ? 'bg-success' : 'bg-danger')
-                        . "'>" . ($tempResult > 0 ? ("+" . $tempResult) : $tempResult)
+                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge " . ($tempResult['tot'] > 0 ? 'bg-success' : 'bg-danger')
+                        . "'>" . ($tempResult['tot'] > 0 ? ("+" . $tempResult['tot']) : $tempResult['tot'])
                         . "</span></div><div class='col-md-5'></div>";
                 }
+                /*if ($tempResult['contoOk'] === false) {
+                    $warning = true;
+                    $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), ['title' => Yii::t('yii', 'Vai alla scheda'),
+                            'class' => 'btn btn-icon btn-sm btn-primary',
+                            'target' => '_blank',])
+                        . "</div><div class='col-md-3'>" . $istanza->anagraficaDisabile->cognome
+                        . " " . $istanza->anagraficaDisabile->nome
+                        . "</div><div class='col-md-1'>" . $istanza->distretto->nome
+                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge bg-warning'>Cambio IBAN non effettuato</span>"
+                        . "</span></div><div class='col-md-5'></div>";
+                }*/
             }
             if (!$errori)
                 $result .= "<div class='col-md-12'>🆗Tutto ok! ✔️</div>";
+            if (!$warning)
+                $result .= "<div class='col-md-12'>🆗Nessun warning! ✔️</div>";
             $result .= "</div>";
         }
         $ibanRipetuti = [];
