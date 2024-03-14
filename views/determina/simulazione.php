@@ -352,19 +352,21 @@ if (!isset($soloVariazioni)) {
                     ],
                 ]); ?>
             </div>
-            <div class="col-md-12">
-                <?= Select2::widget([
-                    'name' => 'singoleIstanze',
-                    'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo(), 'id', 'nominativo'),
-                    'value' => ArrayHelper::getColumn($singoleIstanze, 'id'),
-                    'options' => ['placeholder' => 'Singole istanze ...'],
-                    'pluginOptions' => [
-                        'allowClear' => true,
-                        'multiple' => true,
-                        'class' => 'form-control'
-                    ],
-                ]); ?>
-            </div>
+            <?php if (isset($singoleIstanze)): ?>
+                <div class="col-md-12">
+                    <?= Select2::widget([
+                        'name' => 'singoleIstanze',
+                        'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo(), 'id', 'nominativo'),
+                        'value' => ArrayHelper::getColumn($singoleIstanze, 'id'),
+                        'options' => ['placeholder' => 'Singole istanze ...'],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                            'multiple' => true,
+                            'class' => 'form-control'
+                        ],
+                    ]); ?>
+                </div>
+            <?php endif; ?>
             <?php if (!$soloVisualizzazione): ?>
                 <div class="col-md-12" style="text-align: center;">
                     <div class="form-check form-check-inline">
