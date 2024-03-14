@@ -99,7 +99,7 @@ if (!isset($soloVariazioni)) {
                             <div class="divider-text">Istanze</div>
                         </div>
                     </div>
-                    <?php if ($singoleIstanze): ?>
+                    <?php if (isset($singoleIstanze)): ?>
                         <div class="col-md-12">
                             <?php
                             foreach ($singoleIstanze as $si) {
