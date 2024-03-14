@@ -99,15 +99,17 @@ if (!isset($soloVariazioni)) {
                             <div class="divider-text">Istanze</div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <?php
-                        foreach ($singoleIstanze as $si) {
-                            echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . ($si->id .' - '.$si->anagraficaDisabile->cognome . ' '.$si->anagraficaDisabile->nome). "</span>";
-                        }
-                        // input type hidden of $singoleIstanze
-                        echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze, 'id')));
-                        ?>
-                    </div>
+                    <?php if ($singoleIstanze): ?>
+                        <div class="col-md-12">
+                            <?php
+                            foreach ($singoleIstanze as $si) {
+                                echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . ($si->id . ' - ' . $si->anagraficaDisabile->cognome . ' ' . $si->anagraficaDisabile->nome) . "</span>";
+                            }
+                            // input type hidden of $singoleIstanze
+                            echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze, 'id')));
+                            ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="col-md-12">
                         <div class="divider">
                             <div class="divider-text">Dati Determina</div>
@@ -139,10 +141,10 @@ if (!isset($soloVariazioni)) {
                         <textarea class="form-control" name="descrizione" id="descrizione" rows="3"></textarea>
                     </div>
                     <?php if (!$soloVisualizzazione): ?>
-                    <div class="col-md-12" style="margin-top: 5px">
-                        <input type="hidden" name="escludiNuovoMese" value="<?= $escludiNuovoMese ?>">
-                        <?= "Escludi mese corrente (paga solo positivi) :<b> ".($escludiNuovoMese === "on" ? "SI" : "NO")."</b>" ?>
-                    </div>
+                        <div class="col-md-12" style="margin-top: 5px">
+                            <input type="hidden" name="escludiNuovoMese" value="<?= $escludiNuovoMese ?>">
+                            <?= "Escludi mese corrente (paga solo positivi) :<b> " . ($escludiNuovoMese === "on" ? "SI" : "NO") . "</b>" ?>
+                        </div>
                     <?php else: ?>
                         <div class="col-md-12" style="margin-top: 5px"></div>
                     <?php endif; ?>
@@ -353,7 +355,7 @@ if (!isset($soloVariazioni)) {
             <div class="col-md-12">
                 <?= Select2::widget([
                     'name' => 'singoleIstanze',
-                    'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo() , 'id', 'nominativo'),
+                    'data' => ArrayHelper::map(Istanza::getAllIstanzeAttiveIdNominativo(), 'id', 'nominativo'),
                     'value' => ArrayHelper::getColumn($singoleIstanze, 'id'),
                     'options' => ['placeholder' => 'Singole istanze ...'],
                     'pluginOptions' => [
@@ -394,7 +396,8 @@ if (!isset($soloVariazioni)) {
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" role="switch" name="escludiNuovoMese"
                                id="escludiNuovoMese" <?= $escludiNuovoMese == "on" ? "checked" : "" ?>>
-                        <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente (paga solo positivi)</b></label>
+                        <label class="form-check-label text-danger bold" for="escludiNuovoMese"><b>Escludi mese corrente
+                                (paga solo positivi)</b></label>
                     </div>
                 </div>
             <?php else: ?>
