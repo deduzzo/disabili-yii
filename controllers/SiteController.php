@@ -299,7 +299,7 @@ class SiteController extends Controller
                     }
                     if ($istanze && count($istanze) === 1) {
                         $istanza = $istanze[0];
-                        $ultimoConto = $istanza->getContoValido();
+
                         $iban = $newRow[$header[PagamentiConIban::IBAN1]] . $newRow[$header[PagamentiConIban::IBAN2]] . $newRow[$header[PagamentiConIban::IBAN3]] . $newRow[$header[PagamentiConIban::IBAN4]] . $newRow[$header[PagamentiConIban::IBAN5]] . $newRow[$header[PagamentiConIban::IBAN6]];
                         if ($iban === "")
                             $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
@@ -311,6 +311,7 @@ class SiteController extends Controller
                                 $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
                             $conto->iban = $iban;
                             $conto->attivo = 1;
+                            $conto->validato = 1;
                             $conto->save();
                             if ($conto->errors)
                                 $errors = array_merge($errors, ['conto' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $conto->errors]);
@@ -321,14 +322,15 @@ class SiteController extends Controller
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
-                        if ($conto && $conto->id !== $ultimoConto->id)
+                        $ultimoContoValidoAttivato = $istanza->getUltimoContoAttivoValidato();
+                        if ($iban !== $ultimoContoValidoAttivato->iban)
                         {
-                                $ultimoConto->attivo = 0;
-                                $ultimoConto->data_disattivazione = date('Y-m-d');
-                                $conto->attivo = 1;
-                                $conto->data_validazione = 1;
-                                $conto->save();
-                                $ultimoConto->save();
+                            $ultimoContoValidoAttivato->attivo = 0;
+                            $ultimoContoValidoAttivato->data_disattivazione = date('Y-m-d');
+                            $conto->attivo = 1;
+                            $conto->data_validazione = 1;
+                            $conto->save();
+                            $ultimoContoValidoAttivato->save();
                         }
                         //$istanza->invalidaContiNonValidati();
                         $movimento = new Movimento();
