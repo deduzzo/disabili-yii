@@ -99,7 +99,7 @@ if (!isset($soloVariazioni)) {
                             <div class="divider-text">Istanze</div>
                         </div>
                     </div>
-                    <?php if (isset($singoleIstanze)): ?>
+                    <?php if (!$soloVisualizzazione): ?>
                         <div class="col-md-12">
                             <?php
                             foreach ($singoleIstanze as $si) {
@@ -352,7 +352,7 @@ if (!isset($soloVariazioni)) {
                     ],
                 ]); ?>
             </div>
-            <?php if (isset($singoleIstanze)): ?>
+            <?php if (!$soloVisualizzazione): ?>
                 <div class="col-md-12">
                     <?= Select2::widget([
                         'name' => 'singoleIstanze',
