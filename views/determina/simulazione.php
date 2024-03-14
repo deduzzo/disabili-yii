@@ -177,7 +177,7 @@ if (!isset($soloVariazioni)) {
                             <div class="divider-text" style="margin-bottom:10px">Dati storici</div>
                             <?= Html::beginForm('', 'get', ['class' => 'form-inline']) ?>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="mese" class="form-label">Seleziona Mese</label>
                                     <select class="form-select" id="mese" name="mese">
                                         <?php
@@ -203,7 +203,7 @@ if (!isset($soloVariazioni)) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <label for="anno" class="form-label">Seleziona Anno</label>
                                     <select class="form-select" id="anno" name="anno">
                                         <option selected>Scegli...</option>
@@ -213,7 +213,7 @@ if (!isset($soloVariazioni)) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-7">
                                     <?= Html::dropDownList(
                                         'idDetermina',
                                         null,
