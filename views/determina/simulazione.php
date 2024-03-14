@@ -1,6 +1,7 @@
 <?php
 
 use app\components\ExportWidget;
+use app\models\Determina;
 use app\models\Distretto;
 use app\models\enums\IseeType;
 use app\models\Gruppo;
@@ -212,7 +213,15 @@ if (!isset($soloVariazioni)) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-12">
+                                    <?= Html::dropDownList(
+                                        'idDetermina',
+                                        null,
+                                        Determina::getAllDetermineMap(),
+                                        ['prompt' => 'Selezionare la determina..','class' => 'form-select', 'style' => 'margin-top: 30px']
+                                    ); ?>
+                                </div>
+                                <div class="col-md-12">
                                     <!-- button submit -->
                                     <?= Html::submitButton('Mostra dati', ['class' => 'btn btn-primary', 'style' => 'margin-top: 30px', 'name' => "submit"]) ?>
                                 </div>
