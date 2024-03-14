@@ -308,7 +308,7 @@ class DeterminaController extends \yii\web\Controller
                 $determina->pagamenti_da = $vars['data_inizio'];
                 $determina->pagamenti_a = $vars['data_fine'];
                 $determina->data = $vars['data_determina'];
-                $determina->non_ordinaria = isset($getVars['escludiNuovoMese']);
+                $determina->non_ordinaria = isset($vars['escludiNuovoMese']);
                 $determina->descrizione = "Pagamento mensilità da " . $vars['data_inizio'] . " a " . $vars['data_fine'] . " - " . $vars['descrizione'];
                 $determina->save();
                 $this->actionIndex(false, $determina->id, $vars['escludiNuovoMese'] ?? null, Json::decode($vars['distretti']) ?? null, Json::decode($vars['gruppi']) ?? null, Json::decode($vars['singoleIstanze']) ?? null);
@@ -404,7 +404,7 @@ class DeterminaController extends \yii\web\Controller
                         . "'>" . ($tempResult['tot'] > 0 ? ("+" . $tempResult['tot']) : $tempResult['tot'])
                         . "</span></div><div class='col-md-5'></div>";
                 }
-                /*if ($tempResult['contoOk'] === false) {
+                if ($tempResult['contoOk'] === false) {
                     $warning = true;
                     $result .= "<div class='col-md-1'>❌ #" . $istanza->id . "</div><div class='col-md-1'>" . Html::a('<i class="fa fa-solid fa-eye" style="color: #ffffff;"></i>', Url::toRoute(['istanza/scheda', 'id' => $istanza->id]), ['title' => Yii::t('yii', 'Vai alla scheda'),
                             'class' => 'btn btn-icon btn-sm btn-primary',
@@ -412,9 +412,9 @@ class DeterminaController extends \yii\web\Controller
                         . "</div><div class='col-md-3'>" . $istanza->anagraficaDisabile->cognome
                         . " " . $istanza->anagraficaDisabile->nome
                         . "</div><div class='col-md-1'>" . $istanza->distretto->nome
-                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge bg-warning'>Cambio IBAN non effettuato</span>"
+                        . "</div><div class='col-md-1'><span style='margin-left:20px' class='badge bg-warning'>IBAN diverso</span>"
                         . "</span></div><div class='col-md-5'></div>";
-                }*/
+                }
             }
             if (!$errori)
                 $result .= "<div class='col-md-12'>🆗Tutto ok! ✔️</div>";

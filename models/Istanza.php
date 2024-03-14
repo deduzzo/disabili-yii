@@ -62,7 +62,7 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($istanzeAttive as $istanza) {
             $contoValido = $istanza->getContoValido();
             if (!$contoValido && !$istanza->haRicoveriInCorso()) {
-                $out.= "<div><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO</div><br />";
+                $out .= "<div><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO</div><br />";
             }
         }
         return $out;
@@ -325,13 +325,14 @@ class Istanza extends \yii\db\ActiveRecord
     public function getContoValido()
     {
         $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
-        if (!$conto && $this->haCambioIbanInCorso())
+        if (!$conto || $this->haCambioIbanInCorso())
             return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->one();
         else
             return $conto;
     }
 
-    public function haContoValido() {
+    public function haContoValido()
+    {
         return $this->getContoValido() !== null || $this->haCambioIbanInCorso();
     }
 
@@ -358,38 +359,39 @@ class Istanza extends \yii\db\ActiveRecord
             return $this->anagraficaDisabile->cognome_nome;
     }
 
-    public function getGiorniResiduoDecesso() {
+    public function getGiorniResiduoDecesso()
+    {
         $ultimoMovimentoBancario = $this->getLastMovimentoBancario();
-        $dataUltimoMovimentoBancario = $ultimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d',$ultimoMovimentoBancario->data)->endOfMonth()->format('Y-m-d') : null;
+        $dataUltimoMovimentoBancario = $ultimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d', $ultimoMovimentoBancario->data)->endOfMonth()->format('Y-m-d') : null;
         // add one day to $dataUltimoMovimentoBancario
-        $giornoDopoDataUltimoPagamento = $dataUltimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d',$dataUltimoMovimentoBancario)->addDay()->format('Y-m-d') : null;
+        $giornoDopoDataUltimoPagamento = $dataUltimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d', $dataUltimoMovimentoBancario)->addDay()->format('Y-m-d') : null;
         $dataInizioDovuta = $giornoDopoDataUltimoPagamento ?? $this->gruppo->data_inizio_beneficio;
         $movimentiTornatiIndietro = $this->getPagamentiTornatiIndietro($dataUltimoMovimentoBancario);
         $restituire = false;
         if (Carbon::createFromFormat('Y-m-d', $dataInizioDovuta)->isAfter(Carbon::createFromFormat('Y-m-d', $this->data_decesso)) && $dataUltimoMovimentoBancario)
             $restituire = true;
         // add une day to $this->data_decesso
-        $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : Carbon::createFromFormat('Y-m-d', $this->data_decesso)->addDay()->format('Y-m-d'),!$restituire? $this->data_decesso: $dataInizioDovuta,true);
+        $totaleGiorniDovuti = Utils::getNumGiorni(!$restituire ? $dataInizioDovuta : Carbon::createFromFormat('Y-m-d', $this->data_decesso)->addDay()->format('Y-m-d'), !$restituire ? $this->data_decesso : $dataInizioDovuta, true);
         if ($totaleGiorniDovuti === null)
             return 0;
-        $totale =  ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
+        $totale = ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
         return ($restituire ? -$totale : $totale);
     }
 
     public function getLastMovimentoBancario($data = null)
     {
         if (!$data)
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => false])->orderBy(['periodo_a' => SORT_DESC])->one();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true, 'tornato_indietro' => false])->orderBy(['periodo_a' => SORT_DESC])->one();
         else
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => false])->andWhere(['=', 'data', $data])->one();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true, 'tornato_indietro' => false])->andWhere(['=', 'data', $data])->one();
     }
 
     public function getPagamentiTornatiIndietro($afterDate = null)
     {
         if (!$afterDate)
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => true])->orderBy(['periodo_a' => SORT_DESC])->all();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true, 'tornato_indietro' => true])->orderBy(['periodo_a' => SORT_DESC])->all();
         else
-            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true,'tornato_indietro' => true])->andWhere(['>=', 'data', $afterDate])->all();
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => true, 'tornato_indietro' => true])->andWhere(['>=', 'data', $afterDate])->all();
     }
 
     public function cancellaMovimentiCollegati()
@@ -441,7 +443,7 @@ class Istanza extends \yii\db\ActiveRecord
         $haOmonimi = $this->haOmonimi();
         $op = $alert ?? (($prossimoImporto <= 0.0 || !$this->attivo) ? 'ELIMINARE<br /> PROSSIMO IMPORTO 0'
             : ($differenza != 0.0 ? ($lastMovimento !== null ? "AGGIORNARE IMPORTO" : "AGGIUNGERE <br />AGGIORNARE IMPORTO") : "")) .
-        ($hacambioiban ? ("<br />VERIFICARE CAMBIO IBAN finale ". $this->finaleContoDaValidare()) : "") ;
+        ($hacambioiban ? ("<br />VERIFICARE CAMBIO IBAN finale " . $this->finaleContoDaValidare()) : "");
         if ($op !== null && $op !== "" && $haOmonimi)
             $op .= "<br />ATTENZIONE! OMONIMI NEL DISTRETTO";
         return [
@@ -456,7 +458,8 @@ class Istanza extends \yii\db\ActiveRecord
         ];
     }
 
-    public function finaleContoDaValidare() {
+    public function finaleContoDaValidare()
+    {
         $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->one();
         // if exist return the latest 6 digit of $conto->iban
         return $conto ? substr($conto->iban, -6) : null;
@@ -526,39 +529,54 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
-    public function verificaContabilitaMese($mese, $anno,$determina = null)
+    public function verificaContabilitaMese($mese, $anno, $determina = null)
     {
         if (!$determina) {
             $inizioMese = Carbon::createFromDate($anno, $mese, 1)->format('Y-m-d');
             $fineMese = Carbon::create($inizioMese)->endOfMonth()->format('Y-m-d');
-        }
-        else {
+        } else {
             $dataDetermina = $determina->data;
             $inizioMese = $determina->pagamenti_da;
             $fineMese = Carbon::createFromDate($dataDetermina)->endOfMonth()->format('Y-m-d');
         }
-            $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
+        $movimentiIstanzaMese = Movimento::find()->innerJoin('conto c', 'c.id = movimento.id_conto')->where(['c.id_istanza' => $this->id])->andWhere(['>=', 'movimento.data', $inizioMese])->andWhere(['<=', 'movimento.data', $fineMese])->all();
         $logico = 0;
         $reale = 0;
         $ibanLogico = null;
         $ibanReale = null;
+        $utimaDataLogica = null;
+        $ultimaDataReale = null;
         if ($this->attivo && count($movimentiIstanzaMese) === 0 && !$this->haRicoveriInCorso() && !$determina->non_ordinaria)
             $logico = ($this->getLastIseeType() === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
         foreach ($movimentiIstanzaMese as $movimento) {
             if ($movimento->is_movimento_bancario && $movimento->escludi_contabilita) {
                 if (!$movimento->tornato_indietro) {
+                    if (!$ultimaDataReale)
+                        $ultimaDataReale = $movimento->data;
+                    if (Carbon::createFromFormat('Y-m-d', $movimento->data)->isAfter(Carbon::createFromFormat('Y-m-d', $ultimaDataReale))) {
+                        $ultimaDataReale = $movimento->data;
+                        $ibanReale = $movimento->conto->iban;
+                    }
                     $reale += $movimento->importo;
-                    $ibanReale = $movimento->conto->iban;
                 }
             } else {
+                if (!$utimaDataLogica)
+                    $utimaDataLogica = $movimento->data;
+                if (Carbon::createFromFormat('Y-m-d', $movimento->data)->isAfter(Carbon::createFromFormat('Y-m-d', $utimaDataLogica))) {
+                    $utimaDataLogica = $movimento->data;
+                    $ibanLogico = $movimento->conto->iban;
+                }
                 $logico += $movimento->importo;
-                $ibanLogico = $movimento->conto->iban;
             }
         }
-        return ['contoOk' => ($ibanReale === $ibanLogico), 'tot' => (($reale >0 || $logico > $reale) ? ($reale - $logico) : 0)];
+        $contoOk = true;
+        if (($determina->non_ordinaria && ($reale - $logico != 0)) || !$determina->non_ordinaria)
+            $contoOk = $ibanReale === $ibanLogico;
+
+        return ['contoOk' =>  $contoOk, 'tot' => (($reale > 0 || $logico > $reale) ? ($reale - $logico) : 0)];
     }
 
-    public function finalizzaMensilita($idDetermina,$pagaMeseCorrente = true)
+    public function finalizzaMensilita($idDetermina, $pagaMeseCorrente = true)
     {
         $errors = [];
         if (!$this->haRicoveriInCorso()) {
@@ -718,7 +736,7 @@ class Istanza extends \yii\db\ActiveRecord
                 if ($this->anagraficaDisabile->getEta() < 18)
                     return IseeType::MINORE_25K;
                 else
-                    return  IseeType::NO_ISEE;
+                    return IseeType::NO_ISEE;
         }
     }
 
@@ -726,13 +744,14 @@ class Istanza extends \yii\db\ActiveRecord
     {
         // SELECT ISTANZE WITH SAME NAME AND COGNOME AND DIFFERENT ID
         return (new Query())->select('id_anagrafica_disabile')
-            ->from('istanza i, anagrafica a')->where('i.id_anagrafica_disabile = a.id')
+                ->from('istanza i, anagrafica a')->where('i.id_anagrafica_disabile = a.id')
                 ->andWhere(['!=', 'i.id', $this->id])->andWhere(['i.attivo' => 1])
                 ->andWhere(['a.cognome' => $this->anagraficaDisabile->cognome, 'a.nome' => $this->anagraficaDisabile->nome])
-                ->andWhere(['i.id_distretto' => $this->id_distretto])->count() >0;
+                ->andWhere(['i.id_distretto' => $this->id_distretto])->count() > 0;
     }
 
-    public function inChiusura() {
+    public function inChiusura()
+    {
         return (!$this->chiuso && $this->data_chiusura !== null);
     }
 }
