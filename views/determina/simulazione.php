@@ -101,11 +101,11 @@ if (!isset($soloVariazioni)) {
                     </div>
                     <div class="col-md-12">
                         <?php
-                        foreach ($singoleIstanze ?? [] as $si) {
+                        foreach ($singoleIstanze as $si) {
                             echo "<span class='badge bg-primary badge-pill badge-round ms-2'>" . ($si->id .' - '.$si->anagraficaDisabile->cognome . ' '.$si->anagraficaDisabile->nome). "</span>";
                         }
                         // input type hidden of $singoleIstanze
-                        echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze ?? [], 'id')));
+                        echo Html::hiddenInput('singoleIstanze', json_encode(ArrayHelper::getColumn($singoleIstanze, 'id')));
                         ?>
                     </div>
                     <div class="col-md-12">

@@ -188,7 +188,7 @@ class DeterminaController extends \yii\web\Controller
                 'soloRecuperi' => $soloRecuperi,
                 'escludiNuovoMese' => $escludiNuovoMese,
                 'distretti' => $distretti,
-                'singoleIstanze' => $singoleIstanze,
+                'singoleIstanze' => $singoleIstanze ?? [],
                 'gruppi' => $gruppi,
                 'title' => "Simulazione prossima determina",
                 'stats' => [
