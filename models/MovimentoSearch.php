@@ -61,6 +61,7 @@ class MovimentoSearch extends Movimento
                     'id' => SORT_ASC, // or SORT_ASC for ascending
                 ],
                 'attributes' => [
+                    'id',
                     'periodo_da',
                     'importo',
                     'is_movimento_bancario',
