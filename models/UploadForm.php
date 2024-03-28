@@ -172,7 +172,7 @@ class UploadForm extends Model
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
-                        if ($iban !== $ultimoContoValidoAttivato->iban)
+                        if ($ultimoContoValidoAttivato && $iban !== $ultimoContoValidoAttivato->iban)
                         {
                             $ultimoContoValidoAttivato->attivo = 0;
                             $ultimoContoValidoAttivato->data_disattivazione = date('Y-m-d');
