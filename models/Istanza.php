@@ -535,6 +535,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function verificaContabilitaMese($mese, $anno, $determina = null)
     {
+        die ($anno." ".$mese);
         if (!$determina) {
             $inizioMese = Carbon::createFromDate($anno, $mese, 1)->format('Y-m-d');
             $fineMese = Carbon::create($inizioMese)->endOfMonth()->format('Y-m-d');
