@@ -332,12 +332,13 @@ class DeterminaController extends \yii\web\Controller
         $ultimoPagamento = Movimento::getDataUltimoPagamento();
         $mese = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->month;
         $anno = null; // Carbon::createFromFormat('Y-m-d', $ultimoPagamento)->year;
-        $idDetermina = null;
         $minGruppoPagato = 0;
         if (((isset($vars['mese']) && isset($vars['anno'])) || isset($vars['idDetermina'])) && isset($vars['submit'])) {
             $mese = $vars['mese'];
             $anno = $vars['anno'];
             $idDetermina = $vars['idDetermina'];
+            if ($idDetermina === "")
+                $idDetermina = null;
             $result = "<div class='row'>";
             //$ultimoPagamento = Movimento::getDataUltimoPagamento();
             if ($idDetermina)
@@ -391,8 +392,6 @@ class DeterminaController extends \yii\web\Controller
             $warning = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
-                if ($idDetermina === "")
-                    die("Errore: determina non trovata");
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']), $idDetermina);
                 if ($tempResult['tot'] != 0.0) {
                     $errori = true;
