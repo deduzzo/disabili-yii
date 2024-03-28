@@ -391,6 +391,7 @@ class DeterminaController extends \yii\web\Controller
             $warning = false;
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
+                die($idDetermina);
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']), $idDetermina);
                 if ($tempResult['tot'] != 0.0) {
                     $errori = true;
