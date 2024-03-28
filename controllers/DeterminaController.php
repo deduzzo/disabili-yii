@@ -392,7 +392,7 @@ class DeterminaController extends \yii\web\Controller
             foreach ($allIstanze as $istanza) {
                 $istanza = Istanza::findOne($istanza['id']);
                 if ($idDetermina === null)
-                    die "no";
+                    die("Errore: determina non trovata");
                 $tempResult = $istanza->verificaContabilitaMese(intval($vars['mese']), intval($vars['anno']), $idDetermina);
                 if ($tempResult['tot'] != 0.0) {
                     $errori = true;
