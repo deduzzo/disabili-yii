@@ -574,7 +574,7 @@ class Istanza extends \yii\db\ActiveRecord
             }
         }
         $contoOk = true;
-        if (isset($determina->non_ordinaria) && ($determina->non_ordinaria && ($reale - $logico != 0)) || !$determina->non_ordinaria)
+        if (isset($determina->non_ordinaria) && (($determina->non_ordinaria && ($reale - $logico != 0)) || !$determina->non_ordinaria))
             $contoOk = $ibanReale === $ibanLogico;
 
         return ['contoOk' =>  $contoOk, 'tot' => (($reale > 0 || $logico > $reale) ? ($reale - $logico) : 0)];
