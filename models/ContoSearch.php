@@ -71,8 +71,8 @@ class ContoSearch extends Conto
         $query->andFilterWhere(['like', 'iban', $this->iban])
             ->andFilterWhere(['like', 'note', $this->note]);
 
-        // order by data_creazione
-        $query->orderBy(['data_creazione' => SORT_DESC]);
+        // order by: first the attivo = true and validato = false, than the active conti, then the inactive ordered by data_disattivazione
+        $query->orderBy(['attivo' => SORT_DESC, 'validato' => SORT_ASC, 'data_disattivazione' => SORT_DESC]);
 
         return $dataProvider;
     }
