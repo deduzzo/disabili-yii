@@ -58,7 +58,9 @@ class MovimentoSearch extends Movimento
             ],
             'sort' => [
                 'defaultOrder' => [
-                    'data' => SORT_DESC, // or SORT_ASC for ascending
+                    // order by data and secondarily by id
+                    'data' => SORT_DESC,
+                    'id' => SORT_DESC,
                 ],
                 'attributes' => [
                     'id',
