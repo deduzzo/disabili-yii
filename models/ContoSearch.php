@@ -72,7 +72,7 @@ class ContoSearch extends Conto
             ->andFilterWhere(['like', 'note', $this->note]);
 
         // order by: first the attivo = true and validato = false, than the active conti, then the inactive ordered by data_disattivazione
-        $query->orderBy(['attivo' => SORT_DESC, 'validato' => SORT_ASC, 'data_disattivazione' => SORT_DESC]);
+        $query->orderBy(['attivo' => SORT_DESC, 'id' => SORT_ASC]);
 
         return $dataProvider;
     }
