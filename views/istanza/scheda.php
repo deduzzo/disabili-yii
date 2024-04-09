@@ -442,13 +442,12 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             if (document.getElementById("stato-chiuso").checked)
                 document.getElementById("stato-nonattivo").checked = true;
+            document.getElementById("data-chiusura").disabled = !document.getElementById("rinuncia").checked && !document.getElementById("stato-chiuso").checked;
             // if data-chiusura is enabled and value is empty, set the value to today
             if (!document.getElementById("data-chiusura").disabled && document.getElementById("data-chiusura").value === "")
                 document.getElementById("data-chiusura").value = new Date().toISOString().split('T')[0];
             else
                 document.getElementById("data-chiusura").value = "";
-
-            document.getElementById("data-chiusura").disabled = !document.getElementById("rinuncia").checked && !document.getElementById("stato-chiuso").checked;
         }
 
         function decedutoCheck() {
@@ -456,6 +455,10 @@ $this->params['breadcrumbs'][] = $this->title;
             document.getElementById("data-decesso").disabled = !document.getElementById("deceduto").checked;
             document.getElementById("liquidazione-decesso-completata").disabled = !document.getElementById("deceduto").checked;
             document.getElementById("data-liquidazione").disabled = !document.getElementById("liquidazione-decesso-completata").checked || !document.getElementById("deceduto").checked;
+            if (!document.getElementById("data-liquidazione").disabled && document.getElementById("data-liquidazione").value === "")
+                document.getElementById("data-liquidazione").value = new Date().toISOString().split('T')[0];
+            else
+                document.getElementById("data-liquidazione").value = "";
             if (!document.getElementById("deceduto").checked)
                 document.getElementById("liquidazione-decesso-completata").checked = document.getElementById("deceduto").checked;
             attivoCheck();
