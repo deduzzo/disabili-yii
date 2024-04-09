@@ -436,7 +436,7 @@ $this->params['breadcrumbs'][] = $this->title;
             if (document.getElementById("deceduto").checked) {
                 document.getElementById("stato-nonattivo").checked = true;
             }
-            if (document.getElementById("rinuncia").checked) {
+            if (document.getElementById("rinuncia").checked || document.getElementById("liquidazione-decesso-completata").checked) {
                 document.getElementById("stato-nonattivo").checked = true;
                 document.getElementById("stato-chiuso").checked = true;
             }
