@@ -533,6 +533,14 @@ class Istanza extends \yii\db\ActiveRecord
         return $out;
     }
 
+    public function getTotaleConguaglioDecesso() {
+        $giorniResiduo = $this->getGiorniResiduoDecesso();
+        if ($giorniResiduo === null)
+            return "-";
+        else
+            return $this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
+    }
+
     public function verificaContabilitaMese($mese, $anno, $determina = null)
     {
         if (!$determina) {

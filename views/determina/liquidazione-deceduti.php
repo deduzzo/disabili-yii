@@ -108,11 +108,7 @@ $checkboxColumn = [
     'columns' => array_merge($cols,    [[
         'label' => 'Importo a conguaglio',
         'value' => function ($model) {
-            $giorniResiduo = $model->getGiorniResiduoDecesso();
-            if ($giorniResiduo === null)
-                return "-";
-            else
-                return $model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
+            return $model->getTotaleConguaglioDecesso();
         }
     ]])
 ]) ?>
