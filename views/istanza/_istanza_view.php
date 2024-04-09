@@ -12,13 +12,13 @@ use yii\widgets\DetailView;
     'model' => $model,
     'options' => ['class' => 'table table-striped table-bordered detail-view small'],
     'attributes' => [
-        'data_inserimento:date',
         'riconosciuto:boolean',
         'data_firma_patto:date',
         'classe_disabilita',
         'attivo:boolean',
         'data_decesso',
         'liquidazione_decesso_completata:boolean',
+        'data_liquidazione_decesso:date',
         'chiuso:boolean',
     ],
 ]) ?>
