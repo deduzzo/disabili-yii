@@ -457,7 +457,7 @@ $this->params['breadcrumbs'][] = $this->title;
             document.getElementById("data-liquidazione").disabled = !document.getElementById("liquidazione-decesso-completata").checked || !document.getElementById("deceduto").checked;
             if (!document.getElementById("data-liquidazione").disabled && document.getElementById("data-liquidazione").value === "")
                 document.getElementById("data-liquidazione").value = new Date().toISOString().split('T')[0];
-            else
+            else if (document.getElementById("data-liquidazione").disabled)
                 document.getElementById("data-liquidazione").value = "";
             if (!document.getElementById("deceduto").checked)
                 document.getElementById("liquidazione-decesso-completata").checked = document.getElementById("deceduto").checked;
