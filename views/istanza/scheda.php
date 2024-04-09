@@ -445,6 +445,8 @@ $this->params['breadcrumbs'][] = $this->title;
             // if data-chiusura is enabled and value is empty, set the value to today
             if (!document.getElementById("data-chiusura").disabled && document.getElementById("data-chiusura").value === "")
                 document.getElementById("data-chiusura").value = new Date().toISOString().split('T')[0];
+            else
+                document.getElementById("data-chiusura").value = "";
 
             document.getElementById("data-chiusura").disabled = !document.getElementById("rinuncia").checked && !document.getElementById("stato-chiuso").checked;
         }
