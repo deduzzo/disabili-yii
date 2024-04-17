@@ -26,6 +26,7 @@ use app\models\Movimento;
 use app\models\Recupero;
 use app\models\Ricovero;
 use app\models\UploadForm;
+use app\models\User;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Google_Client;
@@ -221,6 +222,15 @@ class SiteController extends Controller
         return $this->render('upload', [
             'files' => $model,
         ]);
+    }
+
+    public function actionCreateUser() {
+        $user = new User();
+        $user->email = "mauro.mandolfino@asp.messina.it";
+        $user->username = "mauro.mandolfino";
+        $user->password_hash = Yii::$app->security->generatePasswordHash("Mauro1234.");
+        $user->auth_key = Yii::$app->security->generateRandomString();
+        $user->save();
     }
 
     public function actionErrore()
