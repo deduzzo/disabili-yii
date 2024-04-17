@@ -224,14 +224,14 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionCreateUser() {
+/*    public function actionCreateUser() {
         $user = new User();
         $user->email = "mauro.mandolfino@asp.messina.it";
         $user->username = "mauro.mandolfino";
         $user->password_hash = Yii::$app->security->generatePasswordHash("Mauro1234.");
         $user->auth_key = Yii::$app->security->generateRandomString();
         $user->save();
-    }
+    }*/
 
     public function actionErrore()
     {
