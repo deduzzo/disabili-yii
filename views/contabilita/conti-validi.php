@@ -13,6 +13,7 @@ use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var string $result */
+/** @var boolean $fix */
 
 
 $this->title = 'Verifica conti istanze attive';
@@ -24,7 +25,7 @@ $formatter = \Yii::$app->formatter;
             <div class="card-toolbar">
                 <!-- list of all new group names -->
                 <?php
-                $ok = \app\models\Istanza::verificaContiMancantiIstanzeAttive();
+                $ok = \app\models\Istanza::verificaContiMancantiIstanzeAttive($fix);
                 if ($ok === "")
                     echo "✔️Conti validi per tutte le istanze attive";
                 else
