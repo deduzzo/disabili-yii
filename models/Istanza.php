@@ -766,4 +766,23 @@ class Istanza extends \yii\db\ActiveRecord
     {
         return (!$this->chiuso && $this->data_chiusura !== null);
     }
+
+    public function getlastMovimentoContabile($data = null) {
+        if (!$data)
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => false, 'tornato_indietro' => false])->orderBy(['periodo_a' => SORT_DESC])->one();
+        else
+            return Movimento::find()->innerJoin('conto c', 'movimento.id_conto = c.id')->where(['c.id_istanza' => $this->id, 'movimento.is_movimento_bancario' => false, 'tornato_indietro' => false])->andWhere(['=', 'data', $data])->one();
+    }
+
+    public function fixConto() {
+        $ultimoMovimentoBancario = $this->getLastMovimentoBancario();
+        $ultimoMovimentoLogico = $this->getlastMovimentoContabile();
+        if ($ultimoMovimentoBancario && $ultimoMovimentoLogico) {
+            $conto = $ultimoMovimentoBancario->conto;
+            $ultimoMovimentoLogico->id_conto = $conto->id;
+            $ultimoMovimentoLogico->save();
+            $conto->attivo = true;
+            $conto->save();
+        }
+    }
 }

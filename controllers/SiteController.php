@@ -306,4 +306,10 @@ class SiteController extends Controller
 
     }
 
+    public function actionFix($idIstanza) {
+        $istanza = Istanza::findOne($idIstanza);
+        $istanza->fixConto();
+        echo ($idIstanza . " OK");
+    }
+
 }
