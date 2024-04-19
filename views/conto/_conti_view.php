@@ -53,7 +53,15 @@ echo GridView::widget([
             },
             'format' => 'raw',
         ],
-        'note',
+        [
+            'label' => "Dettagli e note",
+            'attribute' => 'note',
+            'value' => function ($model) {
+                return ($model->intestatario  && $model->intestatario !== "" ? ("Intestato a: ".$model->intestatario . "<br />") : "") .
+                    $model->note;
+            },
+            'format' => 'raw',
+        ],
     ],
     'emptyText' => 'Nessun movimento presente',
 
