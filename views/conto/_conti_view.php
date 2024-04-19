@@ -57,7 +57,7 @@ echo GridView::widget([
             'label' => "Dettagli e note",
             'attribute' => 'note',
             'value' => function ($model) {
-                return ($model->intestatario  && $model->intestatario !== "" ? ("Intestato a: ".$model->intestatario . "<br />") : "") .
+                return ($model->intestatario  && $model->intestatario !== "" ? ("<b>Intestato a:</b><br /> ".$model->intestatario . "<br />") : "") .
                     $model->note;
             },
             'format' => 'raw',
