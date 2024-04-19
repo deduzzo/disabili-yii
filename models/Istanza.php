@@ -64,7 +64,7 @@ class Istanza extends \yii\db\ActiveRecord
             if (!$contoValido && !$istanza->haRicoveriInCorso()) {
                 if ($fix)
                     $istanza->fixConto();
-                $out .= "<div><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO</div>".($fix ? "-> FIXATO OK" : " non fixato")."<br />";
+                $out .= "<div><b>#" . $istanza->id . " " . $istanza->getNominativoDisabile() . "</b> CON CONTO NON VALIDO".($fix ? "-> FIXATO OK" : " non fixato")."</div><br />";
             }
         }
         return $out;
