@@ -156,18 +156,16 @@ class UploadForm extends Model
                         if (!$conto) {
                             $conto = new Conto();
                             $conto->id_istanza = $istanza->id;
-                            if ($iban === "")
-                                $iban = $newRow[$header[PagamentiConIban::CODICE_FISCALE]];
                             $conto->iban = $iban;
                             $conto->attivo = 1;
                             $conto->validato = 1;
-                            $conto->save();
+                            $conto->data_validazione = date('Y-m-d');
                             $conto->save();
                             if ($conto->errors)
                                 $errors = array_merge($errors, ['conto' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $conto->errors]);
                             $contoCessionario = new ContoCessionario();
                             $contoCessionario->id_conto = $conto->id;
-                            $contoCessionario->attivo = 0;
+                            $contoCessionario->attivo = 1;
                             $contoCessionario->save();
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);

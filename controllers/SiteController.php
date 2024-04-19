@@ -121,7 +121,7 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-
+/*
     public function actionImport($importaElenchi = false, $importaFileParisi = false, $importaPagamenti = false, $append = true)
     {
         $attivo = false;
@@ -143,7 +143,7 @@ class SiteController extends Controller
             else if ($importaPagamenti)
                 $this->importaPagamenti($importaElenchi, $importaPagamenti);
         }
-    }
+    }*/
 
     /*    public function actionRicoveri() {
             $ricovero = new Ricovero();
