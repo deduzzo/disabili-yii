@@ -179,6 +179,11 @@ class UploadForm extends Model
                             $conto->save();
                             $ultimoContoValidoAttivato->save();
                         }
+                        if ($conto->attivo === 0)
+                        {
+                            $conto->attivo = 1;
+                            $conto->save();
+                        }
 
                         $movimentoExists = Movimento::find()->where(['id_conto' => $conto->id, 'periodo_da' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]), 'periodo_a' => Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]])])->one();
                         if ($movimentoExists)
