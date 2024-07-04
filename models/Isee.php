@@ -4,6 +4,10 @@ namespace app\models;
 
 use Yii;
 
+/*select insta1.id,an1.codice_fiscale, an1.nome, an1.cognome, dis.nome as distretto, isee.maggiore_25mila from istanza insta1, anagrafica an1, distretto dis, isee where insta1.id_distretto = dis.id AND insta1.chiuso = false AND insta1.attivo = true AND insta1.id_anagrafica_disabile = an1.id AND isee.id_istanza = insta1.id AND isee.valido = true AND insta1.id not in (
+    select distinct ista.id from anagrafica ana, istanza ista, isee i
+where ana.id = ista.id_anagrafica_disabile and ista.id = i.id_istanza and i.data_presentazione >= '2024-01-01' AND ista.chiuso = false AND i.valido = true)*/
+
 /**
  * This is the model class for table "isee".
  *
