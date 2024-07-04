@@ -423,11 +423,16 @@ if (!isset($soloVariazioni)) {
             <div class="divider-text">Operazioni</div>
         </div>
         <?= Html::endForm() ?>
+        <?php
+        $colExport = $soloVisualizzazione ?
+            ['distretto', 'cognomeNome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importo'] :
+            ['distretto', 'cf', 'cognome', 'nome', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'];
+        ?>
         <div class="col-md-8"><?= ExportWidget::widget([
                 'dataProvider' => new ArrayDataProvider([
                     'allModels' => $istanzeArray,
                 ]),
-                'columns' => ['distretto', 'cognome', 'nome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'],
+                'columns' => $colExport,
                 'postVars' => $_POST,
             ]) ?></div>
         <div class="col-md-4">
