@@ -19,6 +19,7 @@ class ExportWidget extends Widget
     public $columns;
     public $query;
     public $postVars;
+    public $serverSide = false;
 
     public function init()
     {
@@ -43,7 +44,7 @@ class ExportWidget extends Widget
         set_time_limit(0);
         // no memory limit
         ini_set('memory_limit', '-1');
-        if (Yii::$app->request->isPost && isset(Yii::$app->request->post()['exportWDG']) && Yii::$app->request->post()['exportWDG'] == 'true') {
+        if ($this->serverSide || (Yii::$app->request->isPost && isset(Yii::$app->request->post()['exportWDG']) && Yii::$app->request->post()['exportWDG'] == 'true')) {
             $query = Yii::$app->request->post()['query'] ?? '';
             $columns = $this->columns;
             if ($query !== "") {

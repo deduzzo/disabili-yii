@@ -381,9 +381,9 @@ class UploadForm extends Model
             foreach ($sheet->getRowIterator() as $idxRow => $row) {
                 try {
                     $newRow = [];
-                    if (count($header) === 0 && in_array(FileRicoveri::getLabel($colonnaDistretto), $newRow) && in_array(FileRicoveri::getLabel($colonnaCf), $newRow)) {
-                        foreach ($newRow as $idx => $cell)
-                            $header[$cell] = $idx;
+                    if (count($header) === 0) {
+                        foreach ($row->getCells() as $idxcel => $cel)
+                            $header[$idxcel] = $cel->getValue();
                     } else {
                         foreach ($row->getCells() as $idxcel => $cel) {
                             $newRow[$header[$idxcel]] = $cel->getValue();
@@ -404,6 +404,7 @@ class UploadForm extends Model
                 'allModels' => $out
             ]),
             'columns' => $header,
+            'serverSide' => true
         ]);
         return $widget->run();
     }
