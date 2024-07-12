@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\ExportWidget;
 use app\helpers\SepaParser;
 use app\helpers\Utils;
 use app\models\enums\DatiTipologia;
@@ -13,6 +14,7 @@ use Box\Spout\Reader\XLSX\Sheet;
 use Carbon\Carbon;
 use Yii;
 use yii\base\Model;
+use yii\data\ArrayDataProvider;
 use yii\helpers\Json;
 use yii\web\UploadedFile;
 
@@ -40,7 +42,8 @@ class UploadForm extends Model
         ];
     }
 
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'files' => 'Files',
             'tipo' => 'Tipo',
@@ -95,6 +98,9 @@ class UploadForm extends Model
                     break;
                 case TipologiaDatiCategoria::TRACCIATO_SEPA:
                     $stats = $this->importaTracciatoSepa($okFiles);
+                    break;
+                case TipologiaDatiCategoria::AGGIUNGI_DISTRETTO:
+                    $stats = $this->aggiungiDistretto($okFiles);
                     break;
             }
         }
@@ -170,8 +176,7 @@ class UploadForm extends Model
                             if ($contoCessionario->errors)
                                 $errors = array_merge($errors, ['contoCessionario-' . $newRow[$header[PagamentiConIban::CODICE_FISCALE]] => $contoCessionario->errors]);
                         }
-                        if ($ultimoContoValidoAttivato && $iban !== $ultimoContoValidoAttivato->iban)
-                        {
+                        if ($ultimoContoValidoAttivato && $iban !== $ultimoContoValidoAttivato->iban) {
                             $ultimoContoValidoAttivato->attivo = 0;
                             $ultimoContoValidoAttivato->data_disattivazione = date('Y-m-d');
                             $conto->validato = 1;
@@ -179,8 +184,7 @@ class UploadForm extends Model
                             $conto->save();
                             $ultimoContoValidoAttivato->save();
                         }
-                        if ($conto->attivo === 0)
-                        {
+                        if ($conto->attivo === 0) {
                             $conto->attivo = 1;
                             $conto->save();
                         }
@@ -194,7 +198,7 @@ class UploadForm extends Model
                         $movimento->is_movimento_bancario = true;
                         $movimento->periodo_da = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::DAL]]);
                         $movimento->periodo_a = Utils::convertDateFromFormat($newRow[$header[PagamentiConIban::AL]]);
-                        $movimento->note = "Bonifico di ". Carbon::parse($movimento->periodo_da)->locale('it')->monthName. ' ' . Carbon::parse($movimento->periodo_da)->year;
+                        $movimento->note = "Bonifico di " . Carbon::parse($movimento->periodo_da)->locale('it')->monthName . ' ' . Carbon::parse($movimento->periodo_da)->year;
                         $movimento->data = $movimento->periodo_a;
                         $movimento->importo = $newRow[$header[PagamentiConIban::IMPORTO]];
                         $movimento->id_determina = $idDetermina->id;
@@ -340,7 +344,7 @@ class UploadForm extends Model
         // export ['nonTrovati' => $nonTrovati, 'errors' => $errors] in file json with the same name and path of the original + "_report"
         $folder = Yii::getAlias('@webroot') . '/' . Yii::$app->params['importPath'] . '/';
         $fp = fopen($folder . 'esito-importazione_' . $date . '.json', 'w');
-        fwrite($fp, json_encode(['stats' => $stats,'nonTrovati' => $nonTrovati, 'errors' => $errors, 'warnings' => $warnings]));
+        fwrite($fp, json_encode(['stats' => $stats, 'nonTrovati' => $nonTrovati, 'errors' => $errors, 'warnings' => $warnings]));
         fclose($fp);
         Yii::$app->session->setFlash('success', "Importazione completata. Ricoveri aggiunti: " . $stats["aggiunti"] . ", aggiornati: " . $stats["aggiornati"] . " errori: " . count($errors));
         //return ['nonTrovati' => $nonTrovati, 'errors' => $errors, 'statsfilename' => 'esito-importazione_' . $date . '.json'];
@@ -360,5 +364,47 @@ class UploadForm extends Model
             $allParsedData[] = $parsedData;
         }
         return $allParsedData;
+    }
+
+    private function aggiungiDistretto(array $files, $colonnaDistretto = "distretto", $colonnaCf = "cf")
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $errors = [];
+        $out = [];
+        $filename = $files[0];
+        $reader = ReaderEntityFactory::createReaderFromFile($filename);
+        $reader->open($filename);
+        $header = [];
+        foreach ($reader->getSheetIterator() as $sheet) {
+            /* @var Sheet $sheet */
+            foreach ($sheet->getRowIterator() as $idxRow => $row) {
+                try {
+                    $newRow = [];
+                    if (count($header) === 0 && in_array(FileRicoveri::getLabel($colonnaDistretto), $newRow) && in_array(FileRicoveri::getLabel($colonnaCf), $newRow)) {
+                        foreach ($newRow as $idx => $cell)
+                            $header[$cell] = $idx;
+                    } else {
+                        foreach ($row->getCells() as $idxcel => $cel) {
+                            $newRow[$header[$idxcel]] = $cel->getValue();
+                        }
+                        $cf = $newRow[$colonnaCf];
+                        $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf])->one();
+                        $distretto = $istanza->distretto->nome;
+                        $newRow[$colonnaDistretto] = $distretto;
+                        $out[] = $newRow;
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = [$errors, ['errore' => basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow . " - " . $e->getMessage(), 'header' => $header]];
+                }
+            }
+        }
+        $widget = new ExportWidget([
+            'dataProvider' => new ArrayDataProvider([
+                'allModels' => $out
+            ]),
+            'columns' => $header,
+        ]);
+        return $widget->run();
     }
 }
