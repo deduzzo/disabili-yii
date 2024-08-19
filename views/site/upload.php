@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             TipologiaDatiCategoria::MOVIMENTI_CON_ELENCHI => 'Pagamenti con Elenchi',
             TipologiaDatiCategoria::TRACCIATO_SEPA => 'Tracciato SEPA',
             TipologiaDatiCategoria::AGGIUNGI_DISTRETTO => 'Aggiungi Distretto',
+            TipologiaDatiCategoria::DECESSI => 'Decessi',
         ], ['prompt' => 'Selezionare il tipo di file da importare..']);
         echo $form->field($files, 'idDetermina')->dropDownList(Determina::getAllDetermineMap(), ['prompt' => 'Selezionare la determina..']);
         echo $form->field($files, 'simulazione')->checkbox();

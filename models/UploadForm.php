@@ -6,6 +6,7 @@ use app\components\ExportWidget;
 use app\helpers\SepaParser;
 use app\helpers\Utils;
 use app\models\enums\DatiTipologia;
+use app\models\enums\FileDecessi;
 use app\models\enums\FileRicoveri;
 use app\models\enums\PagamentiConIban;
 use app\models\enums\TipologiaDatiCategoria;
@@ -102,12 +103,68 @@ class UploadForm extends Model
                 case TipologiaDatiCategoria::AGGIUNGI_DISTRETTO:
                     $stats = $this->aggiungiDistretto($okFiles);
                     break;
+                case TipologiaDatiCategoria::DECESSI:
+                    $stats = $this->importaDecessi($okFiles);
+                    break;
             }
         }
         if ($this->errors)
             // show with setFlash the errors array
             Yii::$app->session->setFlash('error', json_encode($this->errors));
         return $stats;
+    }
+
+    private function importaDecessi($okFiles)
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $stats = ["modificati" => [], "nonTrovati" => [], "errors" => []];
+        foreach ($okFiles as $filename) {
+            $reader = ReaderEntityFactory::createReaderFromFile($filename);
+            $reader->open($filename);
+            foreach ($reader->getSheetIterator() as $sheet) {
+                /* @var Sheet $sheet */
+                $header = [];
+                foreach ($sheet->getRowIterator() as $idxRow => $row) {
+                    try {
+                        $newRow = [];
+                        foreach ($row->getCells() as $idxcel => $cel) {
+                            $newRow[$idxcel] = $cel->getValue();
+                        }
+                        if (count($header) === 0) {
+                            foreach ($newRow as $idx => $cell)
+                                $header[$cell] = $idx;
+                        } else if (count($header) > 0) {
+                            $cf = $newRow[$header[FileDecessi::CF]];
+                            $dataDecesso = $newRow[$header[FileDecessi::DATA_DECESSO]];
+                            $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->
+                            where(['a.codice_fiscale' => $cf,'istanza.attivo' => true])->one();
+                            if ($istanza) {
+                                $istanza->data_decesso = Utils::convertDateFromFormat($dataDecesso);
+                                $istanza->attivo = false;
+                                if (!$this->simulazione)
+                                    $istanza->save();
+                                $stats["modificati"][] = ["cf" => $cf, "data_decesso" => $dataDecesso];
+                            }
+                            else
+                                $stats["nonTrovati"][] = ["cf" => $cf, "data_decesso" => $dataDecesso];
+                        }
+                    } catch (\Exception $e) {
+                        $stats["errors"][] = ["errore" => basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow . " - " . $e->getMessage(), 'header' => $header];
+                    }
+                }
+            }
+        }
+        $date = date('Y-m-d_H-i-s');
+        //create folder if not exists ../import/decessi
+        $folder = '../import/decessi/';
+        if (!file_exists($folder))
+            mkdir($folder, 0777, true);
+        $fp = fopen('../import/decessi/res_' . $date . '.json', 'w');
+        fwrite($fp, json_encode($stats));
+        fclose($fp);
+        // send download of file fp
+        Yii::$app->response->sendFile('../import/decessi/res_' . $date . '.json');
     }
 
     private function importaFileConElenchi($path)
@@ -251,7 +308,8 @@ class UploadForm extends Model
     }
 
 
-    private function importaRicoveri($files, $clearAll = false)
+    private
+    function importaRicoveri($files, $clearAll = false)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -355,7 +413,8 @@ class UploadForm extends Model
     /**
      * @throws \Exception
      */
-    private function importaTracciatoSepa(array $okFiles)
+    private
+    function importaTracciatoSepa(array $okFiles)
     {
         $allParsedData = [];
         foreach ($okFiles as $file) {
@@ -366,7 +425,8 @@ class UploadForm extends Model
         return $allParsedData;
     }
 
-    private function aggiungiDistretto(array $files, $colonnaDistretto = "distretto", $colonnaCf = "cf")
+    private
+    function aggiungiDistretto(array $files, $colonnaDistretto = "distretto", $colonnaCf = "cf")
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);

@@ -14,6 +14,7 @@ class TipologiaDatiCategoria extends BaseEnum
     const MOVIMENTI_CON_ELENCHI = 'movimenti-con-elenco';
     const TRACCIATO_SEPA = 'tracciato-sepa';
     const AGGIUNGI_DISTRETTO = 'distretto';
+    const DECESSI = 'decessi';
 
     /**
      * @var string message category
@@ -34,5 +35,6 @@ class TipologiaDatiCategoria extends BaseEnum
         self::MOVIMENTI_CON_ELENCHI => 'Movimenti con Elenco',
         self::TRACCIATO_SEPA => 'Tracciato SEPA',
         self::AGGIUNGI_DISTRETTO => 'Aggiungi Distretto',
+        self::DECESSI => 'Decessi',
     ];
 }
