@@ -295,8 +295,7 @@ class Istanza extends \yii\db\ActiveRecord
         }
     }
 
-    public function getStatoRecupero()
-    {
+    public function getImportoRecuperi() {
         $importoRecuperi = 0;
         $recuperiInCorso = Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => 0])->all();
         $ricoveriDaRecuperare = Ricovero::find()->where(['id_istanza' => $this->id, 'id_recupero' => null, 'contabilizzare' => 1])->all();
@@ -310,6 +309,12 @@ class Istanza extends \yii\db\ActiveRecord
         foreach ($ricoveriDaRecuperare as $ricovero) {
             $importoRecuperi -= $ricovero->getImportoRicovero();
         }
+        return $importoRecuperi;
+    }
+
+    public function getStatoRecupero()
+    {
+        $importoRecuperi = $this->getImportoRecuperi();
         return ($importoRecuperi !== 0) ? ("<div>Recuperare</div><span class='badge bg-warning text-dark h6'>" . Yii::$app->formatter->asCurrency($importoRecuperi) . "</span>") :
             "<span class='badge bg-success'>OK</span>";
     }
@@ -537,7 +542,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getTotaleConguaglioDecesso() {
         $giorniResiduo = $this->getGiorniResiduoDecesso();
-        $totaleRimanente=  $this->getProssimoImporto();
+        $totaleRimanente=  $this->getImportoRecuperi();
         if ($giorniResiduo === null)
             return "-";
         else
