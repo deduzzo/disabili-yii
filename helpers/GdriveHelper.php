@@ -215,7 +215,6 @@ class GdriveHelper
                             $out['errors'][] = "Disabile già presente in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                     }
                     if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) && (str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "positiv"))) {
-                        $count++;
                         if (isset($row[FileGruppiGoogle::CODICE_FISCALE]) && $row[FileGruppiGoogle::CODICE_FISCALE] !== "") {
                             $validator = new Validator(trim(strtoupper($row[FileGruppiGoogle::CODICE_FISCALE])));
                             if (!$validator->isFormallyValid())
@@ -225,6 +224,7 @@ class GdriveHelper
                         if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
                             $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         else {
+                            $count++;
                             if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
                                 $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                             else {
