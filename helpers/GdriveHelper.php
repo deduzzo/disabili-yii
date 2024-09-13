@@ -196,7 +196,9 @@ class GdriveHelper
             $range = $sheetTitle . '!A:AC';
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
 
-            $count = 0;
+            $countTot = 0;
+            $countSiPattoCura = 0;
+
             $totaleDistretto = 0;
             $inferiori = 0;
             $superiori = 0;
@@ -207,35 +209,36 @@ class GdriveHelper
                     if (isset($row[FileGruppiGoogle::GRUPPO])) {
                         $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $row[FileGruppiGoogle::GRUPPO]] ?? "")->one();
                         if (!$gruppo)
-                            $out['errors'][] = "Gruppo non presente in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "Gruppo non presente in riga: " . ($index + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                     }
                     if (isset($row[FileGruppiGoogle::CODICE_FISCALE]) && $row[FileGruppiGoogle::CODICE_FISCALE] !== "") {
                         $istanza = Istanza::find()->innerJoin('anagrafica', 'anagrafica.id = istanza.id_anagrafica_disabile')->where(['codice_fiscale' => strtoupper(trim($row[FileGruppiGoogle::CODICE_FISCALE])), 'chiuso' => false,])->one();
                         if ($istanza)
-                            $out['errors'][] = "Disabile già presente in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "Disabile già presente in riga: " . ($index + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                     }
                     if (isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) && (str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "positiv"))) {
+                        $countTot++;
                         if (isset($row[FileGruppiGoogle::CODICE_FISCALE]) && $row[FileGruppiGoogle::CODICE_FISCALE] !== "") {
                             $validator = new Validator(trim(strtoupper($row[FileGruppiGoogle::CODICE_FISCALE])));
                             if (!$validator->isFormallyValid())
-                                $out['errors'][] = "CF non valido in riga: " . ($count + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                                $out['errors'][] = "CF non valido in riga: " . ($index + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         } else
-                            $out['errors'][] = "CF non presente in riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "CF non presente in riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
-                            $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         else {
-                            $count++;
+                            $countSiPattoCura++;
                             if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
-                                $out['errors'][] = "Iban non presente nella riga: " . ($count + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                                $out['errors'][] = "Iban non presente nella riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                             else {
                                 $iban = (isset($row[FileGruppiGoogle::IBAN_DISABILE]) && $row[FileGruppiGoogle::IBAN_DISABILE] !== "") ? $row[FileGruppiGoogle::IBAN_DISABILE] : $row[FileGruppiGoogle::IBAN_CESSIONARIO];
                                 if (!Utils::verificaIban(trim(strtoupper($iban))))
-                                    $out['errors'][] = "Iban non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                                    $out['errors'][] = "Iban non valido nella riga: " . ($index + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                             }
                             $tipoOk = isset($row[FileGruppiGoogle::ISEE]) && (str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "superiore"));
                             $eta = Utils::getEtaFromCf($row[FileGruppiGoogle::CODICE_FISCALE] ?? null);
                             if ((!$tipoOk && ($eta && $eta >= 18)) || ($eta && $eta > 18 && str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")))
-                                $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                                $out['errors'][] = "Tipo ISEE non valido nella riga: " . ($index + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
 
                             $tipo = (!isset($row[FileGruppiGoogle::ISEE]) || $row[FileGruppiGoogle::ISEE] == "" || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "inferiore") || str_contains(trim(strtolower($row[FileGruppiGoogle::ISEE])), "minore")) ? "inferiore" : "superiore";
                             $totaleDistretto += ($tipo === "inferiore") ? 1200 : 840;
@@ -249,12 +252,12 @@ class GdriveHelper
                             str_contains(strtoupper(trim($sheetTitle)), strtoupper(trim($row[FileGruppiGoogle::DISTRETTO]))) &&
                             str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "deced") && isset($row[FileGruppiGoogle::DATA_DECESSO]) &&
                             $row[FileGruppiGoogle::DATA_DECESSO] === "" && Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) === null)
-                            $out['errors'][] = "Data decesso non presente o non valida nella riga: " . ($count + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
+                            $out['errors'][] = "Data decesso non presente o non valida nella riga: " . ($index + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                 }
             }
-            $out['out'] .= $sheet->getProperties()->getTitle() . ": " . $count . "-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
+            $out['out'] .= $sheet->getProperties()->getTitle() . ": [" . $countTot . "/". $countSiPattoCura."]-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
-            $countTotale += $count;
+            $countTotale += $countTot;
             $inferioriTotali += $inferiori;
             $superioriTotali += $superiori;
         }
