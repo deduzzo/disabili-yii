@@ -386,7 +386,7 @@ class GdriveHelper
                                     $isee->save();
                                     if ($isee->errors)
                                         $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
-                                    if ($numMesiDaCaricare > 0) {
+                                    if ($numMesiDaCaricare > 0 && $istanza->data_decesso !== null) {
                                         $recupero = new Recupero();
                                         $recupero->id_istanza = $istanza->id;
                                         $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
