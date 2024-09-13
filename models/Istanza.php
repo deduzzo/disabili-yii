@@ -381,8 +381,7 @@ class Istanza extends \yii\db\ActiveRecord
         if ($totaleGiorniDovuti === null)
             return 0;
         $totale = ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
-        $totaleRecuperiAttivi = Recupero::find()->where(['id_istanza' => $this->id, 'chiuso' => false])->sum('importo');
-        $totale += $totaleRecuperiAttivi;
+        $totale+= $this->getProssimoImporto();
         return ($restituire ? -$totale : $totale);
     }
 
