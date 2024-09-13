@@ -381,7 +381,6 @@ class Istanza extends \yii\db\ActiveRecord
         if ($totaleGiorniDovuti === null)
             return 0;
         $totale = ($totaleGiorniDovuti['mesi'] * 30 + $totaleGiorniDovuti['giorni']);
-        $totale+= $this->getProssimoImporto();
         return ($restituire ? -$totale : $totale);
     }
 
@@ -538,10 +537,11 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getTotaleConguaglioDecesso() {
         $giorniResiduo = $this->getGiorniResiduoDecesso();
+        $totaleRimanente=  $this->getProssimoImporto();
         if ($giorniResiduo === null)
             return "-";
         else
-            return $this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30);
+            return ($this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30)) + $totaleRimanente;
     }
 
     public function verificaContabilitaMese($mese, $anno, $determina = null)
