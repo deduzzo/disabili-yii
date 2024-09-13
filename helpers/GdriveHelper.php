@@ -255,7 +255,7 @@ class GdriveHelper
                             $out['errors'][] = "Data decesso non presente o non valida nella riga: " . ($index + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                 }
             }
-            $out['out'] .= $sheet->getProperties()->getTitle() . ": [" . $countTot . "/". $countSiPattoCura."]-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
+            $out['out'] .= $sheet->getProperties()->getTitle() . ": [" . $countSiPattoCura . "/". $countTot."]-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $countTot;
             $inferioriTotali += $inferiori;
