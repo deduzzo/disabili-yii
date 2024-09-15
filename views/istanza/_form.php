@@ -11,7 +11,6 @@ use yii\widgets\ActiveForm;
 <div class="istanza-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
     <?= $form->field($model, 'data_inserimento')->textInput() ?>
 
     <?= $form->field($model, 'riconosciuto')->textInput() ?>
