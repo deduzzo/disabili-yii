@@ -224,8 +224,10 @@ class GdriveHelper
                                 $out['errors'][] = "CF non valido in riga: " . ($index + 1) . " nominativo: <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                         } else
                             $out['errors'][] = "CF non presente in riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                        //FIRMA PATTO DI CURA
                         if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
-                            $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
+                              echo "";
+                        //    $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         else {
                             $countSiPattoCura++;
                             if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
