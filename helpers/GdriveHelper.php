@@ -198,6 +198,7 @@ class GdriveHelper
 
             $countTot = 0;
             $countSiPattoCura = 0;
+            $countPattoDiCuraDaFirmare = 0;
 
             $totaleDistretto = 0;
             $inferiori = 0;
@@ -226,7 +227,7 @@ class GdriveHelper
                             $out['errors'][] = "CF non presente in riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         //FIRMA PATTO DI CURA
                         if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
-                              echo "";
+                            $countPattoDiCuraDaFirmare++;
                         //    $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         else {
                             $countSiPattoCura++;
@@ -257,7 +258,7 @@ class GdriveHelper
                             $out['errors'][] = "Data decesso non presente o non valida nella riga: " . ($index + 1) . " nominativo:  <b>" . $row[FileGruppiGoogle::COGNOME] . " " . $row[FileGruppiGoogle::NOME] . "</b> del foglio: " . $sheetTitle;
                 }
             }
-            $out['out'] .= $sheet->getProperties()->getTitle() . ": [" . $countSiPattoCura . "/". $countTot."]-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "]<br />";
+            $out['out'] .= $sheet->getProperties()->getTitle() . ": [" . $countSiPattoCura . "/". $countTot."]-> " . Yii::$app->formatter->asCurrency($totaleDistretto) . " [inferiori: " . $inferiori . ", superiori: " . $superiori . "] da firmare: ". $countPattoDiCuraDaFirmare. "<br />";
             $totaleMeseGlobale += $totaleDistretto;
             $countTotale += $countTot;
             $inferioriTotali += $inferiori;
