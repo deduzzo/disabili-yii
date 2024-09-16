@@ -226,10 +226,11 @@ class GdriveHelper
                         } else
                             $out['errors'][] = "CF non presente in riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
                         //FIRMA PATTO DI CURA
+                        $vivo =  $row[FileGruppiGoogle::DATA_DECESSO] === "" || !isset($row[FileGruppiGoogle::DATA_DECESSO]);
                         if ((!isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) || $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] === ""))
                             $countPattoDiCuraDaFirmare++;
                         //    $out['errors'][] = "INFO: Patto di cura non firmato (manca data) riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
-                        else {
+                        else if ($vivo){
                             $countSiPattoCura++;
                             if ((!isset($row[FileGruppiGoogle::IBAN_DISABILE]) || $row[FileGruppiGoogle::IBAN_DISABILE] === "") && (!isset($row[FileGruppiGoogle::IBAN_CESSIONARIO]) || $row[FileGruppiGoogle::IBAN_CESSIONARIO] === ""))
                                 $out['errors'][] = "Iban non presente nella riga: " . ($index + 1) . " nominativo:  <b>" . ($row[FileGruppiGoogle::COGNOME] ?? "[Cognome non presente]") . " " . ($row[FileGruppiGoogle::NOME] ?? "[Nome non presente]") . "</b> del foglio: " . $sheetTitle;
