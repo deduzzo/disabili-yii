@@ -28,7 +28,6 @@ use yii2tech\spreadsheet\Spreadsheet;
 
 class DeterminaController extends \yii\web\Controller
 {
-    const DECEDUTI = -1;
     public function actionIndex($export = false, $idDeterminaFinalizzare = null, $escludiNuovoMese = null, $distretti = null, $gruppi = null, $singoleIstanze = null)
     {
         ini_set('memory_limit', '-1');
@@ -49,14 +48,9 @@ class DeterminaController extends \yii\web\Controller
         $soloProblematici = (isset($getVars['soloProblematici']) && !$idDeterminaFinalizzare) ? $getVars['soloProblematici'] : 'off';
         $soloVariazioni = (isset($getVars['soloVariazioni']) && $idDeterminaFinalizzare) ? $getVars['soloVariazioni'] : 'off';
         $soloRecuperi = (isset($getVars['soloRecuperi']) && $idDeterminaFinalizzare) ? $getVars['soloRecuperi'] : 'off';
-        $mostraDecedutiAParte = (isset($getVars['mostraDecedutiAParte']) && $idDeterminaFinalizzare) ? $getVars['mostraDecedutiAParte'] : 'on';
         if ($escludiNuovoMese === null)
             $escludiNuovoMese = isset($getVars['escludiNuovoMese']) ? $getVars['escludiNuovoMese'] : 'off';
-        $allIstanzeAttive = (new Query())->select('id')->from('istanza')->andWhere(['chiuso' => false]);
-        if ($mostraDecedutiAParte === "on")
-            $allIstanzeAttive->andWhere(['and', ['not', ['data_decesso' => null]], ['attivo' => false], ['liquidazione_decesso_completata' => false]]);
-        else
-            $allIstanzeAttive->andWhere(['attivo' => true]);
+        $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = Movimento::getDataUltimoPagamento();
         $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])
@@ -78,12 +72,6 @@ class DeterminaController extends \yii\web\Controller
             $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
             $recuperiPerDistretto[$item->id] = [];
             $alert[$item->id] = [];
-        }
-        if ($mostraDecedutiAParte === "on") {
-            $importiTotali[self::DECEDUTI] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-            $numeriTotali[self::DECEDUTI] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0];
-            $recuperiPerDistretto[self::DECEDUTI] = [];
-            $alert[self::DECEDUTI] = [];
         }
         foreach ($allPagamentiPrecedenti as $pagamento) {
             $pagamentiPrecedentiPerDistretti[$pagamento['id_distretto']][] = $pagamento['id_istanza'];
@@ -199,7 +187,7 @@ class DeterminaController extends \yii\web\Controller
                 'soloVariazioni' => $soloVariazioni,
                 'soloRecuperi' => $soloRecuperi,
                 'escludiNuovoMese' => $escludiNuovoMese,
-                'distretti' =>$mostraDecedutiAParte ? array_merge($distretti,[self::DECEDUTI]) : $distretti,
+                'distretti' => $distretti,
                 'singoleIstanze' => $singoleIstanze ?? [],
                 'gruppi' => $gruppi,
                 'title' => "Simulazione prossima determina",
