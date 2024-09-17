@@ -21,6 +21,7 @@ use yii\helpers\Url;
 /** @var string $soloVariazioni */
 /** @var string $soloProblematici */
 /** @var string $escludiNuovoMese */
+/** @var string $mostraDecedutiAParte */
 /** @var array $distretti */
 /** @var array $gruppi */
 /** @var array $stats */
@@ -397,6 +398,11 @@ if (!isset($soloVariazioni)) {
                         <label class="form-check-label text-danger bold" for="soloRecuperi">Solo ist. con
                             Recuperi in
                             corso</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" role="switch" name="soloRecuperi"
+                               id="soloRecuperi" <?= $mostraDecedutiAParte == "on" ? "checked" : "" ?>>
+                        <label class="form-check-label text-danger bold" for="soloRecuperi">Mostra deceduti a parte</label>
                     </div>
                 </div>
             <?php else: ?>
