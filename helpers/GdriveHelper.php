@@ -302,7 +302,7 @@ class GdriveHelper
             $distretto = Distretto::find()->where(['like', 'nome', '%' . strtoupper(substr($sheetTitle, 0, 4)) . '%', false])->one();
             $values = $this->spreeadsheetService->spreadsheets_values->get($spreadsheetId, $range)->getValues();
             foreach ($values as $index => $row) {
-                if ($index > 1 && isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] !== "") {
+                if ($index > 1 && isset($row[FileGruppiGoogle::DISTRETTO]) && $row[FileGruppiGoogle::DISTRETTO] !== "" && ((isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] !== "") || (str_contains(strtolower(trim($row[FileGruppiGoogle::ESITO])), "positiv")))) {
                     if ($gruppoOriginale == "*")
                         $gruppo = Gruppo::find()->where(['descrizione_gruppo' => $row[FileGruppiGoogle::GRUPPO]])->one();
                     else
@@ -339,18 +339,19 @@ class GdriveHelper
                         if ($disabile && $distretto && $gruppo) {
                             $istanza = new Istanza();
                             $istanza->id_distretto = $distretto->id;
-                            $istanza->riconosciuto = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
+                            $istanza->riconosciuto = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO"));
                             $istanza->id_gruppo = $gruppo->id;
                             $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA] ?? null;
                             $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
                             $istanza->id_anagrafica_disabile = $disabile->id;
                             $istanza->data_firma_patto = (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) : null;
+                            $istanza->data_riconoscimento = $istanza->data_firma_patto;
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_decesso === null);
+                            $istanza->attivo = $istanza->riconosciuto;
                             $istanza->chiuso = false;
-                            $istanza->note = $row[FileGruppiGoogle::NOTE] ?? "";
+                            $istanza->note = $row[FileGruppiGoogle::NOTE_FORNITORE] ?? "". $row[FileGruppiGoogle::NOTE] ?? "";
                             $istanza->save();
                             if ($istanza->errors)
                                 $errors = array_merge($errors, ['istanza-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $istanza->errors]);
