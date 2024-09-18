@@ -383,14 +383,16 @@ class GdriveHelper
                                     $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => ['ISEE non valido, eta '.$eta.' anni'. ' isee:'.$row[FileGruppiGoogle::ISEE]]]);
                                 }
                                 else {
-                                    $isee = new Isee();
-                                    $isee->id_istanza = $istanza->id;
-                                    $isee->data_presentazione = Carbon::now()->format("Y-m-d");
-                                    $isee->maggiore_25mila = !($eta< 18 || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE")));
-                                    $isee->valido = true;
-                                    $isee->save();
-                                    if ($isee->errors)
-                                        $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
+                                    if ($eta< 18 || ((trim($row[FileGruppiGoogle::ISEE]) !== "") && isset($row[FileGruppiGoogle::ISEE]))) {
+                                        $isee = new Isee();
+                                        $isee->id_istanza = $istanza->id;
+                                        $isee->data_presentazione = Carbon::now()->format("Y-m-d");
+                                        $isee->maggiore_25mila = !($eta < 18 || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "INFERIORE" || (strtoupper(trim($row[FileGruppiGoogle::ISEE])) === "MINORENNE")));
+                                        $isee->valido = true;
+                                        $isee->save();
+                                        if ($isee->errors)
+                                            $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
+                                    }
                                     if ($numMesiDaCaricare > 0 && $istanza->data_decesso !== null) {
                                         $recupero = new Recupero();
                                         $recupero->id_istanza = $istanza->id;
