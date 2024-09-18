@@ -339,7 +339,7 @@ class GdriveHelper
                         if ($disabile && $distretto && $gruppo) {
                             $istanza = new Istanza();
                             $istanza->id_distretto = $distretto->id;
-                            $istanza->riconosciuto = isset($row[FileGruppiGoogle::ESITO]) && strtoupper(trim($row[FileGruppiGoogle::ESITO])) === "POSITIVO";
+                            $istanza->riconosciuto = isset($row[FileGruppiGoogle::ESITO]) && (strtoupper(trim($row[FileGruppiGoogle::ESITO])) === "POSITIVO");
                             $istanza->id_gruppo = $gruppo->id;
                             $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA] ?? null;
                             $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
@@ -352,6 +352,7 @@ class GdriveHelper
                             $istanza->attivo = $istanza->riconosciuto;
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE_FORNITORE] ?? "". $row[FileGruppiGoogle::NOTE] ?? "";
+                            //test
                             $istanza->save();
                             if ($istanza->errors)
                                 $errors = array_merge($errors, ['istanza-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $istanza->errors]);
