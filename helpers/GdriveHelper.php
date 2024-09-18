@@ -349,7 +349,7 @@ class GdriveHelper
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = $istanza->riconosciuto;
+                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_firma_patto !== null);
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE_FORNITORE] ?? "". $row[FileGruppiGoogle::NOTE] ?? "";
                             //test
