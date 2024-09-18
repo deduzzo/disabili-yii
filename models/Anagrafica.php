@@ -52,7 +52,7 @@ class Anagrafica extends \yii\db\ActiveRecord
             [['data_nascita'], 'safe'],
             [['cognome_nome', 'nome','cognome', 'comune_nascita', 'comune_residenza'], 'string', 'max' => 100],
             [['codice_fiscale'], 'string', 'max' => 20],
-            [['indirizzo_residenza'], 'string', 'max' => 200],
+            [['indirizzo_residenza'], 'string', 'max' => 1000],
             [['codice_fiscale'], 'unique'],
         ];
     }
