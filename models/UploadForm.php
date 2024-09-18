@@ -449,7 +449,7 @@ class UploadForm extends Model
                             $newRow[$header[$idxcel]] = $cel->getValue();
                         }
                         $cf = $newRow[$colonnaCf];
-                        $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf])->one();
+                        $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf, 'attivo' => true])->one();
                         $distretto = $istanza->distretto->nome;
                         $newRow[$colonnaDistretto] = $distretto;
                         $out[] = $newRow;
