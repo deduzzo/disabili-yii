@@ -416,6 +416,7 @@ class GdriveHelper
             return true;
         } else {
             $transaction->rollBack();
+            die(json_encode($errors));
             $date = date('Y-m-d_H-i-s');
             $folder = Yii::getAlias('@webroot') . '/' . Yii::$app->params['importPath'] . '/';
             $fp = fopen($folder . 'esito-importazione_' . $date . '.json', 'w');

@@ -82,10 +82,8 @@ class ContabilitaController extends Controller
                 // show success
                 if ($res === true)
                     Yii::$app->session->setFlash('success', 'Gruppo creato e dati importati con successo');
-                else {
+                else
                     Yii::$app->session->setFlash('error', 'Errore durante la creazione del gruppo e l\'importazione dei dati');
-                print_r($res);
-                }
                 return $this->redirect(['istanza/index']);
             }
         }
