@@ -383,7 +383,7 @@ class GdriveHelper
                                     $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => ['ISEE non valido, eta '.$eta.' anni'. ' isee:'.$row[FileGruppiGoogle::ISEE]]]);
                                 }
                                 else {
-                                    if ($eta< 18 || ((trim($row[FileGruppiGoogle::ISEE]) !== "") && isset($row[FileGruppiGoogle::ISEE]))) {
+                                    if ($eta< 18 || (isset($row[FileGruppiGoogle::ISEE])) && (trim($row[FileGruppiGoogle::ISEE]) !== "")) {
                                         $isee = new Isee();
                                         $isee->id_istanza = $istanza->id;
                                         $isee->data_presentazione = Carbon::now()->format("Y-m-d");
