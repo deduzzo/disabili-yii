@@ -342,7 +342,7 @@ class GdriveHelper
                             $istanza->riconosciuto = isset($row[FileGruppiGoogle::ESITO]) && (strtoupper(trim($row[FileGruppiGoogle::ESITO])) === "POSITIVO");
                             $istanza->id_gruppo = $gruppo->id;
                             $istanza->classe_disabilita = $row[FileGruppiGoogle::TIPOLOGIA_DISABILITA] ?? null;
-                            $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) || (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
+                            $istanza->patto_di_cura = strtoupper(trim($row[FileGruppiGoogle::ESITO] === "POSITIVO")) && (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && strtoupper(trim($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA])) !== "");
                             $istanza->id_anagrafica_disabile = $disabile->id;
                             $istanza->data_firma_patto = (isset($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) && $row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_FIRMA_PATTO_CURA]) : null;
                             $istanza->data_riconoscimento = $istanza->data_firma_patto;
