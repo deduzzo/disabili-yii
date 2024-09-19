@@ -349,7 +349,7 @@ class GdriveHelper
                             if ($cessionario)
                                 $istanza->id_caregiver = $cessionario->id;
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
-                            $istanza->attivo = $istanza->riconosciuto && ($istanza->data_firma_patto !== null);
+                            $istanza->attivo = $istanza->riconosciuto && $istanza->data_firma_patto !== null && $istanza->data_decesso === null;
                             $istanza->chiuso = false;
                             $istanza->note = $row[FileGruppiGoogle::NOTE_FORNITORE] ?? "". $row[FileGruppiGoogle::NOTE] ?? "";
                             //test
@@ -394,7 +394,7 @@ class GdriveHelper
                                         if ($isee->errors)
                                             $errors = array_merge($errors, ['isee-' . $row[FileGruppiGoogle::CODICE_FISCALE] => $isee->errors]);
                                     }
-                                    if ($numMesiDaCaricare > 0 && $istanza->data_decesso !== null) {
+                                    if ($numMesiDaCaricare > 0 && $istanza->data_decesso === null) {
                                         $recupero = new Recupero();
                                         $recupero->id_istanza = $istanza->id;
                                         $recupero->importo = ($isee->maggiore_25mila ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) * $numMesiDaCaricare;
