@@ -425,8 +425,8 @@ if (!isset($soloVariazioni)) {
         <?= Html::endForm() ?>
         <?php
         $colExport = $soloVisualizzazione ?
-            ['distretto', 'cognomeNome', 'cf', 'dataNascita', 'eta', 'isee', 'gruppo', 'importo'] :
-            ['distretto', 'cf', 'cognome', 'nome', 'dataNascita', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'];
+            ['distretto', 'cognomeNome', 'cf', 'dataNascita', 'stato', 'eta', 'isee', 'gruppo', 'importo'] :
+            ['distretto', 'cf', 'cognome', 'nome', 'dataNascita','stato', 'eta', 'isee', 'gruppo', 'importoPrecedente', 'importo', 'operazione'];
         ?>
         <div class="col-md-8"><?= ExportWidget::widget([
                 'dataProvider' => new ArrayDataProvider([
