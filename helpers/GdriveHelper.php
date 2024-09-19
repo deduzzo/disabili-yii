@@ -351,7 +351,7 @@ class GdriveHelper
                             $istanza->data_decesso = (isset($row[FileGruppiGoogle::DATA_DECESSO]) && $row[FileGruppiGoogle::DATA_DECESSO] != "") ? Utils::convertDateFromFormat($row[FileGruppiGoogle::DATA_DECESSO]) : null;
                             $istanza->attivo = $istanza->riconosciuto && $istanza->data_firma_patto !== null && $istanza->data_decesso === null;
                             $istanza->chiuso = false;
-                            $istanza->note = $row[FileGruppiGoogle::NOTE_FORNITORE] ?? "". $row[FileGruppiGoogle::NOTE] ?? "";
+                            $istanza->note = ($row[FileGruppiGoogle::NOTE_FORNITORE] ?? ""). " - ". ($row[FileGruppiGoogle::NOTE] ?? "");
                             //test
                             $istanza->save();
                             if ($istanza->errors)
