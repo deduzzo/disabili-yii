@@ -123,10 +123,10 @@ echo GridView::widget([
                 echo Html::label('Anno di riferimento', 'anno_riferimento', ['class' => 'control-label']);
                 echo Html::dropDownList('anno_riferimento', date('Y'), array_combine(range(date('Y') - 4, date('Y')), range(date('Y') - 4, date('Y'))), ['class' => 'form-control', 'id' => 'anno_riferimento']);
                 echo Html::endTag('div');
-                // data_presentazione today
+                // data_presentazione today, type date
                 echo Html::beginTag('div', ['class' => 'form-group']);
                 echo Html::label('Data presentazione', 'data_presentazione', ['class' => 'control-label']);
-                echo Html::textInput('data_presentazione', date('d/m/Y'), ['class' => 'form-control', 'id' => 'data_presentazione']);
+                echo Html::input('date', 'data_presentazione', date('Y-m-d'), ['class' => 'form-control', 'id' => 'data_presentazione']);
                 echo Html::endTag('div');
                 ?>
             </div>
