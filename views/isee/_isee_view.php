@@ -118,15 +118,15 @@ echo GridView::widget([
                 echo Html::label('Isee', 'tipologia', ['class' => 'control-label']);
                 echo Html::dropDownList('tipologia', null, ['minore' => "<MINORE 25.000",'maggiore'=> '>MAGGIORE 25.000'], ['class' => 'form-control', 'id' => 'id_isee', 'prompt' => 'Seleziona un valore..']);
                 echo Html::endTag('div');
-                // data_riferimento this year
+                // data_riferimento select box last 4 years, default current year
                 echo Html::beginTag('div', ['class' => 'form-group']);
-                echo Html::label('Anno riferimento', 'anno_riferimento', ['class' => 'control-label']);
-                echo Html::textInput('anno_riferimento', date('Y'), ['class' => 'form-control', 'id' => 'anno_riferimento']);
+                echo Html::label('Anno di riferimento', 'anno_riferimento', ['class' => 'control-label']);
+                echo Html::dropDownList('anno_riferimento', date('Y'), array_combine(range(date('Y') - 4, date('Y')), range(date('Y') - 4, date('Y'))), ['class' => 'form-control', 'id' => 'anno_riferimento']);
                 echo Html::endTag('div');
-                // data_presentazione, combobox of the last 5 years, selected this year
+                // data_presentazione today
                 echo Html::beginTag('div', ['class' => 'form-group']);
                 echo Html::label('Data presentazione', 'data_presentazione', ['class' => 'control-label']);
-                echo Html::dropDownList('data_presentazione', null, array_combine(range(date('Y'), date('Y') - 5), range(date('Y'), date('Y') - 5)), ['class' => 'form-control', 'id' => 'data_presentazione', 'prompt' => 'Seleziona un valore..']);
+                echo Html::textInput('data_presentazione', date('d/m/Y'), ['class' => 'form-control', 'id' => 'data_presentazione']);
                 echo Html::endTag('div');
                 ?>
             </div>
