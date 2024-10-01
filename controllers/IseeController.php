@@ -129,6 +129,7 @@ class IseeController extends Controller
             $model = new Isee();
             $model->id_istanza = $istanza->id;
             $model->data_presentazione = Carbon::createFromFormat('d/m/Y', $data['data_presentazione'])->toDateString();
+            $model->anno_riferimento = (isset($data['anno_riferimento']) && $data['anno_riferimento'] !== "") ? intval($data['anno_riferimento']) : null;
             $model->valido = true;
             $model->maggiore_25mila = $data['tipologia'] === 'maggiore';
             $model->save();
