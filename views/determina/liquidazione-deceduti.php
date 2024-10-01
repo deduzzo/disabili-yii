@@ -151,10 +151,10 @@ $checkboxColumn = [
                     'columns' => array_merge($checkboxColumn,$cols,    [[
                         'label' => 'Importo a conguaglio',
                         'value' => function ($model) {
-                            $okLiquidazioneDecesso = $model->getOkLiquidazioneDecesso();
+                            $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
                             $giorniResiduo = $model->getGiorniResiduoDecesso();
-                            if ($okLiquidazioneDecesso !== "")
-                                return "ALERT: ". $okLiquidazioneDecesso;
+                            if ($problemiLiquidazioneDecesso)
+                                return "ALERT: ". $problemiLiquidazioneDecesso;
                             else if ($giorniResiduo === null)
                                 return "-";
                             else
