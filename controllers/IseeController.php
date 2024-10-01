@@ -121,10 +121,16 @@ class IseeController extends Controller
         $data = $this->request->post();
         $istanza = Istanza::findOne($data['id_istanza']);
         if ($istanza && $this->request->isPost && ($data['tipologia'] === 'maggiore' || $data['tipologia'] === 'minore')) {
-            $iseeIstanza = Isee::find()->where(['id_istanza' => $istanza->id])->all();
+            $iseeIstanza = Isee::find()->where(['id_istanza' => $istanza->id]);
+            if (isset($data['anno_riferimento']) && $data['anno_riferimento'] !== "")
+                $iseeIstanza->andWhere(['anno_riferimento' => $data['anno_riferimento']]);
+            $iseeIstanza->all();
             foreach ($iseeIstanza as $isee) {
-                $isee->valido = false;
-                $isee->save();
+                if ($isee->valido) {
+                    $isee->valido = false;
+                    $isee->valido_fino_a = Carbon::now()->toDateString();
+                    $isee->save();
+                }
             }
             $model = new Isee();
             $model->id_istanza = $istanza->id;
