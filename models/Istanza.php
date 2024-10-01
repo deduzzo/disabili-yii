@@ -370,6 +370,20 @@ class Istanza extends \yii\db\ActiveRecord
             return $this->anagraficaDisabile->cognome_nome;
     }
 
+    public function getOkLiquidazioneDecesso(): string
+    {
+        $out = "";
+        if (!$this->patto_di_cura)
+            $out .= "MANCA PATTO - ";
+        if ($this->getLastIseeType() == IseeType::NO_ISEE)
+            $out .= "MANCA ISEE - ";
+        if ($this->rinuncia)
+            $out .= "RINUNCIA - ";
+        if (!$this->haContoValido())
+            $out .= "MANCA CONTO - ";
+        return $out;
+    }
+
     public function getGiorniResiduoDecesso()
     {
         $ultimoMovimentoBancario = $this->getLastMovimentoBancario();

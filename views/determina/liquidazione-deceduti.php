@@ -151,8 +151,11 @@ $checkboxColumn = [
                     'columns' => array_merge($checkboxColumn,$cols,    [[
                         'label' => 'Importo a conguaglio',
                         'value' => function ($model) {
+                            $okLiquidazioneDecesso = $model->getOkLiquidazioneDecesso();
                             $giorniResiduo = $model->getGiorniResiduoDecesso();
-                            if ($giorniResiduo === null)
+                            if ($okLiquidazioneDecesso !== "")
+                                return "ALERT: ". $okLiquidazioneDecesso;
+                            else if ($giorniResiduo === null)
                                 return "-";
                             else
                                 return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
