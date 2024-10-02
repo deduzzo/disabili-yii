@@ -129,8 +129,9 @@ class IseeController extends Controller
                 $iseeIstanza = Isee::find()->where(['id_istanza' => $istanza->id])->all();
             foreach ($iseeIstanza as $isee) {
                 if ($isee->valido) {
+                    if ($isee->valido)
+                        $isee->valido_fino_a = Carbon::now()->toDateString();
                     $isee->valido = false;
-                    $isee->valido_fino_a = Carbon::now()->toDateString();
                     $isee->save();
                 }
             }
