@@ -125,6 +125,8 @@ class IseeController extends Controller
             if (isset($data['anno_riferimento']) && $data['anno_riferimento'] !== "")
                 $iseeIstanza->andWhere(['anno_riferimento' => $data['anno_riferimento']]);
             $iseeIstanza->all();
+            if ($iseeIstanza->count() === 0)
+                $iseeIstanza = Isee::find()->where(['id_istanza' => $istanza->id])->all();
             foreach ($iseeIstanza as $isee) {
                 if ($isee->valido) {
                     $isee->valido = false;
