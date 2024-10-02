@@ -64,8 +64,10 @@ echo GridView::widget([
             'attribute' => 'valido',
             'label' => 'Stato',
             'value' => function ($model) {
+                $tooltipText =$model->valido_fino_a ? \Carbon\Carbon::parse($model->valido_fino_a)->format('d/m/Y') : 'N/D';
                 return $model->valido ?
-                    '<span class="badge bg-success">ATTIVO</span>' : '<span class="badge bg-danger">SCADUTO</span>';
+                    '<span class="badge bg-success" title="Valido fino al: ' . $tooltipText . '">ATTIVO</span>' :
+                    '<span class="badge bg-danger" title="Valido fino al: ' . $tooltipText . '">SCADUTO</span>';
             },
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
