@@ -100,8 +100,8 @@ class UploadForm extends Model
                 case TipologiaDatiCategoria::TRACCIATO_SEPA:
                     $stats = $this->importaTracciatoSepa($okFiles);
                     break;
-                case TipologiaDatiCategoria::AGGIUNGI_DISTRETTO:
-                    $stats = $this->aggiungiDistretto($okFiles);
+                case TipologiaDatiCategoria::AGGIUNGI_DISTRETTO_GRUPPO:
+                    $stats = $this->aggiungiDistrettoGruppo($okFiles);
                     break;
                 case TipologiaDatiCategoria::DECESSI:
                     $stats = $this->importaDecessi($okFiles);
@@ -426,7 +426,7 @@ class UploadForm extends Model
     }
 
     private
-    function aggiungiDistretto(array $files, $colonnaDistretto = "distretto", $colonnaCf = "cf")
+    function aggiungiDistrettoGruppo(array $files, $colonnaDistretto = "distretto", $colonnaGruppo= "gruppo", $colonnaCf = "cf")
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -452,6 +452,7 @@ class UploadForm extends Model
                         $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf, 'attivo' => true])->one();
                         $distretto = $istanza->distretto->nome;
                         $newRow[$colonnaDistretto] = $distretto;
+                        $newRow[$colonnaGruppo] = $istanza->gruppo->descrizione_gruppo;
                         $out[] = $newRow;
                     }
                 } catch (\Exception $e) {

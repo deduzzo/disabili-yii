@@ -13,7 +13,7 @@ class TipologiaDatiCategoria extends BaseEnum
     const MOVIMENTI_CON_IBAN = 'movimenti-con-iban';
     const MOVIMENTI_CON_ELENCHI = 'movimenti-con-elenco';
     const TRACCIATO_SEPA = 'tracciato-sepa';
-    const AGGIUNGI_DISTRETTO = 'distretto';
+    const AGGIUNGI_DISTRETTO_GRUPPO = 'distretto-gruppo';
     const DECESSI = 'decessi';
 
     /**
@@ -34,7 +34,7 @@ class TipologiaDatiCategoria extends BaseEnum
         self::MOVIMENTI_CON_IBAN => 'Movimenti con IBAN',
         self::MOVIMENTI_CON_ELENCHI => 'Movimenti con Elenco',
         self::TRACCIATO_SEPA => 'Tracciato SEPA',
-        self::AGGIUNGI_DISTRETTO => 'Aggiungi Distretto',
+        self::AGGIUNGI_DISTRETTO_GRUPPO => 'Aggiungi Distretto / Gruppo',
         self::DECESSI => 'Decessi',
     ];
 }
