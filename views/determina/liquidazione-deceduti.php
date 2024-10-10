@@ -37,11 +37,11 @@ $cols = [
         }
     ],
     [
-            'label' => 'Codice Fiscale',
-            'attribute' => 'cf',
-            'value' => function ($model) {
-                return $model->anagraficaDisabile->codice_fiscale;
-            }
+        'label' => 'Codice Fiscale',
+        'attribute' => 'cf',
+        'value' => function ($model) {
+            return $model->anagraficaDisabile->codice_fiscale;
+        }
 
     ],
     'data_decesso:date',
@@ -74,7 +74,7 @@ $cols = [
         'value' => function ($model) {
             $last = $model->getLastMovimentoBancario();
             $tornatiIndietro = $model->getPagamentiTornatiIndietro(!$last ? null : $last->data);
-            return (count($tornatiIndietro) === 0) ? "NO" :  "SI";
+            return (count($tornatiIndietro) === 0) ? "NO" : "SI";
         }
     ],
     [
@@ -105,13 +105,13 @@ $checkboxColumn = [
 <?= ExportWidget::widget([
     //'models' => $dataProvider->getModels(),
     'dataProvider' => $dataProvider,
-    'columns' => array_merge($cols,    [[
+    'columns' => array_merge($cols, [[
         'label' => 'Importo a conguaglio',
         'value' => function ($model) {
             $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
             $giorniResiduo = $model->getGiorniResiduoDecesso();
             if ($problemiLiquidazioneDecesso)
-                return "ALERT: ". $problemiLiquidazioneDecesso;
+                return "ALERT: " . $problemiLiquidazioneDecesso;
             else if ($giorniResiduo === null)
                 return "-";
             else
@@ -121,62 +121,70 @@ $checkboxColumn = [
 ]) ?>
 
 <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
-    <div class="card">
-        <div class="card-header">
-            <div class="card-toolbar">
-                <!--begin::Button-->
-                <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
-                <!-- Textbox per incollare i valori -->
-                <textarea id="valuesTextbox" rows="2" cols="10" placeholder="Inserisci valori separati da invio"></textarea>
-                <button onclick="selezionaCheckbox()">Seleziona Checkbox</button>
-            </div>
-            <div class="card-body">
-                <?= GridView::widget([
-                    'id' => 'elenco-disabili',
-                    'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
-                    'layout' =>
-                        "<div class='table-container'>{items}</div>
-                            <div class='dataTable-bottom'>
-                                  <div class='dataTable-info'>{summary}</div>
-                                  <nav class='dataTable-pagination'>
-                                        {pager}
-                                  </nav>
-                            </div>",
-                    'pager' => [
-                        'class' => 'yii\bootstrap5\LinkPager',
-                        'firstPageLabel' => 'PRIMA',
-                        'lastPageLabel' => 'ULTIMA',
-                        'nextPageLabel' => '>>',
-                        'prevPageLabel' => '<<',
-                        'linkOptions' => ['class' => 'page-link'],
-                    ],
-                    'options' => [
-                        'tag' => 'div',
-                        'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
-                    ],
-                    'tableOptions' => [
-                        'class' => 'table table-striped dataTable-table',
-                    ],
-                    'columns' => array_merge($checkboxColumn,$cols,    [[
-                        'label' => 'Importo a conguaglio',
-                        'value' => function ($model) {
-                            $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
-                            $giorniResiduo = $model->getGiorniResiduoDecesso();
-                            if ($problemiLiquidazioneDecesso)
-                                return "ALERT: ". $problemiLiquidazioneDecesso;
-                            else if ($giorniResiduo === null)
-                                return "-";
-                            else
-                                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
-                        }
-                    ]])
-                ]); ?>
-            </div>
+<div class="card">
+    <div class="card-header">
+        <div class="card-toolbar d-flex align-items-center">
+            <!--begin::Button-->
+            <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
+
+            <!-- Textbox per incollare i valori -->
+            <textarea id="valuesTextbox" rows="2" cols="10" class="form-control me-2"
+                      placeholder="Inserisci valori separati da invio"></textarea>
+
+            <!-- Bottone Seleziona Checkbox -->
+            <button id="selezionaCheckboxBtn" class="btn btn-secondary">Seleziona Checkbox</button>
         </div>
     </div>
+    <div class="card-body">
+        <?= GridView::widget([
+            'id' => 'elenco-disabili',
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'layout' =>
+                "<div class='table-container'>{items}</div>
+                        <div class='dataTable-bottom'>
+                              <div class='dataTable-info'>{summary}</div>
+                              <nav class='dataTable-pagination'>
+                                    {pager}
+                              </nav>
+                        </div>",
+            'pager' => [
+                'class' => 'yii\bootstrap5\LinkPager',
+                'firstPageLabel' => 'PRIMA',
+                'lastPageLabel' => 'ULTIMA',
+                'nextPageLabel' => '>>',
+                'prevPageLabel' => '<<',
+                'linkOptions' => ['class' => 'page-link'],
+            ],
+            'options' => [
+                'tag' => 'div',
+                'class' => 'dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns',
+            ],
+            'tableOptions' => [
+                'class' => 'table table-striped dataTable-table',
+            ],
+            'columns' => array_merge($checkboxColumn, $cols, [
+                [
+                    'label' => 'Importo a conguaglio',
+                    'value' => function ($model) {
+                        $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
+                        $giorniResiduo = $model->getGiorniResiduoDecesso();
+                        if ($problemiLiquidazioneDecesso)
+                            return "ALERT: " . $problemiLiquidazioneDecesso;
+                        else if ($giorniResiduo === null)
+                            return "-";
+                        else
+                            return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                    }
+                ]
+            ])
+        ]); ?>
+    </div>
+</div>
 <script>
-    function selezionaCheckbox() {
+    document.getElementById("selezionaCheckboxBtn").addEventListener("click", function (event) {
+        event.preventDefault(); // Previeni il ricaricamento della pagina
+
         // Ottieni i valori dalla textbox
         const textbox = document.getElementById("valuesTextbox");
         const valori = textbox.value.split('\n').map(val => val.trim());
@@ -192,6 +200,6 @@ $checkboxColumn = [
                 checkbox.checked = false; // Puoi rimuovere questa riga se vuoi mantenere le selezioni precedenti.
             }
         });
-    }
+    });
 </script>
 <?= Html::endForm() ?>
