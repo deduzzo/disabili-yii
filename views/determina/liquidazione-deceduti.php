@@ -102,40 +102,45 @@ $checkboxColumn = [
 
 ?>
 
-<?= ExportWidget::widget([
-    //'models' => $dataProvider->getModels(),
-    'dataProvider' => $dataProvider,
-    'columns' => array_merge($cols, [[
-        'label' => 'Importo a conguaglio',
-        'value' => function ($model) {
-            $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
-            $giorniResiduo = $model->getGiorniResiduoDecesso();
-            if ($problemiLiquidazioneDecesso)
-                return "ALERT: " . $problemiLiquidazioneDecesso;
-            else if ($giorniResiduo === null)
-                return "-";
-            else
-                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
-        }
-    ]])
-]) ?>
-
-<?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
 <div class="card">
     <div class="card-header">
-        <div class="card-toolbar d-flex align-items-center">
-            <!--begin::Button-->
-            <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
+        <div class="row">
+            <div class="col-12">
+                <div class="card-toolbar d-flex align-items-center">
+                    <!--begin::Button-->
+                    <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
 
-            <!-- Textbox per incollare i valori -->
-            <textarea id="valuesTextbox" rows="2" cols="10" class="form-control me-2"
-                      placeholder="Inserisci valori separati da invio"></textarea>
+                    <!-- Textbox per incollare i valori -->
+                    <textarea id="valuesTextbox" rows="2" cols="10" class="form-control me-2"
+                              placeholder="Inserisci valori separati da invio"></textarea>
 
-            <!-- Bottone Seleziona Checkbox -->
-            <button id="selezionaCheckboxBtn" class="btn btn-secondary">Seleziona Checkbox</button>
+                    <!-- Bottone Seleziona Checkbox -->
+                    <button id="selezionaCheckboxBtn" class="btn btn-secondary">Seleziona Checkbox</button>
+                </div>
+            </div>
+            <div class="col-12">
+                <?= ExportWidget::widget([
+                    //'models' => $dataProvider->getModels(),
+                    'dataProvider' => $dataProvider,
+                    'columns' => array_merge($cols, [[
+                        'label' => 'Importo a conguaglio',
+                        'value' => function ($model) {
+                            $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
+                            $giorniResiduo = $model->getGiorniResiduoDecesso();
+                            if ($problemiLiquidazioneDecesso)
+                                return "ALERT: " . $problemiLiquidazioneDecesso;
+                            else if ($giorniResiduo === null)
+                                return "-";
+                            else
+                                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                        }
+                    ]])
+                ]) ?>
+            </div>
         </div>
     </div>
     <div class="card-body">
+        <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
         <?= GridView::widget([
             'id' => 'elenco-disabili',
             'dataProvider' => $dataProvider,
@@ -179,6 +184,7 @@ $checkboxColumn = [
                 ]
             ])
         ]); ?>
+        <?= Html::endForm() ?>
     </div>
 </div>
 <script>
@@ -202,4 +208,3 @@ $checkboxColumn = [
         });
     });
 </script>
-<?= Html::endForm() ?>
