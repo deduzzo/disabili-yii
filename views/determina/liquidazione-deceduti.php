@@ -126,6 +126,9 @@ $checkboxColumn = [
             <div class="card-toolbar">
                 <!--begin::Button-->
                 <?= Html::submitButton('Liquidazione Deceduti', ['class' => 'btn btn-primary me-3', 'disabled' => true]) ?>
+                <!-- Textbox per incollare i valori -->
+                <textarea id="valuesTextbox" rows="2" cols="10" placeholder="Inserisci valori separati da invio"></textarea>
+                <button onclick="selezionaCheckbox()">Seleziona Checkbox</button>
             </div>
             <div class="card-body">
                 <?= GridView::widget([
@@ -172,4 +175,23 @@ $checkboxColumn = [
             </div>
         </div>
     </div>
+<script>
+    function selezionaCheckbox() {
+        // Ottieni i valori dalla textbox
+        const textbox = document.getElementById("valuesTextbox");
+        const valori = textbox.value.split('\n').map(val => val.trim());
+
+        // Seleziona tutte le checkbox
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        // Loop sulle checkbox e seleziona quelle che corrispondono ai valori incollati
+        checkboxes.forEach(checkbox => {
+            if (valori.includes(checkbox.value)) {
+                checkbox.checked = true;
+            } else {
+                checkbox.checked = false; // Puoi rimuovere questa riga se vuoi mantenere le selezioni precedenti.
+            }
+        });
+    }
+</script>
 <?= Html::endForm() ?>
