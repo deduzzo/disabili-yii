@@ -103,14 +103,14 @@ $checkboxColumn = [
 ?>
 
 
-
-
 <div class="modal fade text-left" id="finalizza-determina" tabindex="-1" aria-labelledby="label-modifica"
      style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document"
          style="min-width: 800px">
         <div class="modal-content">
+            <?= Html::beginForm(['/determina/finalizza-liquidazione-deceduti'], 'post', ['id' => 'finalizza-deceduti', 'class' => 'form-horizontal']) ?>
+            <input type="hidden" name="ids" id="ids">
             <div class="modal-header bg-primary">
                 <h5 class="modal-title white" id="label-modifica">
                     Determina liquidazione
@@ -125,26 +125,63 @@ $checkboxColumn = [
                 </button>
             </div>
             <div class="modal-body">
+                <div class="row">
+                    <div class="cols-12">
+                        <p id="info_istanze" class="mb-2"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Data determina con input type="date" -->
+                        <div class="mb-3">
+                            <label for="dataDetermina" class="form-label">Data Determina</label>
+                            <input type="date" class="form-control" id="dataDetermina" name="dataDetermina" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Data pagamentiDa con input type="date" -->
+                        <div class="mb-3">
+                            <label for="pagamentiDa" class="form-label">Pagamenti da</label>
+                            <input type="date" class="form-control" id="pagamentiDa" name="pagamentiDa" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Data pagamentiA con input type="date" -->
+                        <div class="mb-3">
+                            <label for="pagamentiA" class="form-label">Pagamenti a</label>
+                            <input type="date" class="form-control" id="pagamentiA" name="pagamentiA" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <!-- Textbox per il numero della determina -->
+                        <div class="mb-3">
+                            <label for="numeroDetermina" class="form-label">Numero determina</label>
+                            <input type="text" class="form-control" id="numeroDetermina" name="numeroDetermina" placeholder="Numero.." maxlength="10" required>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <!-- Textbox per il nome della determina -->
+                        <div class="mb-3">
+                            <label for="descrizioneDetermina" class="form-label">Descrizione determina</label>
+                            <input type="text" class="form-control" id="descrizioneDetermina" name="descrizioneDetermina" placeholder="Inserisci qui una descrizione" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Annulla</span>
+                    </button>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                    <i class="bx bx-x d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Annulla</span>
-                </button>
+                    <button type="submit" class="btn btn-warning ms-1">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Finalizza determina di liquidazione</span>
+                    </button>
 
-                <button type="submit" class="btn btn-warning ms-1">
-                    <i class="bx bx-check d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Finalizza determina di liquidazione</span>
-                </button>
+                </div>
                 <?= Html::endForm() ?>
             </div>
         </div>
     </div>
 </div>
-
-
-
 
 
 <div class="card">
@@ -170,14 +207,11 @@ $checkboxColumn = [
                     'columns' => array_merge($cols, [[
                         'label' => 'Importo a conguaglio',
                         'value' => function ($model) {
-                            $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
-                            $giorniResiduo = $model->getGiorniResiduoDecesso();
-                            if ($problemiLiquidazioneDecesso)
-                                return "ALERT: " . $problemiLiquidazioneDecesso;
-                            else if ($giorniResiduo === null)
-                                return "-";
+                            $dati = $model->getDatiLiquidazioneDecesso();
+                            if ($dati['ok'] === true)
+                                return $dati['valore'];
                             else
-                                return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                                return $dati['descrizione'];
                         }
                     ]])
                 ]) ?>
@@ -185,7 +219,6 @@ $checkboxColumn = [
         </div>
     </div>
     <div class="card-body">
-        <?= Html::beginForm(['determina/liquidazione-deceduti'], 'post'); ?>
         <?= GridView::widget([
             'id' => 'elenco-disabili',
             'dataProvider' => $dataProvider,
@@ -217,22 +250,29 @@ $checkboxColumn = [
                 [
                     'label' => 'Importo a conguaglio',
                     'value' => function ($model) {
-                        $problemiLiquidazioneDecesso = $model->getProblemiLiquidazioneDecesso();
-                        $giorniResiduo = $model->getGiorniResiduoDecesso();
-                        if ($problemiLiquidazioneDecesso)
-                            return "ALERT: " . $problemiLiquidazioneDecesso;
-                        else if ($giorniResiduo === null)
-                            return "-";
-                        else
-                            return Yii::$app->formatter->asCurrency($model->getGiorniResiduoDecesso() * ((($model->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                            $dati = $model->getDatiLiquidazioneDecesso();
+                            return $dati['descrizione'];
                     }
                 ]
             ])
         ]); ?>
-        <?= Html::endForm() ?>
     </div>
 </div>
 <script>
+
+    function check() {
+        // Ottieni tutte le checkbox selezionate
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+        // Raccogli i valori (gli ID) delle checkbox selezionate
+        const selectedIds = Array.from(checkboxes).map(checkbox => checkbox.value);
+        document.getElementById('info_istanze').innerHTML = selectedIds.length + " Istanze selezionate";
+
+        // Inserisci gli ID nell'input nascosto
+        document.getElementById('ids').value = selectedIds.join(',');
+
+    }
+
     document.getElementById("selezionaCheckboxBtn").addEventListener("click", function (event) {
         event.preventDefault(); // Previeni il ricaricamento della pagina
 

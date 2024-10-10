@@ -13,6 +13,7 @@ use Yii;
  * @property string|null $pagamenti_a
  * @property string|null $data
  * @property float|null $importo
+ * @property boolean $deceduti
  * @property boolean $storico
  * @property boolean $non_ordinaria
  * @property string|null $descrizione
@@ -44,7 +45,7 @@ class Determina extends \yii\db\ActiveRecord
         return [
             [['data','pagamenti_da','pagamenti_a'], 'safe'],
             [['descrizione'], 'string'],
-            [['storico','non_ordinaria'], 'boolean'],
+            [['storico','non_ordinaria','deceduti'], 'boolean'],
             [['importo'], 'number'],
             [['numero'], 'string', 'max' => 10],
         ];
@@ -62,6 +63,7 @@ class Determina extends \yii\db\ActiveRecord
             'pagamenti_da' => 'Pagamenti Da',
             'pagamenti_a' => 'Pagamenti A',
             'importo' => 'Importo',
+            'deceduti' => 'Deceduti',
             'storico' => 'Storico',
             'non_ordinaria' => 'Non Ordinaria',
             'descrizione' => 'Descrizione',

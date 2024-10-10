@@ -427,9 +427,9 @@ class Istanza extends \yii\db\ActiveRecord
         }
     }
 
-    public function getProssimoImporto($includiNuovoMese = true)
+    public function getProssimoImporto($includiNuovoMese = true, $skipDeceduto = false)
     {
-        if ($this->isInAlert())
+        if ($this->isInAlert($skipDeceduto))
             return null;
         else {
             /* @var $lastIsee Isee */
@@ -490,12 +490,12 @@ class Istanza extends \yii\db\ActiveRecord
         return $conto ? substr($conto->iban, -6) : null;
     }
 
-    public function isInAlert()
+    public function isInAlert($skipDeceduto = false)
     {
         $out = null;
-        if (!$this->attivo || $this->chiuso)
+        if ((!$this->attivo || $this->chiuso) && !$skipDeceduto)
             $out .= "NON ATTIVO - ";
-        if ($this->data_decesso)
+        if ($this->data_decesso && !$skipDeceduto)
             $out .= "DECEDUTO - ";
         if (!$this->patto_di_cura)
             $out .= "MANCA PATTO - ";
@@ -563,6 +563,26 @@ class Istanza extends \yii\db\ActiveRecord
             return ($this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30)) + $totaleRimanente;
     }
 
+    public function getDatiLiquidazioneDecesso() {
+        $prossimoImportoResiduo = $this->getProssimoImporto(false,true);
+        if ($prossimoImportoResiduo === null) {
+            $alert = $this->isInAlert(true);
+            return ["ok" => false, "descrizione" => $alert, "valore" => 0.0];
+        }
+        else {
+            $problemiLiquidazioneDecesso = $this->getProblemiLiquidazioneDecesso();
+            $giorniResiduo = $this->getGiorniResiduoDecesso();
+            if ($problemiLiquidazioneDecesso)
+                return "ALERT: " . $problemiLiquidazioneDecesso;
+            else if ($giorniResiduo === null)
+                return ["ok" => false, "descrizione" => "Non è possibile calcolare il totale", "valore" => 0.0];
+            else {
+                $val = $prossimoImportoResiduo + ($this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                return ["ok" => true, "descrizione" => Yii::$app->formatter->asCurrency($val), "valore" => $val];
+            }
+        }
+    }
+
     public function verificaContabilitaMese($mese, $anno, $determina = null)
     {
         if (!$determina) {
@@ -610,7 +630,7 @@ class Istanza extends \yii\db\ActiveRecord
         return ['contoOk' =>  $contoOk, 'tot' => (($reale > 0 || $logico > $reale) ? ($reale - $logico) : 0)];
     }
 
-    public function finalizzaMensilita($idDetermina, $pagaMeseCorrente = true)
+    public function finalizzaMensilita($idDetermina, $pagaMeseCorrente = true, $chiusuraDeceduto = false)
     {
         $errors = [];
         if (!$this->haRicoveriInCorso()) {
@@ -634,6 +654,26 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->save();
                 if ($movimento->errors)
                     $errors = array_merge($movimento->errors, $errors);
+                $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
+            }
+            if ($chiusuraDeceduto) {
+                $chiusura = $this->getDatiLiquidazioneDecesso();
+                if ($chiusura["ok"] === true) {
+                    $movimento = new Movimento();
+                    $movimento->id_conto = $contoValido->id;
+                    $movimento->contabilizzare = false;
+                    $movimento->is_movimento_bancario = false;
+                    $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
+                    $movimento->periodo_da = $determina->pagamenti_da;
+                    $movimento->periodo_a = $determina->pagamenti_a;
+                    $movimento->id_determina = $idDetermina;
+                    $movimento->note = "Chiusura decesso";
+                    $movimento->importo = $chiusura["valore"];
+                    $movimento->save();
+                    if ($movimento->errors)
+                        $errors = array_merge($movimento->errors, $errors);
+                    $importoSurplus += $chiusura["valore"];
+                }
             }
             foreach ($recuperiPositivi as $recuperPos) {
                 $movimento = new Movimento();
@@ -666,8 +706,6 @@ class Istanza extends \yii\db\ActiveRecord
                 if ($movimento->errors)
                     $errors = array_merge($movimento->errors, $errors);
             }
-            if ($pagaMeseCorrente)
-                $importoSurplus += ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
             // priorità i recuperi negativi rateizzati
             $ricoveri = $this->getRicoveriDaContabilizzare();
             foreach ($ricoveri as $ricoveroDaCont) {

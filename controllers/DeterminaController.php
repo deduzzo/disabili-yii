@@ -205,6 +205,43 @@ class DeterminaController extends \yii\web\Controller
         }
     }
 
+    public function actionFinalizzaLiquidazioneDeceduti() {
+        if ($this->request->isPost) {
+            $vars = $this->request->post();
+            // data_determina, descrizione_determina, ids (che sono separati da , e che vanno splittati)
+            $dataDetermina = $vars['dataDetermina'];
+            $pagamentiDa = $vars['pagamentiDa'];
+            $pagamentiA = $vars['pagamentiA'];
+            $descrizioneDetermina = $vars['descrizioneDetermina'];
+            $numero = $vars['numeroDetermina'];
+            $ids = explode(",", $vars['ids']);
+            if ($dataDetermina && $descrizioneDetermina && count($ids) >0) {
+                $determina = new Determina();
+                $determina->numero = $numero;
+                $determina->data = $dataDetermina;
+                $determina->pagamenti_da = $pagamentiDa;
+                $determina->pagamenti_a = $pagamentiA;
+                $determina->deceduti = true;
+                $determina->descrizione = $descrizioneDetermina . " - Pagamento " . count($ids) . " deceduti";
+                $determina->save();
+                foreach ($ids as $id) {
+                    $istanza = Istanza::findOne($id);
+                    $istanza->finalizzaMensilita($determina->id, false,true);
+                    $istanza->chiuso = true;
+                    $istanza->liquidazione_decesso_completata = true;
+                    $istanza->data_liquidazione_decesso = $dataDetermina;
+                    $istanza->save();
+                }
+                Yii::$app->session->setFlash('success', 'Determina finalizzata correttamente!');
+                return $this->redirect(['istanza/index']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Errore durante la creazione della determina');
+                return $this->redirect(['contabilita/liquidazione-deceduti']);
+            }
+        }
+
+    }
+
     public function actionLiquidazioneDeceduti()
     {
         $vars = [];
