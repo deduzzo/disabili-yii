@@ -40,7 +40,6 @@ class ExportWidget extends Widget
 
     public function run()
     {
-        die(json_encode($this->columns));
         // no timeout
         set_time_limit(0);
         // no memory limit
