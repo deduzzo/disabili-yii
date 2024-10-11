@@ -40,6 +40,7 @@ class ExportWidget extends Widget
 
     public function run()
     {
+        die(var_dump($this->columns));
         // no timeout
         set_time_limit(0);
         // no memory limit
@@ -54,7 +55,6 @@ class ExportWidget extends Widget
                 if (Utils::is_assoc($columns))
                     $columns = $columns['default'];
             }
-            die(var_dump($columns));
             $exporter = new Spreadsheet([
                 'dataProvider' => $this->dataProvider/* ?? (new ArrayDataProvider([
                     'allModels' => $this->models
