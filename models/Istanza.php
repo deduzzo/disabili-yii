@@ -565,6 +565,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getDatiLiquidazioneDecesso() {
         $prossimoImportoResiduo = $this->getProssimoImporto(false,true);
+        $importoRecuperi = $this->getImportoRecuperi();
         if ($prossimoImportoResiduo === null) {
             $alert = $this->isInAlert(true);
             return ["ok" => false, "descrizione" => $alert, "valore" => 0.0];
@@ -577,7 +578,7 @@ class Istanza extends \yii\db\ActiveRecord
             else if ($giorniResiduo === null)
                 return ["ok" => false, "descrizione" => "Non è possibile calcolare il totale", "valore" => 0.0];
             else {
-                $val = $prossimoImportoResiduo + ($this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
+                $val = $importoRecuperi + ($this->getGiorniResiduoDecesso() * ((($this->getLastIseeType() === IseeType::MAGGIORE_25K) ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1) / 30));
                 return ["ok" => true, "descrizione" => Yii::$app->formatter->asCurrency($val), "valore" => $val];
             }
         }
