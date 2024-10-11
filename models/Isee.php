@@ -18,6 +18,7 @@ where ana.id = ista.id_anagrafica_disabile and ista.id = i.id_istanza and i.data
  * @property int|null $anno_riferimento
  * @property string|null $data_scadenza
  * @property bool $valido
+ * @property bool $verificato
  * @property string|null $valido_fino_a
  * @property int|null $id_istanza
  *
@@ -40,7 +41,7 @@ class Isee extends \yii\db\ActiveRecord
     {
         return [
             [['importo'], 'number'],
-            [['maggiore_25mila', 'valido'], 'boolean'],
+            [['maggiore_25mila', 'valido','verificato'], 'boolean'],
             [['data_presentazione', 'data_scadenza','valido_fino_a'], 'safe'],
             [['id_istanza','anno_riferimento'], 'integer'],
             [['id_istanza'], 'exist', 'skipOnError' => true, 'targetClass' => Istanza::class, 'targetAttribute' => ['id_istanza' => 'id']],
@@ -60,6 +61,7 @@ class Isee extends \yii\db\ActiveRecord
             'anno_riferimento' => 'Anno Riferimento',
             'data_scadenza' => 'Data Scadenza',
             'valido' => 'Valido',
+            'verificato' => 'Verificato',
             'valido_fino_a' => 'Valido Fino A',
             'id_istanza' => 'Id Istanza',
         ];
