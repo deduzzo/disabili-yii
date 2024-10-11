@@ -65,9 +65,10 @@ echo GridView::widget([
             'label' => 'Stato',
             'value' => function ($model) {
                 $tooltipText = $model->valido_fino_a ? \Carbon\Carbon::parse($model->valido_fino_a)->format('d/m/Y') : 'N/D';
-                return $model->valido ?
+                return !$model->verificato ? '<span class="badge bg-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Da validare">DA VALIDARE</span>'  :
+                    ($model->valido ?
                     '<span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Valido fino al: ' . $tooltipText . '">ATTIVO</span>' :
-                    '<span class="badge bg-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Valido fino al: ' . $tooltipText . '">SCADUTO</span>';
+                    '<span class="badge bg-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Valido fino al: ' . $tooltipText . '">SCADUTO</span>');
             },
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
@@ -129,6 +130,11 @@ echo GridView::widget([
                 echo Html::beginTag('div', ['class' => 'form-group']);
                 echo Html::label('Data presentazione', 'data_presentazione', ['class' => 'control-label']);
                 echo Html::input('date', 'data_presentazione', date('Y-m-d'), ['class' => 'form-control', 'id' => 'data_presentazione']);
+                echo Html::endTag('div');
+                // verificato checkbox default checked
+                echo Html::beginTag('div', ['class' => 'form-check']);
+                echo Html::checkbox('verificato', true, ['class' => 'form-check-input', 'id' => 'verificato']);
+                echo Html::label('Verificato', 'verificato', ['class' => 'form-check-label']);
                 echo Html::endTag('div');
                 ?>
             </div>

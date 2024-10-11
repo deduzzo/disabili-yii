@@ -236,7 +236,7 @@ class Istanza extends \yii\db\ActiveRecord
 
     private function getLastIsee()
     {
-        return Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
+        return Isee::find()->where(['id_istanza' => $this->id, 'valido' => 1,'verificato' => 1])->orderBy(['data_presentazione' => SORT_DESC])->one();
     }
 
 
