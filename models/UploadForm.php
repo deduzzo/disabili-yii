@@ -16,7 +16,6 @@ use Carbon\Carbon;
 use Yii;
 use yii\base\Model;
 use yii\data\ArrayDataProvider;
-use yii\helpers\Json;
 use yii\web\UploadedFile;
 
 class UploadForm extends Model
@@ -444,6 +443,7 @@ class UploadForm extends Model
                     if (count($header) === 0) {
                         foreach ($row->getCells() as $idxcel => $cel)
                             $header[$idxcel] = $cel->getValue();
+                        die (json_encode($header));
                     } else {
                         foreach ($row->getCells() as $idxcel => $cel) {
                             $newRow[$header[$idxcel]] = $cel->getValue();
