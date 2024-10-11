@@ -386,7 +386,8 @@ class Istanza extends \yii\db\ActiveRecord
 
     public function getGiorniResiduoDecesso()
     {
-        $ultimoMovimentoBancario = $this->getLastMovimentoBancario();
+        //$ultimoMovimentoBancario = $this->getLastMovimentoBancario();
+        $ultimoMovimentoBancario = $this->getlastMovimentoContabile();
         $dataUltimoMovimentoBancario = $ultimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d', $ultimoMovimentoBancario->data)->endOfMonth()->format('Y-m-d') : null;
         // add one day to $dataUltimoMovimentoBancario
         $giornoDopoDataUltimoPagamento = $dataUltimoMovimentoBancario ? Carbon::createFromFormat('Y-m-d', $dataUltimoMovimentoBancario)->addDay()->format('Y-m-d') : null;
