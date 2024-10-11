@@ -459,7 +459,6 @@ class UploadForm extends Model
                 }
             }
         }
-        die (json_encode($out));
         $widget = new ExportWidget([
             'dataProvider' => new ArrayDataProvider([
                 'allModels' => $out
