@@ -54,6 +54,7 @@ class ExportWidget extends Widget
                 if (Utils::is_assoc($columns))
                     $columns = $columns['default'];
             }
+            die(var_dump($columns));
             $exporter = new Spreadsheet([
                 'dataProvider' => $this->dataProvider/* ?? (new ArrayDataProvider([
                     'allModels' => $this->models
