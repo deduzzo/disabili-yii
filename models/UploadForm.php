@@ -443,11 +443,11 @@ class UploadForm extends Model
                     if (count($header) === 0) {
                         foreach ($row->getCells() as $idxcel => $cel)
                             $header[$idxcel] = $cel->getValue();
-                        die (json_encode($header));
                     } else {
                         foreach ($row->getCells() as $idxcel => $cel) {
                             $newRow[$header[$idxcel]] = $cel->getValue();
                         }
+                        die (json_encode($header));
                         $cf = $newRow[$colonnaCf];
                         $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf, 'attivo' => true])->one();
                         $distretto = $istanza->distretto->nome;
