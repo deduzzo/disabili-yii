@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property string|null $note
  * @property string|null $data_creazione
  * @property string|null $data_modifica
+ * @property bool $chiusura_decesso
  * @property int|null $id_istanza
  * @property int|null $id_recupero_collegato
  *
@@ -52,7 +53,7 @@ class Recupero extends \yii\db\ActiveRecord
     {
         return [
             [['importo', 'importo_rata'], 'number'],
-            [['chiuso', 'annullato', 'rateizzato'], 'boolean'],
+            [['chiuso', 'annullato', 'rateizzato', 'chiusura_decesso'], 'boolean'],
             [['data_annullamento', 'data_creazione', 'data_modifica'], 'safe'],
             [['num_rate', 'id_istanza', 'id_recupero_collegato'], 'integer'],
             [['note'], 'string'],
@@ -93,6 +94,7 @@ class Recupero extends \yii\db\ActiveRecord
             'note' => 'Note',
             'data_creazione' => 'Data Creazione',
             'data_modifica' => 'Data Modifica',
+            'chiusura_decesso' => 'Chiusura Decesso',
             'id_istanza' => 'Id Istanza',
             'id_recupero_collegato' => 'Id Recupero Collegato',
         ];
