@@ -649,10 +649,10 @@ class Istanza extends \yii\db\ActiveRecord
                 $movimento->contabilizzare = false;
                 $movimento->is_movimento_bancario = false;
                 $movimento->data = $determina->data ?? Carbon::now()->format('Y-m-d');
-                $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($movimento->data)->startOfMonth())->format('Y-m-d');
-                $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($movimento->data)->endOfMonth())->format('Y-m-d');
+                $movimento->periodo_da = Carbon::createFromDate(Carbon::parse($determina->pagamenti_a)->startOfMonth())->format('Y-m-d');
+                $movimento->periodo_a = Carbon::createFromDate(Carbon::parse($determina->pagamenti_a)->endOfMonth())->format('Y-m-d');
                 $movimento->id_determina = $idDetermina;
-                $movimento->note = "Beneficio contabile di " . Carbon::parse($movimento->data)->locale('it')->monthName . ' ' . Carbon::parse($movimento->data)->year;
+                $movimento->note = "Beneficio contabile di " . Carbon::parse($determina->pagamenti_a)->locale('it')->monthName . ' ' . Carbon::parse($determina->pagamenti_a)->year;
                 $movimento->importo = ($lastIseeType === IseeType::MAGGIORE_25K ? ImportoBase::MAGGIORE_25K_V1 : ImportoBase::MINORE_25K_V1);
                 $movimento->save();
                 if ($movimento->errors)
