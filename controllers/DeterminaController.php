@@ -291,13 +291,17 @@ class DeterminaController extends \yii\web\Controller
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
+        $determina = Determina::findOne($getVars['idDetermina']) ?? null;
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
-        $allPagamenti = (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
+        $allPagamenti = !$determina ? (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
             ->andwhere(['>=', 'data', $ultimaData->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->endOfMonth()->format('Y-m-d')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
-            ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all();
+            ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all() :
+            (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')
+                ->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
+                ->andWhere(['m.id_determina' => $determina->id])->all();
         $importiTotali = [];
         $numeriTotali = [];
         foreach (Distretto::find()->all() as $item) {
