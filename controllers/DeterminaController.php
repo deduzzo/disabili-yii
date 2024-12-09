@@ -232,6 +232,7 @@ class DeterminaController extends \yii\web\Controller
                     $movimento->importo = $valore;
                     $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
                     $movimento->is_movimento_bancario = true;
+                    $movimento->escludi_contabilita = true;
                     $movimento->id_determina = $determina->id;
                     $movimento->save();
 
