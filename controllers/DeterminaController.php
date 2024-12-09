@@ -209,27 +209,35 @@ class DeterminaController extends \yii\web\Controller
         if ($this->request->isPost) {
             $vars = $this->request->post();
             // data_determina, descrizione_determina, ids (che sono separati da , e che vanno splittati)
-            $dataDetermina = $vars['dataDetermina'];
-            $pagamentiDa = $vars['pagamentiDa'];
-            $pagamentiA = $vars['pagamentiA'];
-            $descrizioneDetermina = $vars['descrizioneDetermina'];
-            $numero = $vars['numeroDetermina'];
+            $idDetermina = $vars['idDetermina'];
             $ids = explode(",", $vars['ids']);
-            if ($dataDetermina && $descrizioneDetermina && count($ids) >0) {
-                $determina = new Determina();
-                $determina->numero = $numero;
-                $determina->data = $dataDetermina;
-                $determina->pagamenti_da = $pagamentiDa;
-                $determina->pagamenti_a = $pagamentiA;
-                $determina->deceduti = true;
-                $determina->descrizione = $descrizioneDetermina . " - Pagamento " . count($ids) . " deceduti";
-                $determina->save();
+            if ($idDetermina && count($ids) >0) {
+                $determina = Determina::findOne($idDetermina);
                 foreach ($ids as $id) {
                     $istanza = Istanza::findOne($id);
-                    $istanza->finalizzaMensilita($determina->id, false,true);
+                    $valore = $istanza->getDatiLiquidazioneDecesso()['valore'];
+                    // Creo prima il movimento contabile
+                    $movimento = new Movimento();
+                    $movimento->id_conto = $istanza->getContoValido()->id;
+                    $movimento->data = $determina->data;
+                    $movimento->importo = $valore;
+                    $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
+                    $movimento->is_movimento_bancario = false;
+                    $movimento->id_determina = $determina->id;
+                    $movimento->save();
+                    // Creo il movimento bancario
+                    $movimento = new Movimento();
+                    $movimento->id_conto = $istanza->getContoValido()->id;
+                    $movimento->data = $determina->data;
+                    $movimento->importo = $valore;
+                    $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
+                    $movimento->is_movimento_bancario = true;
+                    $movimento->id_determina = $determina->id;
+                    $movimento->save();
+
                     $istanza->chiuso = true;
                     $istanza->liquidazione_decesso_completata = true;
-                    $istanza->data_liquidazione_decesso = $dataDetermina;
+                    $istanza->data_liquidazione_decesso = $determina->data;
                     $istanza->save();
                 }
                 Yii::$app->session->setFlash('success', 'Determina finalizzata correttamente!');
@@ -250,6 +258,11 @@ class DeterminaController extends \yii\web\Controller
         }
         $searchModel = new IstanzaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, array_key_exists('ExportWDG', $vars));
+
+        // Impostiamo il numero di righe per pagina a 1000
+        $dataProvider->pagination = [
+            'pageSize' => 1000,
+        ];
 
         $dataProvider->query->where(['chiuso' => false])
             ->andWhere(['not', ['data_decesso' => null]]);

@@ -95,7 +95,11 @@ $checkboxColumn = [
     [
         'class' => CheckboxColumn::class,
         'checkboxOptions' => function ($model) {
-            return ['value' => $model->id];
+            // Modifichiamo questa parte per usare il codice fiscale come valore
+            return [
+                'value' => $model->anagraficaDisabile->codice_fiscale,
+                'data-id' => $model->id // Manteniamo l'ID come attributo data per il form
+            ];
         },
     ]
 ];
@@ -129,41 +133,12 @@ $checkboxColumn = [
                     <div class="cols-12">
                         <p id="info_istanze" class="mb-2"></p>
                     </div>
-                    <div class="col-md-3">
-                        <!-- Data determina con input type="date" -->
-                        <div class="mb-3">
-                            <label for="dataDetermina" class="form-label">Data Determina</label>
-                            <input type="date" class="form-control" id="dataDetermina" name="dataDetermina" required>
-                        </div>
+                    <div class="col-md-12">
+                        <?= // echo dropDownList with Determina::getAllDetermineMap() and 'prompt' => 'Selezionare la determina..'
+                            Html::dropDownList('idDetermina', null, \app\models\Determina::getAllDetermineMap(), ['prompt' => 'Selezionare la determina..', 'class' => 'form-control'])
+                        ?>
                     </div>
-                    <div class="col-md-3">
-                        <!-- Data pagamentiDa con input type="date" -->
-                        <div class="mb-3">
-                            <label for="pagamentiDa" class="form-label">Pagamenti da</label>
-                            <input type="date" class="form-control" id="pagamentiDa" name="pagamentiDa" required>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <!-- Data pagamentiA con input type="date" -->
-                        <div class="mb-3">
-                            <label for="pagamentiA" class="form-label">Pagamenti a</label>
-                            <input type="date" class="form-control" id="pagamentiA" name="pagamentiA" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <!-- Textbox per il numero della determina -->
-                        <div class="mb-3">
-                            <label for="numeroDetermina" class="form-label">Numero determina</label>
-                            <input type="text" class="form-control" id="numeroDetermina" name="numeroDetermina" placeholder="Numero.." maxlength="10" required>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <!-- Textbox per il nome della determina -->
-                        <div class="mb-3">
-                            <label for="descrizioneDetermina" class="form-label">Descrizione determina</label>
-                            <input type="text" class="form-control" id="descrizioneDetermina" name="descrizioneDetermina" placeholder="Inserisci qui una descrizione" required>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
@@ -259,36 +234,44 @@ $checkboxColumn = [
     </div>
 </div>
 <script>
-
     function check() {
         // Ottieni tutte le checkbox selezionate
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 
-        // Raccogli i valori (gli ID) delle checkbox selezionate
-        const selectedIds = Array.from(checkboxes).map(checkbox => checkbox.value);
+        // Raccogli gli ID dalle checkbox selezionate usando l'attributo data-id
+        const selectedIds = Array.from(checkboxes)
+            .map(checkbox => checkbox.getAttribute('data-id'))
+            .filter(id => id); // Filtra eventuali valori null/undefined
+
         document.getElementById('info_istanze').innerHTML = selectedIds.length + " Istanze selezionate";
 
         // Inserisci gli ID nell'input nascosto
         document.getElementById('ids').value = selectedIds.join(',');
-
     }
 
     document.getElementById("selezionaCheckboxBtn").addEventListener("click", function (event) {
-        event.preventDefault(); // Previeni il ricaricamento della pagina
+        event.preventDefault();
+        console.log("Bottone premuto");
 
-        // Ottieni i valori dalla textbox
+        // Ottieni i codici fiscali dalla textbox
         const textbox = document.getElementById("valuesTextbox");
-        const valori = textbox.value.split('\n').map(val => val.trim());
+        const codiciFiscali = textbox.value.split('\n')
+            .map(val => val.trim().toUpperCase()) // Normalizziamo i codici fiscali in maiuscolo
+            .filter(val => val); // Rimuove le righe vuote
+
+        console.log("Codici fiscali da cercare:", codiciFiscali);
 
         // Seleziona tutte le checkbox
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-        // Loop sulle checkbox e seleziona quelle che corrispondono ai valori incollati
+        // Loop sulle checkbox e seleziona quelle che corrispondono ai codici fiscali
         checkboxes.forEach(checkbox => {
-            if (valori.includes(checkbox.value)) {
+            const value = checkbox.value.trim().toUpperCase();
+            if (codiciFiscali.includes(value)) {
                 checkbox.checked = true;
+                console.log("Trovata corrispondenza per:", value);
             } else {
-                checkbox.checked = false; // Puoi rimuovere questa riga se vuoi mantenere le selezioni precedenti.
+                checkbox.checked = false;
             }
         });
     });
