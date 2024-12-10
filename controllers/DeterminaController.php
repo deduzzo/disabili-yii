@@ -309,6 +309,10 @@ class DeterminaController extends \yii\web\Controller
             $importiTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
             $numeriTotali[$item->id] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
         }
+        // deceduti
+        $importiTotali[-1] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
+        $numeriTotali[-1] = [IseeType::MAGGIORE_25K => 0, IseeType::MINORE_25K => 0, IseeType::NO_ISEE => 0];
+
         $istanzeArray = [];
         // id, cf, cognome, nome distretto, isee, eta, gruppo, importo
         foreach ($allPagamenti as $istanzaRaw) {
@@ -320,7 +324,7 @@ class DeterminaController extends \yii\web\Controller
                 'cognomeNome' => $istanza->getNominativoDisabile(),
                 'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
                 'dataDecesso' => $istanza->data_decesso,
-                'distretto' => $istanza->distretto->nome,
+                'distretto' => !$istanza -> liquidazione_decesso_completata ? $istanza->distretto->nome : "DECEDUTI",
                 'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
                 'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
@@ -331,8 +335,13 @@ class DeterminaController extends \yii\web\Controller
             ];
             $istanzeArray[] = $istVal;
 
-            $numeriTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += 1;
-            $importiTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
+            if (!$istanza -> liquidazione_decesso_completata) {
+                $numeriTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += 1;
+                $importiTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
+            } else {
+                $numeriTotali[-1][$istanza->getIseeTypeInDate($ultimaData)] += 1;
+                $importiTotali[-1][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
+            }
         }
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $istanzeArray);

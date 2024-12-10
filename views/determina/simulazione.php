@@ -256,6 +256,18 @@ if (!isset($soloVariazioni)) {
                                 </a>
 
                             <?php endforeach; ?>
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between"
+                               id="dettagli_-1_list" data-bs-toggle="list" href="#dettagli_-1" role="tab">
+                                Deceduti
+                                <div style="">
+                                    <span class="badge bg-secondary badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][-1][IseeType::MINORE_25K] . '</span>' ?>
+                                    <span class="badge bg-secondary badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][-1][IseeType::MAGGIORE_25K] . '</span>' ?>
+                                    <span class="badge bg-secondary badge-pill badge-round ms-2"
+                                          style="width: 50px"><?= $stats['numeriTotali'][-1][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][-1][IseeType::MINORE_25K] . '</span>' ?>
+                                </div>
+                            </a>
                         </div>
                     </div>
                     <div class="col-6 col-sm-12 col-md-8 mt-1">
@@ -286,6 +298,26 @@ if (!isset($soloVariazioni)) {
                                     ?>
                                 </div>
                             <?php endforeach; ?>
+                            <div class="tab-pane show" id="dettagli_-1" style="text-align:center" role="tabpanel"
+                                 aria-labelledby="dettagli_-1_list">
+                                <?php
+                                echo "<div class='row'><div class='col-md-12'><h2>Dettaglio deceduti</h2></div>";
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
+
+                                echo '<button type="button" class="btn btn-success">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][-1][IseeType::MINORE_25K]) . '<span class="badge bg-transparent">' . $stats['numeriTotali'][-1][IseeType::MINORE_25K] . '</span>
+                                    </button></div>';
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-warning"  style="margin-bottom:5px">' . Html::encode("> MAGGIORE 25K €") . '</span><br />';
+
+                                echo '<button type="button" class="btn btn-warning">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][-1][IseeType::MAGGIORE_25K]) . '<span class="badge bg-transparent">' . $stats['numeriTotali'][-1][IseeType::MAGGIORE_25K] . '</span>
+                                    </button></div>';
+
+                                echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-secondary"  style="margin-bottom:5px">IMPORTO TOTALE</span><br />';
+                                echo '<button type="button" class="btn btn-secondary">
+                                        ' . $formatter->asCurrency($stats['importiTotali'][-1][IseeType::MAGGIORE_25K] + $stats['importiTotali'][-1][IseeType::MINORE_25K]) . ' € <span class="badge bg-transparent">' . ($stats['numeriTotali'][-1][IseeType::MAGGIORE_25K] + $stats['numeriTotali'][-1][IseeType::MINORE_25K]) . '</span>
+                                    </button></div></div>';
+                                ?>
                         </div>
                     </div>
                 </div>
