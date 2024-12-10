@@ -258,7 +258,7 @@ if (!isset($soloVariazioni)) {
                             <?php endforeach; ?>
                             <a class="list-group-item list-group-item-action d-flex justify-content-between"
                                id="dettagli_-1_list" data-bs-toggle="list" href="#dettagli_-1" role="tab">
-                                <b>Deceduti</b>
+                                <b>DECEDUTI</b>
                                 <div style="">
                                     <span class="badge bg-secondary badge-pill badge-round ms-2"
                                           style="width: 50px"><?= $stats['numeriTotali'][-1][IseeType::MINORE_25K] . '</span>' ?>
@@ -301,7 +301,7 @@ if (!isset($soloVariazioni)) {
                             <div class="tab-pane show" id="dettagli_-1" style="text-align:center" role="tabpanel"
                                  aria-labelledby="dettagli_-1_list">
                                 <?php
-                                echo "<div class='row'><div class='col-md-12'><h2>Dettaglio deceduti</h2></div>";
+                                echo "<div class='row'><div class='col-md-12'><h2>Dettaglio elenco DECEDUTI</h2></div>";
                                 echo '<div class="col-md-4" style="text-align:center"><span class="badge bg-success" style="margin-bottom:5px">' . Html::encode("< MINORE 25K €") . '</span><br />';
 
                                 echo '<button type="button" class="btn btn-success">
