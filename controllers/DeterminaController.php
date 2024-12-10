@@ -227,7 +227,7 @@ class DeterminaController extends \yii\web\Controller
                     $movimento->save();
                     // Creo il movimento bancario
                     $movimento = new Movimento();
-                    $movimento->id_conto = $istanza->getContoValido()->id;
+                    $movimento->id_conto = $istanza->getContoValido(true)->id;
                     $movimento->data = $determina->data;
                     $movimento->importo = $valore;
                     $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
