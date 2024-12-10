@@ -258,7 +258,7 @@ if (!isset($soloVariazioni)) {
                             <?php endforeach; ?>
                             <a class="list-group-item list-group-item-action d-flex justify-content-between"
                                id="dettagli_-1_list" data-bs-toggle="list" href="#dettagli_-1" role="tab">
-                                Deceduti
+                                <b>Deceduti</b>
                                 <div style="">
                                     <span class="badge bg-secondary badge-pill badge-round ms-2"
                                           style="width: 50px"><?= $stats['numeriTotali'][-1][IseeType::MINORE_25K] . '</span>' ?>
