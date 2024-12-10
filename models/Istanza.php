@@ -333,13 +333,15 @@ class Istanza extends \yii\db\ActiveRecord
         return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => true])->one();
     }
 
-    public function getContoValido()
+    public function getContoValido($lastIfEmpty = false)
     {
         $conto = $this->getUltimoContoAttivoValidato();
         if (!$conto || $this->haCambioIbanInCorso())
-            return Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->one();
-        else
-            return $conto;
+            $conto = Conto::find()->where(['id_istanza' => $this->id, 'attivo' => true, 'validato' => false])->one();
+        if (!$conto && $lastIfEmpty)
+            // get the last conto used in the last payment
+            $conto = $this->getLastMovimentoBancario()->conto;
+        return $conto;
     }
 
     public function haContoValido()

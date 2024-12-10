@@ -218,7 +218,7 @@ class DeterminaController extends \yii\web\Controller
                     $valore = $istanza->getDatiLiquidazioneDecesso()['valore'];
                     // Creo prima il movimento contabile
                     $movimento = new Movimento();
-                    $movimento->id_conto = $istanza->getContoValido()->id;
+                    $movimento->id_conto = $istanza->getContoValido(true)->id;
                     $movimento->data = $determina->data;
                     $movimento->importo = $valore;
                     $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
