@@ -292,7 +292,7 @@ class DeterminaController extends \yii\web\Controller
         $distretti = $getVars['distrettiPost'] ?? Distretto::getAllIds();
         $distretti = Distretto::find()->where(['id' => $distretti])->all();
         $gruppi = $getVars['gruppiPost'] ?? Gruppo::getAllIds();
-        $determina = Determina::findOne($getVars['idDetermina'] ?? null) ?? null;
+        $determina = Determina::findOne($getVars['idDetermina'] ?? null) ?? Determina::find()->orderBy(['data' => SORT_DESC])->one();
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
