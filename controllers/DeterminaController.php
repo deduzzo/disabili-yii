@@ -56,6 +56,7 @@ class DeterminaController extends \yii\web\Controller
         $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
+            ->andWhere(['i.liquidazione_decesso_completata' => false])
             ->all();
         $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
         $pagamentiPrecedentiPerDistretti = [];
@@ -205,13 +206,14 @@ class DeterminaController extends \yii\web\Controller
         }
     }
 
-    public function actionFinalizzaLiquidazioneDeceduti() {
+    public function actionFinalizzaLiquidazioneDeceduti()
+    {
         if ($this->request->isPost) {
             $vars = $this->request->post();
             // data_determina, descrizione_determina, ids (che sono separati da , e che vanno splittati)
             $idDetermina = $vars['idDetermina'];
             $ids = explode(",", $vars['ids']);
-            if ($idDetermina && count($ids) >0) {
+            if ($idDetermina && count($ids) > 0) {
                 $determina = Determina::findOne($idDetermina);
                 foreach ($ids as $id) {
                     $istanza = Istanza::findOne($id);
@@ -324,7 +326,7 @@ class DeterminaController extends \yii\web\Controller
                 'cognomeNome' => $istanza->getNominativoDisabile(),
                 'dataNascita' => $istanza->anagraficaDisabile->data_nascita,
                 'dataDecesso' => $istanza->data_decesso,
-                'distretto' => !$istanza -> liquidazione_decesso_completata ? $istanza->distretto->nome : "DECEDUTI",
+                'distretto' => !$istanza->liquidazione_decesso_completata ? $istanza->distretto->nome : "DECEDUTI",
                 'isee' => $istanza->getIseeTypeInDate($ultimaData->endOfMonth()),
                 'eta' => $istanza->anagraficaDisabile->getEta($ultimaData),
                 'gruppo' => $istanza->gruppo->descrizione_gruppo_old . " [" . $istanza->gruppo->descrizione_gruppo . "]",
@@ -335,7 +337,7 @@ class DeterminaController extends \yii\web\Controller
             ];
             $istanzeArray[] = $istVal;
 
-            if (!$istanza -> liquidazione_decesso_completata) {
+            if (!$istanza->liquidazione_decesso_completata) {
                 $numeriTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += 1;
                 $importiTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
             } else {
@@ -412,7 +414,7 @@ class DeterminaController extends \yii\web\Controller
             if (!$idDetermina) {
                 $mesePagamento = Carbon::createFromFormat('Y-m-d', $vars['anno'] . '-' . $vars['mese'] . "-01");
                 $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')->andWhere(['m.is_movimento_bancario' => true])
-                ->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
+                    ->andWhere(['>=', 'm.data', $mesePagamento->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'm.data', $mesePagamento->endOfMonth()->format('Y-m-d')])->all();
                 //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
                 $istanzeAttiveArrayId = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
                     ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
@@ -426,15 +428,15 @@ class DeterminaController extends \yii\web\Controller
                 $allIstanze = array_merge($istanzePagate, $istanzeAttiveArrayId);
             } else {
                 $istanzePagate = [];
-/*                $allGruppiPagati = DeterminaGruppoPagamento::find()->where(['id_determina' => $idDetermina->id])->all();
-                foreach ($allGruppiPagati as $gruppo) {
-                    if ($gruppo->id < $minGruppoPagato || $minGruppoPagato === 0)
-                        $minGruppoPagato = $gruppo->id;
-                    $allIstanzeGruppo = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')
-                        ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
-                        ->andWhere(['m.is_movimento_bancario' => true])->andWhere(['m.id_gruppo_pagamento' => $gruppo->id_gruppo])->all();
-                    $istanzePagate = array_merge($istanzePagate, $allIstanzeGruppo);
-                }*/
+                /*                $allGruppiPagati = DeterminaGruppoPagamento::find()->where(['id_determina' => $idDetermina->id])->all();
+                                foreach ($allGruppiPagati as $gruppo) {
+                                    if ($gruppo->id < $minGruppoPagato || $minGruppoPagato === 0)
+                                        $minGruppoPagato = $gruppo->id;
+                                    $allIstanzeGruppo = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')
+                                        ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
+                                        ->andWhere(['m.is_movimento_bancario' => true])->andWhere(['m.id_gruppo_pagamento' => $gruppo->id_gruppo])->all();
+                                    $istanzePagate = array_merge($istanzePagate, $allIstanzeGruppo);
+                                }*/
                 $istanzePagate = (new Query())->select('i.id')->distinct()->from('istanza i, conto c, movimento m')
                     ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
                     ->andWhere(['m.is_movimento_bancario' => true])->andWhere(['m.id_determina' => $idDetermina->id])->all();
@@ -453,7 +455,7 @@ class DeterminaController extends \yii\web\Controller
             }
             $allIstanzeAttiveContoDaValidare = (new Query())->select('i.id')->distinct()->from('istanza i, movimento m, conto c')
                 ->where('m.id_conto = c.id')->andWhere('c.id_istanza = i.id')
-                ->andWhere(['i.attivo' => true])->andWhere(['c.validato' => false,'c.attivo' => true])->all();
+                ->andWhere(['i.attivo' => true])->andWhere(['c.validato' => false, 'c.attivo' => true])->all();
             $allIstanze = array_merge($allIstanze, $allIstanzeAttiveContoDaValidare);
 
             $allIstanze = array_map("unserialize", array_unique(array_map("serialize", $allIstanze)));
