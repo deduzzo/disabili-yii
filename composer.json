@@ -42,7 +42,8 @@
     "ext-zip": "*",
     "ext-json": "*",
     "amphp/process": "^1.1",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "g
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",
