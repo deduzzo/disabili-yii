@@ -133,13 +133,6 @@ $checkboxColumn = [
                     <div class="cols-12">
                         <p id="info_istanze" class="mb-2"></p>
                     </div>
-                    <!-- checkbox per indicare "considera iban da colonna "iban" -->
-                    <div class="col-md-12">
-                        <div class="form-check form-switch form-check-primary">
-                            <input type="checkbox" class="form-check-input" id="considera-iban" name="considera-iban">
-                            <label class="form-check" for="considera-iban">Considera iban da colonna "iban"</label>
-                        </div>
-                    </div>
                     <div class="col-md-12">
                         <?= // echo dropDownList with Determina::getAllDetermineMap() and 'prompt' => 'Selezionare la determina..'
                             Html::dropDownList('idDetermina', null, \app\models\Determina::getAllDetermineMap(), ['prompt' => 'Selezionare la determina..', 'class' => 'form-control'])
