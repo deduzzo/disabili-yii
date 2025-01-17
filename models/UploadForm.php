@@ -164,7 +164,7 @@ class UploadForm extends Model
                                 $movimento->is_movimento_bancario = true;
                                 $movimento->escludi_contabilita = true;
                                 $movimento->data = date('Y-m-d');
-                                $movimento->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
+                                $movimento->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
                                 $movimento->importo = intval($importo);
                                 $movimento->contabilizzare = true;
                                 if ($idDetermina)
@@ -175,7 +175,7 @@ class UploadForm extends Model
                                 $movimento2->is_movimento_bancario = false;
                                 $movimento2->escludi_contabilita = false;
                                 $movimento2->data = date('Y-m-d');
-                                $movimento2->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
+                                $movimento2->note = "Liquidazione decesso " . $istanza->getNominativoDisabile();
                                 $movimento2->importo = intval($importo);
                                 $movimento2->contabilizzare = false;
                                 if ($idDetermina)
