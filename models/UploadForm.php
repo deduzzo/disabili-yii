@@ -120,6 +120,7 @@ class UploadForm extends Model
         ini_set('memory_limit', '-1');
         set_time_limit(0);
         $stats = ["modificati" => [], "nonTrovati" => [], "errors" => []];
+        $idDetermina = Determina::find()->where(['id' => $this->idDetermina])->one();
         foreach ($okFiles as $filename) {
             $reader = ReaderEntityFactory::createReaderFromFile($filename);
             $reader->open($filename);
@@ -166,6 +167,8 @@ class UploadForm extends Model
                                 $movimento->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
                                 $movimento->importo = intval($importo);
                                 $movimento->contabilizzare = true;
+                                if ($idDetermina)
+                                    $movimento->id_determina = $idDetermina->id;
                                 $movimento->save();
                                 $movimento2 = new Movimento();
                                 $movimento2->id_conto = $conto->id;
@@ -175,6 +178,8 @@ class UploadForm extends Model
                                 $movimento2->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
                                 $movimento2->importo = intval($importo);
                                 $movimento2->contabilizzare = false;
+                                if ($idDetermina)
+                                    $movimento2->id_determina = $idDetermina->id;
                                 $movimento2->save();
                                 $istanza->chiuso = true;
                                 $istanza->liquidazione_decesso_completata = true;
