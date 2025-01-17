@@ -105,12 +105,101 @@ class UploadForm extends Model
                 case TipologiaDatiCategoria::DECESSI:
                     $stats = $this->importaDecessi($okFiles);
                     break;
+                case TipologiaDatiCategoria::LIQUIDAZIONE_EREDI_RAW:
+                    $stats = $this->importaLiquidazioneErediRaw($okFiles);
             }
         }
         if ($this->errors)
             // show with setFlash the errors array
             Yii::$app->session->setFlash('error', json_encode($this->errors));
         return $stats;
+    }
+
+    private function importaLiquidazioneErediRaw($okFiles, $cfCol = "cf", $ibanCol = "iban", $importoCol = "importo", $eredeCol = "erede")
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        $stats = ["modificati" => [], "nonTrovati" => [], "errors" => []];
+        foreach ($okFiles as $filename) {
+            $reader = ReaderEntityFactory::createReaderFromFile($filename);
+            $reader->open($filename);
+            foreach ($reader->getSheetIterator() as $sheet) {
+                /* @var Sheet $sheet */
+                $header = [];
+                foreach ($sheet->getRowIterator() as $idxRow => $row) {
+                    try {
+                        $newRow = [];
+                        foreach ($row->getCells() as $idxcel => $cel) {
+                            $newRow[$idxcel] = $cel->getValue();
+                        }
+                        if (count($header) === 0) {
+                            foreach ($newRow as $idx => $cell)
+                                $header[$cell] = $idx;
+                        } else if (count($header) > 0) {
+                            $cf = trim($newRow[$header[$cfCol]]);
+                            $iban = trim($newRow[$header[$ibanCol]]);
+                            $importo = trim($newRow[$header[$importoCol]]);
+                            $erede =  trim($newRow[$header[$eredeCol]]);
+                            $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->where(['a.codice_fiscale' => $cf, 'istanza.chiuso' => false])->one();
+                            if ($istanza && $importo && $importo !== "" && $iban && $iban !== "" && $erede && $erede !== "")
+                            {
+                                $conto = $istanza->getUltimoContoAttivoValidato();
+                                if (!$conto || $conto->iban !== $iban)
+                                {
+                                    if ($conto) {
+                                        $conto->attivo = false;
+                                        $conto->save();
+                                    }
+                                    $conto = new Conto();
+                                    $conto->id_istanza = $istanza->id;
+                                    $conto->iban = $iban;
+                                    $conto->attivo = true;
+                                    $conto->validato = true;
+                                    $conto->intestatario = $erede;
+                                    $conto->save();
+                                }
+                                $movimento = new Movimento();
+                                $movimento->id_conto = $conto->id;
+                                $movimento->is_movimento_bancario = true;
+                                $movimento->escludi_contabilita = true;
+                                $movimento->data = date('Y-m-d');
+                                $movimento->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
+                                $movimento->importo = intval($importo);
+                                $movimento->contabilizzare = true;
+                                $movimento->save();
+                                $movimento2 = new Movimento();
+                                $movimento2->id_conto = $conto->id;
+                                $movimento2->is_movimento_bancario = false;
+                                $movimento2->escludi_contabilita = false;
+                                $movimento2->data = date('Y-m-d');
+                                $movimento2->note = "Liquidazione decesso " + $istanza->getNominativoDisabile();
+                                $movimento2->importo = intval($importo);
+                                $movimento2->contabilizzare = false;
+                                $movimento2->save();
+                                $istanza->chiuso = true;
+                                $istanza->liquidazione_decesso_completata = true;
+                                $istanza->data_liquidazione_decesso = date('Y-m-d');
+                                $istanza->save();
+                            }
+                            else
+                                $stats["nonTrovati"][] = ["cf" => $cf, "iban" => $iban, "importo" => $importo];
+                        }
+                    } catch (\Exception $e) {
+                        $stats["errors"][] = ["errore" => basename($filename) . " - " . $sheet->getName() . ' riga ' . $idxRow . " - " . $e->getMessage(), 'header' => $header];
+                    }
+                }
+            }
+        }
+        $date = date('Y-m-d_H-i-s');
+        //create folder if not exists ../import/decessi
+        $folder = '../import/decessi/';
+        if (!file_exists($folder))
+            mkdir($folder, 0777, true);
+        $fp = fopen('../import/decessi/res_' . $date . '.json', 'w');
+        fwrite($fp, json_encode($stats));
+        fclose($fp);
+        // send download of file fp
+        Yii::$app->response->sendFile('../import/decessi/res_' . $date . '.json');
     }
 
     private function importaDecessi($okFiles)
@@ -137,15 +226,14 @@ class UploadForm extends Model
                             $cf = $newRow[$header[FileDecessi::CF]];
                             $dataDecesso = $newRow[$header[FileDecessi::DATA_DECESSO]];
                             $istanza = Istanza::find()->innerJoin('anagrafica a', 'a.id = istanza.id_anagrafica_disabile')->
-                            where(['a.codice_fiscale' => $cf,'istanza.attivo' => true])->one();
+                            where(['a.codice_fiscale' => $cf, 'istanza.attivo' => true])->one();
                             if ($istanza) {
                                 $istanza->data_decesso = Utils::convertDateFromFormat($dataDecesso);
                                 $istanza->attivo = false;
                                 if (!$this->simulazione)
                                     $istanza->save();
                                 $stats["modificati"][] = ["cf" => $cf, "data_decesso" => $dataDecesso];
-                            }
-                            else
+                            } else
                                 $stats["nonTrovati"][] = ["cf" => $cf, "data_decesso" => $dataDecesso];
                         }
                     } catch (\Exception $e) {
@@ -424,8 +512,7 @@ class UploadForm extends Model
         return $allParsedData;
     }
 
-    private
-    function aggiungiDistrettoGruppo(array $files, $colonnaDistretto = "distretto", $colonnaGruppo= "gruppo", $colonnaCf = "cf")
+    private function aggiungiDistrettoGruppo(array $files, $colonnaDistretto = "distretto", $colonnaGruppo = "gruppo", $colonnaCf = "cf")
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);

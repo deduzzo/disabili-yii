@@ -16,6 +16,8 @@ class TipologiaDatiCategoria extends BaseEnum
     const AGGIUNGI_DISTRETTO_GRUPPO = 'distretto-gruppo';
     const DECESSI = 'decessi';
 
+    const LIQUIDAZIONE_EREDI_RAW = 'liquidazione-eredi-raw';
+
     /**
      * @var string message category
      * You can set your own message category for translate the values in the $list property
@@ -36,5 +38,6 @@ class TipologiaDatiCategoria extends BaseEnum
         self::TRACCIATO_SEPA => 'Tracciato SEPA',
         self::AGGIUNGI_DISTRETTO_GRUPPO => 'Aggiungi Distretto / Gruppo',
         self::DECESSI => 'Decessi',
+        self::LIQUIDAZIONE_EREDI_RAW => 'Liquidazione Eredi da file',
     ];
 }
