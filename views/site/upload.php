@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             TipologiaDatiCategoria::TRACCIATO_SEPA => 'Tracciato SEPA',
             TipologiaDatiCategoria::AGGIUNGI_DISTRETTO_GRUPPO => 'Aggiungi Distretto / Gruppo (colonne da creare gruppo e distretto)',
             TipologiaDatiCategoria::DECESSI => 'Decessi',
-            TipologiaDatiCategoria::LIQUIDAZIONE_EREDI_RAW => 'Liquidazione Eredi da file (colonne fondamentali sono cf, iban, importo, erede opzionale)',
+            TipologiaDatiCategoria::LIQUIDAZIONE_EREDI_RAW => 'Liquidazione Eredi da file (colonne fondamentali sono cf, iban, importo, erede)',
         ], ['prompt' => 'Selezionare il tipo di file da importare..']);
         echo $form->field($files, 'idDetermina')->dropDownList(Determina::getAllDetermineMap(), ['prompt' => 'Selezionare la determina..']);
         echo $form->field($files, 'simulazione')->checkbox();
