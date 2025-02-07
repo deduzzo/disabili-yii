@@ -53,7 +53,12 @@ class DeterminaController extends \yii\web\Controller
         $allIstanzeAttive = (new Query())->select('id')->from('istanza')->where(['attivo' => true])->andWhere(['chiuso' => false]);
         //new rawquery
         $ultimaData = Movimento::getDataUltimoPagamento();
-        $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])
+        $allPagamentiPrecedenti = (new Query())->select('c.id_istanza, i.id_distretto')->from('movimento m, conto c, istanza i, determina d')
+            ->where("m.id_conto = c.id")
+            ->andWhere('c.id_istanza = i.id')
+            ->andWhere('m.id_determina = d.id')
+            ->andWhere('d.deceduti = false')
+            ->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
             ->andWhere(['i.liquidazione_decesso_completata' => false])
