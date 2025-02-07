@@ -41,9 +41,12 @@ class Movimento extends \yii\db\ActiveRecord
         return 'movimento';
     }
 
-    public static function getDataUltimoPagamento()
+    public static function getDataUltimoPagamento($escludiDecesso = true)
     {
-        return (new Query())->from('movimento')->select('max(data)')->where('is_movimento_bancario = true')->andWhere('escludi_contabilita = true')->scalar();
+        return (new Query())->from('movimento m, determina d')->select('max(data)')
+            ->where('m.id_determina = d.id')->andWhere('d.deceduti' . ($escludiDecesso ? ' = false' : ' = true'))
+            ->andWhere('is_movimento_bancario = true')->andWhere('escludi_contabilita = true')
+        ->scalar();
     }
 
     /**
