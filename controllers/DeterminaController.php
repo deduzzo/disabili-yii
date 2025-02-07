@@ -58,7 +58,7 @@ class DeterminaController extends \yii\web\Controller
             ->andWhere('c.id_istanza = i.id')
             ->andWhere('m.id_determina = d.id')
             ->andWhere('d.deceduti = false')
-            ->andWhere('is_movimento_bancario = true')->andWhere(['data' => $ultimaData])
+            ->andWhere('is_movimento_bancario = true')->andWhere(['m.data' => $ultimaData])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
             ->andWhere(['i.liquidazione_decesso_completata' => false])
