@@ -151,6 +151,9 @@ class Utils
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
+            // if year is differente, add 12 months for each year
+            if ($da->year !== $a->year)
+                $out['mesi'] += ($a->year - $da->year) * 12;
             if ($da->month !== $a->month)
                 $out['mesi'] += $a->diffInMonths($da);
             if ($a->day !== $da->day) {
