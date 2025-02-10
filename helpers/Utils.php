@@ -152,8 +152,12 @@ class Utils
             return null;
         } else {
             // if year is differente, add 12 months for each year
-            if ($da->year !== $a->year)
+            if ($da->year !== $a->year) {
                 $out['mesi'] += ($a->year - $da->year) * 12;
+                // se il mese è lo stesso, e il giorno di $da è maggiore di quello di $a, allora decrementa i mesi
+                if ($da->month === $a->month && $da->day > $a->day)
+                    $out['mesi']--;
+            }
             if ($da->month !== $a->month)
                 $out['mesi'] += $a->diffInMonths($da);
             if ($a->day !== $da->day) {
