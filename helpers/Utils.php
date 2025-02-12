@@ -151,22 +151,18 @@ class Utils
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
-            // if year is differente, add 12 months for each year
-            if ($da->year !== $a->year) {
-                $out['mesi'] += ($a->year - $da->year) * 12;
-                // se il mese è lo stesso, e il giorno di $da è maggiore di quello di $a, allora decrementa i mesi
-                if ($da->month === $a->month && $da->day > $a->day)
-                    $out['mesi']--;
-            }
-            if ($da->month !== $a->month)
-                $out['mesi'] += $a->diffInMonths($da);
-            if ($a->day !== $da->day) {
-                $quantiGiorni = $da->daysInMonth >30 ? 30 : ($da->daysInMonth  <30 ? 30 : $da->daysInMonth);
-                if ($da->day < $a->day)
-                    $out['giorni'] += $a->day - $da->day;
-                else
-                    $out['giorni'] += $quantiGiorni - $da->day + $a->day;
-            }
+            // Calcolo differenza totale in giorni
+            $diffGiorni = $da->diffInDays($a);
+
+            // Calcolo differenza in mesi
+            $diffMesi = $da->diffInMonths($a);
+
+            // Calcola la data dopo i mesi completi
+            $dataDopoMesiCompleti = $da->copy()->addMonths($diffMesi);
+            // Calcola i giorni rimanenti come differenza tra la data finale e la data dopo i mesi completi
+            $giorniRimanenti = $dataDopoMesiCompleti->diffInDays($a);
+            $out['mesi'] = $diffMesi;
+            $out['giorni'] = $giorniRimanenti;
         }
         return $out;
     }
