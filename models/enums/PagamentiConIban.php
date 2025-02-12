@@ -11,7 +11,7 @@ class PagamentiConIban extends BaseEnum
     const MATRICOLA = "Matricola";
     const COGNOME_NOME = "Cognome e Nome";
     const CODICE_FISCALE = "Codice Fiscale";
-    const DAL = "Dal Periodo";
+    const DAL = "Dal Periodo ";
     const AL = "Al Periodo ";
     const FASCIA = "Fascia di Reddito";
     const IMPORTO = "Importo";
