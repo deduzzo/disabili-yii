@@ -151,12 +151,8 @@ class Utils
         if (!checkdate(intval($daMese), intval($daGiorno), intval($daAnno)) || !checkdate(intval($aMese), intval($aGiorno), intval($aAnno)) || !$da->lessThanOrEqualTo($a)) {
             return null;
         } else {
-            // Calcolo differenza totale in giorni
-            $diffGiorni = $da->diffInDays($a);
-
             // Calcolo differenza in mesi
             $diffMesi = $da->diffInMonths($a);
-
             // Calcola la data dopo i mesi completi
             $dataDopoMesiCompleti = $da->copy()->addMonths($diffMesi);
             // Calcola i giorni rimanenti come differenza tra la data finale e la data dopo i mesi completi
