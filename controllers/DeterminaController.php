@@ -61,7 +61,7 @@ class DeterminaController extends \yii\web\Controller
             ->andWhere('is_movimento_bancario = true')->andWhere(['m.data' => $ultimaData])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
-            ->andWhere(['i.liquidazione_decesso_completata' => false])
+            ->andWhere(['d.deceduti' => false])
             ->all();
         $allIdPagatiMeseScorso = $allPagamentiPrecedenti ? array_column($allPagamentiPrecedenti, 'id_istanza') : [];
         $pagamentiPrecedentiPerDistretti = [];
@@ -397,8 +397,7 @@ class DeterminaController extends \yii\web\Controller
 
 
     //select DISTINCT i.id from istanza i, movimento m, conto c where m.id_conto = c.id AND c.id_istanza = i.id AND i.attivo = true AND i.id not in (SELECT distinct c2.id_istanza from movimento m2, conto c2 where m2.escludi_contabilita = true AND c2.id = m2.id_conto AND m2.data >= "2023-10-01");
-    public
-    function actionPagamenti()
+    public function actionPagamenti()
     {
         $result = null;
         $vars = $this->request->get();
