@@ -11,6 +11,7 @@ use app\models\Anagrafica;
 use app\models\AnagraficaAltricampi;
 use app\models\Conto;
 use app\models\ContoCessionario;
+use app\models\Determina;
 use app\models\DeterminaGruppoPagamento;
 use app\models\Distretto;
 use app\models\enums\FileParisi;
@@ -23,7 +24,9 @@ use app\models\GruppoPagamento;
 use app\models\Isee;
 use app\models\Istanza;
 use app\models\Movimento;
+use Carbon\Carbon;
 use app\models\Recupero;
+use yii\db\Query;
 use app\models\Ricovero;
 use app\models\UploadForm;
 use app\models\User;
@@ -67,7 +70,121 @@ class SiteController extends Controller
     public function actionIndex()
     {
         Utils::verificaChiusuraAutomaticaIstanze();
-        return $this->render('index');
+        $anno = Yii::$app->request->get('anno', date('Y'));
+        return $this->render('index', [
+            'anno' => $anno
+        ]);
+    }
+
+    /**
+     * AJAX endpoint to get data for a specific year for the payments vs income chart
+     *
+     * @param string $anno The year to get data for
+     * @return array The data for the chart
+     */
+    public function actionGetChartData($anno = null)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($anno === null) {
+            $anno = date('Y');
+        }
+
+        $importi = ["spesa" => [], "incasso" => [], 'colspan' => [], 'determineStoriche' => []];
+        foreach (range(0, 11) as $mese) {
+            // spesa
+            $inizioMese = Carbon::createfromformat('Y-m-d', $anno . '-' . ($mese + 1) . '-01');
+            $fineMese = (clone $inizioMese)->endOfMonth();
+            $dataUltimoPagamento = Movimento::getDataUltimoPagamento();
+            // Always process data, even for future years
+            if (true) {
+                $spesa = (new Query())
+                    ->select('SUM(importo)')
+                    ->from('movimento')
+                    ->where(
+                        ['and',
+                            ['>=', 'data', $inizioMese->format('Y-m-d')],
+                            ['<=', 'data', $fineMese->format('Y-m-d')]
+                        ]
+                    )
+                    ->andWhere([
+                        'is_movimento_bancario' => true,
+                        'tornato_indietro' => false
+                    ]);
+
+                $spesa = $spesa->scalar();
+                $importi["spesa"][$mese] = floatval($spesa);
+                // fondi
+                if (!isset($importi['colspan'][$mese - 1]) || $importi['colspan'][$mese - 1] === 1) {
+                    $fondi = (new Query())
+                        ->select('descrizione_atto,data,importo,dal,al')
+                        ->from('decreto')
+                        ->where(['<=', 'dal', $inizioMese->format('Y-m-d')])
+                        ->andWhere(['>=', 'al', $fineMese->format('Y-m-d')])
+                        ->orderBy('data ASC')->all();
+                    if ($fondi) {
+                        $numMontsFromDalAndAl = Carbon::createfromformat('Y-m-d', $fondi[0]['dal'])->diffInMonths(Carbon::createfromformat('Y-m-d', $fondi[0]['al']), false);
+                        $importi["incasso"][$mese] = 0;
+                        foreach ($fondi as $fondo) {
+                            $importi["incasso"][$mese] += floatval($fondo['importo']);
+                        }
+
+                        $importi['colspan'][$mese] = $numMontsFromDalAndAl + 1;
+                    } else
+                        $importi['colspan'][$mese] = 1;
+                } else
+                    $importi['colspan'][$mese] = $importi['colspan'][$mese - 1] - 1;
+            }
+        }
+
+        $inizioAnno = Carbon::createfromformat('Y-m-d', $anno . '-01-01');
+        $fineAnno = (clone $inizioAnno)->endOfYear();
+        $importi['determineStoriche'] = Determina::find()->where(['storico' => true])->andWhere(['>=', 'data', $inizioAnno->format('Y-m-d')])->andWhere(['<=', 'data', $fineAnno->format('Y-m-d')])->all();
+
+        // Process data for chart
+        $spesaMensile = [];
+        $incassoMensile = [];
+        $differenzaMensile = [];
+        $totaleFondi = 0;
+        $totaleUscite = 0;
+
+        for ($i = 0; $i < 12; $i++) {
+            $spesaMensile[$i] = floatval($importi['spesa'][$i] ?? 0);
+            $totaleUscite += $spesaMensile[$i];
+
+            // Calcolo incasso per il mese
+            if ($i === 0 || $importi['colspan'][$i - 1] === 1) {
+                $incassoMensile[$i] = floatval($importi['incasso'][$i] ?? 0);
+                $totaleFondi += $incassoMensile[$i];
+            } else {
+                $incassoMensile[$i] = 0; // Mese coperto da un incasso precedente
+            }
+
+            // Calcolo differenza
+            if (($i === 0 || $importi['colspan'][$i - 1] === 1)) {
+                $spesa = 0;
+                for ($k = $i; $k < $i + ($importi['colspan'][$i] ?? 0); $k++) {
+                    $spesa += $importi['spesa'][$k] ?? 0;
+                }
+                $valore = ($importi['incasso'][$i] ?? 0) - $spesa;
+                $differenzaMensile[$i] = $valore;
+            } else {
+                $differenzaMensile[$i] = 0; // Mese coperto da un calcolo precedente
+            }
+        }
+
+        // Calculate total difference
+        $totaleGlobale = $totaleFondi - $totaleUscite;
+
+        return [
+            'spesaMensile' => array_values($spesaMensile),
+            'incassoMensile' => array_values($incassoMensile),
+            'differenzaMensile' => array_values($differenzaMensile),
+            'totaleFondi' => $totaleFondi,
+            'totaleUscite' => $totaleUscite,
+            'totaleGlobale' => $totaleGlobale,
+            'anno' => $anno
+        ];
     }
 
     /**

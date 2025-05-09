@@ -372,6 +372,144 @@ class Istanza extends \yii\db\ActiveRecord
         return Istanza::find()->where(['chiuso' => false])->andWhere(['IS NOT', 'data_decesso', null])->andWhere(['liquidazione_decesso_completata' => false])->count();
     }
 
+    /**
+     * Returns the age distribution of active disabled people
+     *
+     * @return array An array with the count of disabled people in each age group
+     */
+    public static function getAgeDistribution()
+    {
+        $distribution = [
+            'under18' => 0,
+            'between18and65' => 0,
+            'over65' => 0,
+            'total' => 0
+        ];
+
+        $activeInstances = Istanza::find()
+            ->where(['attivo' => 1])
+            ->with('anagraficaDisabile')
+            ->all();
+
+        foreach ($activeInstances as $instance) {
+            $age = $instance->anagraficaDisabile->getEta();
+
+            if ($age === null) {
+                continue; // Skip if age cannot be calculated
+            }
+
+            $distribution['total']++;
+
+            if ($age < 18) {
+                $distribution['under18']++;
+            } elseif ($age >= 18 && $age <= 65) {
+                $distribution['between18and65']++;
+            } else {
+                $distribution['over65']++;
+            }
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Returns the ISEE distribution of active disabled people
+     *
+     * @return array An array with the count of disabled people in each ISEE group
+     */
+    public static function getIseeDistribution()
+    {
+        $distribution = [
+            'maggiore25k' => 0,
+            'minore25k' => 0,
+            'no_isee' => 0,
+            'total' => 0
+        ];
+
+        $activeInstances = Istanza::find()
+            ->where(['attivo' => 1])
+            ->all();
+
+        foreach ($activeInstances as $instance) {
+            $iseeType = $instance->getLastIseeType();
+            $distribution['total']++;
+
+            if ($iseeType === IseeType::MAGGIORE_25K) {
+                $distribution['maggiore25k']++;
+            } elseif ($iseeType === IseeType::MINORE_25K) {
+                $distribution['minore25k']++;
+            } else {
+                $distribution['no_isee']++;
+            }
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Returns the distribution of active disabled people by district
+     *
+     * @return array An array with district data including counts by age and ISEE
+     */
+    public static function getDistrictDistribution()
+    {
+        $districts = Distretto::find()->all();
+        $distribution = [];
+
+        foreach ($districts as $district) {
+            $distribution[$district->id] = [
+                'name' => $district->nome,
+                'total' => 0,
+                'under18' => 0,
+                'adults' => 0,
+                'maggiore25k' => 0,
+                'minore25k' => 0
+            ];
+        }
+
+        $activeInstances = Istanza::find()
+            ->where(['attivo' => 1])
+            ->with(['anagraficaDisabile', 'distretto'])
+            ->all();
+
+        foreach ($activeInstances as $instance) {
+            $districtId = $instance->id_distretto;
+            $age = $instance->anagraficaDisabile->getEta();
+            $iseeType = $instance->getLastIseeType();
+
+            if (!isset($distribution[$districtId])) {
+                continue; // Skip if district not found
+            }
+
+            $distribution[$districtId]['total']++;
+
+            if ($age !== null) {
+                if ($age < 18) {
+                    $distribution[$districtId]['under18']++;
+                } else {
+                    $distribution[$districtId]['adults']++;
+                }
+            } else {
+                $distribution[$districtId]['adults']++; // Default to adult if age unknown
+            }
+
+            if ($iseeType === IseeType::MAGGIORE_25K) {
+                $distribution[$districtId]['maggiore25k']++;
+            } elseif ($iseeType === IseeType::MINORE_25K) {
+                $distribution[$districtId]['minore25k']++;
+            }
+        }
+
+        // Remove districts with no active instances
+        foreach ($distribution as $id => $data) {
+            if ($data['total'] === 0) {
+                unset($distribution[$id]);
+            }
+        }
+
+        return $distribution;
+    }
+
     public function haRicoveriInCorso()
     {
         return Ricovero::find()->where(['contabilizzare' => 1, 'id_istanza' => $this->id])->andWhere(['IS', 'a', null])->count() > 0;

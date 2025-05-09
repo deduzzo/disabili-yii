@@ -49,6 +49,65 @@ class Movimento extends \yii\db\ActiveRecord
         ->scalar();
     }
 
+    public static function getNumPagatiUltimoPagamento()
+    {
+        $dataUltimoPagamento = self::getDataUltimoPagamento();
+        if (!$dataUltimoPagamento) {
+            return 0;
+        }
+
+        // Get the first day of the month of the last payment
+        $dataInizio = date('Y-m-01', strtotime($dataUltimoPagamento));
+        // Get the last day of the month of the last payment
+        $dataFine = date('Y-m-t', strtotime($dataUltimoPagamento));
+
+        $count = (new Query())->select('COUNT(DISTINCT c.id_istanza)')
+            ->from('movimento m')
+            ->innerJoin('conto c', 'm.id_conto = c.id')
+            ->where(['m.is_movimento_bancario' => true])
+            ->andWhere(['m.tornato_indietro' => false])
+            ->andWhere(['>=', 'm.data', $dataInizio])
+            ->andWhere(['<=', 'm.data', $dataFine])
+            ->scalar();
+
+        return $count ? $count : 0; // Return 0 if null
+    }
+
+    public static function getTotalePagatiUltimoPagamento()
+    {
+        $dataUltimoPagamento = self::getDataUltimoPagamento();
+        if (!$dataUltimoPagamento) {
+            return 0;
+        }
+
+        // Get the first day of the month of the last payment
+        $dataInizio = date('Y-m-01', strtotime($dataUltimoPagamento));
+        // Get the last day of the month of the last payment
+        $dataFine = date('Y-m-t', strtotime($dataUltimoPagamento));
+
+        $total = (new Query())->select('SUM(m.importo)')
+            ->from('movimento m')
+            ->where(['m.is_movimento_bancario' => true])
+            ->andWhere(['m.tornato_indietro' => false])
+            ->andWhere(['>=', 'm.data', $dataInizio])
+            ->andWhere(['<=', 'm.data', $dataFine])
+            ->scalar();
+
+        return $total ? $total : 0; // Return 0 if null
+    }
+
+    public static function getNumPagatiLastMonth()
+    {
+        // For backward compatibility, now uses the last payment date
+        return self::getNumPagatiUltimoPagamento();
+    }
+
+    public static function getTotalePagatiLastMonth()
+    {
+        // For backward compatibility, now uses the last payment date
+        return self::getTotalePagatiUltimoPagamento();
+    }
+
     /**
      * {@inheritdoc}
      */
