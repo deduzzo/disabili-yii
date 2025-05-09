@@ -552,9 +552,25 @@ $districtDistribution = Istanza::getDistrictDistribution();
         },
         plotOptions: {
             bar: {
-                horizontal: false,
-                columnWidth: '70%',
+                horizontal: true,
+                barHeight: '70%',
+                dataLabels: {
+                    position: 'bottom'
+                }
             },
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function(val) {
+                // Only show labels for values above 5 to avoid clutter
+                return val > 5 ? val : '';
+            },
+            textAnchor: 'start',
+            style: {
+                fontSize: '10px',
+                colors: ['#fff']
+            },
+            offsetX: 0
         },
         xaxis: {
             categories: districtNames,
@@ -566,8 +582,13 @@ $districtDistribution = Istanza::getDistrictDistribution();
         },
         yaxis: {
             title: {
-                text: 'Persone'
+                text: 'Distretti'
             },
+            labels: {
+                style: {
+                    fontSize: '10px'
+                }
+            }
         },
         legend: {
             position: 'bottom',
