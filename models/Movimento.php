@@ -21,6 +21,7 @@ use yii\db\Query;
  * @property int|null $num_rata
  * @property bool $contabilizzare
  * @property bool $escludi_contabilita
+ * @property bool $liquidazione_decesso
  * @property string|null $note
  * @property int|null $id_gruppo_pagamento
  * @property int|null $id_determina
@@ -116,7 +117,7 @@ class Movimento extends \yii\db\ActiveRecord
         return [
             [['importo'], 'required'],
             [['importo'], 'number'],
-            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare','escludi_contabilita'], 'boolean'],
+            [['is_movimento_bancario', 'tornato_indietro', 'contabilizzare','escludi_contabilita','liquidazione_decesso'], 'boolean'],
             [['data', 'periodo_da', 'periodo_a'], 'safe'],
             [['data_invio_notifica', 'data_incasso', 'id_recupero', 'num_rata', 'id_gruppo_pagamento', 'id_determina', 'id_conto'], 'integer'],
             [['note'], 'string'],
@@ -145,6 +146,8 @@ class Movimento extends \yii\db\ActiveRecord
             'id_recupero' => 'Id Recupero',
             'num_rata' => 'Num Rata',
             'contabilizzare' => 'Contabilizzare',
+            'escludi_contabilita' => 'Escludi Contabilita',
+            'liquidazione_decesso' => 'Liquidazione Decesso',
             'note' => 'Note',
             'id_gruppo_pagamento' => 'Id Gruppo Pagamento',
             'id_determina' => 'Id Determina',

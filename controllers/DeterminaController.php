@@ -303,11 +303,11 @@ class DeterminaController extends \yii\web\Controller
         $gruppi = Gruppo::find()->where(['id' => $gruppi])->all();
         //new rawquery
         $ultimaData = Carbon::createFromFormat('Y-m-d', $anno . '-' . $mese . "-01");
-        $allPagamenti = !$determina ? (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
+        $allPagamenti = !$determina ? (new Query())->select('c.id_istanza, i.id_distretto,m.importo,m.liquidazione_decesso')->from('movimento m, conto c, istanza i')->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
             ->andwhere(['>=', 'data', $ultimaData->startOfMonth()->format('Y-m-d')])->andWhere(['<=', 'data', $ultimaData->endOfMonth()->format('Y-m-d')])
             ->andWhere(['i.id_gruppo' => ArrayHelper::getColumn($gruppi, 'id')])
             ->andWhere(['i.id_distretto' => ArrayHelper::getColumn($distretti, 'id')])->all() :
-            (new Query())->select('c.id_istanza, i.id_distretto,m.importo')->from('movimento m, conto c, istanza i')
+            (new Query())->select('c.id_istanza, i.id_distretto,m.importo,m.liquidazione_decesso')->from('movimento m, conto c, istanza i')
                 ->where("m.id_conto = c.id")->andWhere('c.id_istanza = i.id')->andWhere('is_movimento_bancario = true')
                 ->andWhere(['m.id_determina' => $determina->id])->all();
         $importiTotali = [];
@@ -342,7 +342,7 @@ class DeterminaController extends \yii\web\Controller
             ];
             $istanzeArray[] = $istVal;
 
-            if (!$istanza->liquidazione_decesso_completata) {
+            if ($istanzaRaw['liquidazione_decesso'] === 0) {
                 $numeriTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += 1;
                 $importiTotali[$istanza->distretto->id][$istanza->getIseeTypeInDate($ultimaData)] += $istanzaRaw['importo'];
             } else {
