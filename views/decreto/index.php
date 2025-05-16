@@ -40,14 +40,23 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'data',
                 'format' => 'date',
+                'value' => function ($model) {
+                    return $model->data ? date('Y-m-d', strtotime(str_replace('/', '-', $model->data))) : null;
+                }
             ],
             [
                 'attribute' => 'dal',
                 'format' => 'date',
+                'value' => function ($model) {
+                    return $model->dal ? date('Y-m-d', strtotime(str_replace('/', '-', $model->dal))) : null;
+                }
             ],
             [
                 'attribute' => 'al',
                 'format' => 'date',
+                'value' => function ($model) {
+                    return $model->al ? date('Y-m-d', strtotime(str_replace('/', '-', $model->al))) : null;
+                }
             ],
             'importo',
             //'inclusi_minorenni',
@@ -89,14 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h5 class="modal-title white" id="decretoModalLabel">Decreto</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="feather feather-x">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="decreto-modal-content">
                 <!-- Content will be loaded here -->
@@ -111,14 +113,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="modal-content">
             <div class="modal-header bg-danger">
                 <h5 class="modal-title white" id="deleteDecretoModalLabel">Conferma eliminazione</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="feather feather-x">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Sei sicuro di voler eliminare questo decreto?</p>
@@ -131,7 +126,12 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<script>
+<?php
+$createUrl = Url::to(['decreto/create']);
+$updateUrl = Url::to(['decreto/update']);
+$deleteUrl = Url::to(['decreto/delete']);
+
+$this->registerJs(<<<JS
     let decretoIdToDelete = null;
 
     $(document).ready(function() {
@@ -143,16 +143,26 @@ $this->params['breadcrumbs'][] = $this->title;
 
             if (mode === 'create') {
                 modal.find('.modal-title').text('Nuovo Decreto');
-                $.get('<?= Url::to(['decreto/create']) ?>', function(data) {
+                $.get('$createUrl', function(data) {
                     $('#decreto-modal-content').html(data);
                 });
             } else if (mode === 'update') {
                 const id = button.data('id');
                 modal.find('.modal-title').text('Modifica Decreto');
-                $.get('<?= Url::to(['decreto/update']) ?>' + '?id=' + id, function(data) {
+                $.get('$updateUrl' + '?id=' + id, function(data) {
                     $('#decreto-modal-content').html(data);
                 });
             }
+        });
+
+        // Clean up modal content when modal is hidden
+        $('#decreto-modal').on('hidden.bs.modal', function () {
+            $('#decreto-modal-content').html('');
+        });
+
+        // Clean up delete modal when hidden
+        $('#delete-decreto-modal').on('hidden.bs.modal', function () {
+            decretoIdToDelete = null;
         });
     });
 
@@ -163,10 +173,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
     $('#confirm-delete-btn').click(function() {
         if (decretoIdToDelete) {
-            $.post('<?= Url::to(['decreto/delete']) ?>' + '?id=' + decretoIdToDelete, function() {
+            $.post('$deleteUrl' + '?id=' + decretoIdToDelete, function() {
                 $('#delete-decreto-modal').modal('hide');
                 $.pjax.reload({container: '#decreti-grid'});
             });
         }
     });
-</script>
+JS, \yii\web\View::POS_READY);
+
+// Make confirmDeleteDecreto function globally available
+$this->registerJs("window.confirmDeleteDecreto = function(id) {
+    decretoIdToDelete = id;
+    $('#delete-decreto-modal').modal('show');
+};", \yii\web\View::POS_HEAD);
+?>
