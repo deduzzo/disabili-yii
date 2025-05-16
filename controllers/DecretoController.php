@@ -68,13 +68,21 @@ class DecretoController extends Controller
     public function actionCreate()
     {
         $model = new Decreto();
+        $model->loadDefaultValues();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
+                if ($this->request->isAjax) {
+                    return $this->asJson(['success' => true]);
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
-            $model->loadDefaultValues();
+        }
+
+        if ($this->request->isAjax) {
+            return $this->renderAjax('_form', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('create', [
@@ -94,7 +102,16 @@ class DecretoController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            if ($this->request->isAjax) {
+                return $this->asJson(['success' => true]);
+            }
             return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        if ($this->request->isAjax) {
+            return $this->renderAjax('_form', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('update', [
@@ -112,6 +129,10 @@ class DecretoController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+
+        if ($this->request->isAjax) {
+            return $this->asJson(['success' => true]);
+        }
 
         return $this->redirect(['index']);
     }

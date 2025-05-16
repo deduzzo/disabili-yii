@@ -15,7 +15,6 @@ use app\helpers\DateManagerBehavior;
  * @property string|null $al
  * @property int|null $inclusi_minorenni
  * @property int|null $inclusi_maggiorenni
- * @property string|null $nome_file
  * @property string|null $note
  *
  * @property DecretoGruppi[] $decretoGruppis
@@ -51,7 +50,7 @@ class Decreto extends \yii\db\ActiveRecord
             [['importo'], 'number'],
             [['inclusi_minorenni', 'inclusi_maggiorenni'], 'integer'],
             [['note'], 'string'],
-            [['descrizione_atto', 'nome_file'], 'string', 'max' => 100],
+            [['descrizione_atto'], 'string', 'max' => 100],
         ];
     }
 

@@ -46,6 +46,11 @@ class DecretoSearch extends Decreto
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'data' => SORT_DESC,
+                ]
+            ],
         ]);
 
         $this->load($params);

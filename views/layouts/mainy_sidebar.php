@@ -133,6 +133,9 @@ JS) ?>
                         <li class="submenu-item">
                             <a href="/contabilita/conti-validi">Verifica conti</a>
                         </li>
+                        <li class="submenu-item">
+                            <a href="/decreto/index">Decreti</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="sidebar-item has-sub">
